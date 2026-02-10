@@ -1,0 +1,146 @@
+{
+  "id": "course-slug-N",
+  "title": "Lecture Title",
+  "module": "Course Name",
+  "duration": 45,
+  "lastUpdated": "YYYY-MM-DD",
+  "videoUrl": "",
+  "description": "Brief description of the lecture content and learning objectives.",
+  "level": "Foundational",
+  "tags": ["Tag1", "Tag2", "Tag3"],
+
+  "slides": [
+    {
+      "id": "intro",
+      "title": "Introduction",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Opening paragraph introducing the topic."
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Key point 1",
+            "Key point 2",
+            "Key point 3"
+          ]
+        }
+      ],
+      "diagram": null,
+      "callouts": [
+        {
+          "type": "keyTakeaway",
+          "text": "Main takeaway from this slide."
+        }
+      ]
+    },
+    {
+      "id": "mechanism",
+      "title": "Mechanism of Action",
+      "content": [
+        {
+          "type": "definition",
+          "term": "Key Term",
+          "definition": "Clear definition of the key term."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Step 1 in the process",
+            "Step 2 in the process",
+            "Step 3 in the process"
+          ]
+        }
+      ],
+      "diagram": {
+        "type": "pathway",
+        "title": "Signaling Pathway",
+        "layout": "vertical",
+        "nodes": [
+          { "id": "start", "label": "Starting Point", "tier": 1, "color": "blue" },
+          { "id": "middle", "label": "Intermediate", "tier": 2, "color": "green" },
+          { "id": "end", "label": "Outcome", "tier": 3, "color": "green" }
+        ],
+        "connections": [
+          { "from": "start", "to": "middle", "label": "Activates" },
+          { "from": "middle", "to": "end", "label": "Produces" }
+        ]
+      },
+      "callouts": [
+        {
+          "type": "clinicalNote",
+          "text": "Clinical relevance and application."
+        }
+      ]
+    },
+    {
+      "id": "clinical-data",
+      "title": "Clinical Evidence",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Overview of clinical evidence supporting this topic."
+        },
+        {
+          "type": "table",
+          "headers": ["Parameter", "Baseline", "Post-Treatment", "Change"],
+          "rows": [
+            ["Metric 1", "Value", "Value", "+X%"],
+            ["Metric 2", "Value", "Value", "+Y%"]
+          ]
+        }
+      ],
+      "diagram": null,
+      "callouts": [
+        {
+          "type": "evidence",
+          "study": "Key Study Name (Author et al., Year)",
+          "finding": "Primary finding from the study."
+        }
+      ]
+    },
+    {
+      "id": "summary",
+      "title": "Summary and Key Points",
+      "content": [
+        {
+          "type": "highlight",
+          "text": "The main message to remember from this lecture."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Key concept 1",
+            "Key concept 2",
+            "Key concept 3"
+          ]
+        }
+      ],
+      "diagram": null,
+      "callouts": [
+        {
+          "type": "keyTakeaway",
+          "text": "Final summary statement."
+        }
+      ]
+    }
+  ],
+
+  "keyTakeaways": [
+    "First key takeaway from the entire lecture",
+    "Second key takeaway",
+    "Third key takeaway",
+    "Fourth key takeaway"
+  ],
+
+  "references": [
+    {
+      "pmid": "12345678",
+      "title": "Study Title",
+      "authors": "Author A, Author B, et al.",
+      "journal": "Journal Name",
+      "year": 2024
+    }
+  ]
+}

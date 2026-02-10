@@ -1,0 +1,21 @@
+{
+  "deployments": {
+    "vapi-call-handler": {
+      "workflowId": "1IX82-PqM5HiZq7sUSfpf",
+      "sourceFile": "n8n-workflow-vapi-call-handler.json",
+      "lastDeployed": "2026-02-10T02:05:06.277Z",
+      "name": "Equity Insurance - VAPI AI Receptionist (Main)",
+      "nodeCount": 13,
+      "active": true
+    },
+    "notifications-escalation": {
+      "workflowId": "5LCW3l7WBBOClWIV",
+      "sourceFile": "n8n-workflow-notifications.json",
+      "lastDeployed": "2026-02-10T02:06:00.000Z",
+      "name": "Equity Insurance - Post-Call Notifications & Escalation",
+      "nodeCount": 9,
+      "active": false,
+      "note": "Needs SMTP credentials configured on n8n instance before activation"
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "module_id": "module-12",
+  "started_at": "2026-01-17T11:00:40.369074",
+  "tasks": [
+    {
+      "lecture_number": 186,
+      "lecture_title": "EMR Selection & Optimization for Longevity Practice",
+      "task_id": "696afb5989cf947718ce9345",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:00:42.578373"
+    },
+    {
+      "lecture_number": 187,
+      "lecture_title": "Patient Portal Design & Engagement Strategies",
+      "task_id": "696afb5d89cf947718ce9346",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:00:46.306241"
+    },
+    {
+      "lecture_number": 188,
+      "lecture_title": "Lab Integration & Automated Result Processing",
+      "task_id": "696afb6189cf947718ce9347",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:00:50.299237"
+    },
+    {
+      "lecture_number": 189,
+      "lecture_title": "Wearable Device Data Aggregation & Analysis",
+      "task_id": "696afb6689cf947718ce9348",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:00:55.481555"
+    },
+    {
+      "lecture_number": 190,
+      "lecture_title": "Custom Dashboard Development for Patient Monitoring",
+      "task_id": "696afb6a89cf947718ce9349",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:00:59.303173"
+    },
+    {
+      "lecture_number": 191,
+      "lecture_title": "Appointment Scheduling & Workflow Automation",
+      "task_id": "696afb6e89cf947718ce934a",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:03.211299"
+    },
+    {
+      "lecture_number": 192,
+      "lecture_title": "Billing Software & Revenue Cycle Management",
+      "task_id": "696afb7189cf947718ce934b",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:07.062338"
+    },
+    {
+      "lecture_number": 193,
+      "lecture_title": "Telemedicine Platforms & Virtual Care Tools",
+      "task_id": "696afb7589cf947718ce934c",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:10.745456"
+    },
+    {
+      "lecture_number": 194,
+      "lecture_title": "Data Security & HIPAA-Compliant Cloud Storage",
+      "task_id": "696afb7989cf947718ce934d",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:14.842630"
+    },
+    {
+      "lecture_number": 195,
+      "lecture_title": "API Integrations & Software Interoperability",
+      "task_id": "696afb7d89cf947718ce934e",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:18.788172"
+    },
+    {
+      "lecture_number": 196,
+      "lecture_title": "Mobile App Development for Patient Engagement",
+      "task_id": "696afb8189cf947718ce934f",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:22.739000"
+    },
+    {
+      "lecture_number": 197,
+      "lecture_title": "Backup Systems & Disaster Recovery Protocols",
+      "task_id": "696afb8689cf947718ce9350",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:27.911519"
+    },
+    {
+      "lecture_number": 198,
+      "lecture_title": "Software Training & Team Onboarding",
+      "task_id": "696afb8e89cf947718ce9351",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:35.599906"
+    },
+    {
+      "lecture_number": 199,
+      "lecture_title": "Vendor Evaluation & Technology Roadmapping",
+      "task_id": "696afb9289cf947718ce9352",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:39.507458"
+    },
+    {
+      "lecture_number": 200,
+      "lecture_title": "Emerging Technologies: Blockchain, IoT & Edge Computing",
+      "task_id": "696afb9689cf947718ce9353",
+      "status": "submitted",
+      "submitted_at": "2026-01-17T11:01:43.647929"
+    }
+  ],
+  "completed_at": "2026-01-17T11:01:43.647929"
+}

@@ -1,0 +1,648 @@
+{
+  "id": "scaling-operations-multi-location-strategies",
+  "title": "Scaling Operations: Multi-Location Strategies",
+  "module": "Module 11: Business Operations",
+  "duration": 45,
+  "videoUrl": "https://share.descript.com/embed/scaling-operations-multi-location",
+  "slides": [
+    {
+      "id": "the-scaling-paradox",
+      "title": "The Scaling Paradox in Longevity Medicine",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Here's a striking disconnect in longevity medicine: 77% of clinics plan to expand to multiple locations, yet only 39% are currently profitable. This gap between ambition and operational reality reveals a fundamental misunderstanding about what it takes to scale a personalized medicine practice. The clinics that succeed don't just replicate their first location\u2014they build something entirely different first."
+        },
+        {
+          "type": "highlight",
+          "text": "Structure enables personalization at scale\u2014this is the paradox you must master. The more systematized your operations become, the more freedom your clinicians have to deliver truly individualized care."
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Fragmented systems: Each location develops its own workflows, creating chaos when patients visit different sites",
+            "Inconsistent patient experience: What made your first location special gets diluted or lost entirely",
+            "Quality metric deterioration: Organizations scaling without adequate infrastructure show 23% higher rates of quality decline within 3 years"
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 380\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.diagram-label { font-family: 'Inter', system-ui, sans-serif; font-size: 13px; fill: #1F2124; font-weight: 600; }.diagram-sublabel { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #5C626B; }.stat-text { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #8B909A; }</style><defs><linearGradient id=\"successGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><linearGradient id=\"warningGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#E04E3F\"/><stop offset=\"100%\" stop-color=\"#E03E2F\"/></linearGradient><linearGradient id=\"goldGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"3\" stdDeviation=\"4\" flood-color=\"#0A0B0C\" flood-opacity=\"0.12\"/></filter></defs><rect width=\"650\" height=\"380\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"380\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Two Paths to Multi-Location Expansion</text><rect x=\"250\" y=\"55\" width=\"150\" height=\"55\" rx=\"10\" fill=\"url(#goldGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"80\" text-anchor=\"middle\" class=\"diagram-label\" fill=\"#FFFFFF\">Single Location</text><text x=\"325\" y=\"97\" text-anchor=\"middle\" class=\"stat-text\" fill=\"#FFFFFF\">Success</text><path d=\"M 280,110 Q 200,140 160,175\" stroke=\"#E03E2F\" stroke-width=\"2.5\" fill=\"none\" stroke-dasharray=\"6,4\"/><path d=\"M 370,110 Q 450,140 490,175\" stroke=\"#5C8A6B\" stroke-width=\"2.5\" fill=\"none\"/><circle cx=\"160\" cy=\"175\" r=\"6\" fill=\"#E03E2F\"/><circle cx=\"490\" cy=\"175\" r=\"6\" fill=\"#5C8A6B\"/><rect x=\"60\" y=\"185\" width=\"200\" height=\"160\" rx=\"12\" fill=\"#FDF8F7\" stroke=\"#E03E2F\" stroke-width=\"1.5\" filter=\"url(#shadow)\"/><text x=\"160\" y=\"210\" text-anchor=\"middle\" class=\"diagram-label\" fill=\"#E03E2F\">Premature Expansion</text><line x1=\"80\" y1=\"225\" x2=\"240\" y2=\"225\" stroke=\"#E5E3DE\" stroke-width=\"1\"/><text x=\"90\" y=\"250\" class=\"diagram-sublabel\">\u2717 Fragmented systems</text><text x=\"90\" y=\"272\" class=\"diagram-sublabel\">\u2717 Inconsistent quality</text><text x=\"90\" y=\"294\" class=\"diagram-sublabel\">\u2717 Staff confusion</text><rect x=\"90\" y=\"308\" width=\"140\" height=\"26\" rx=\"6\" fill=\"#E03E2F\" fill-opacity=\"0.1\"/><text x=\"160\" y=\"326\" text-anchor=\"middle\" class=\"stat-text\" fill=\"#E03E2F\">23% quality decline</text><rect x=\"390\" y=\"185\" width=\"200\" height=\"160\" rx=\"12\" fill=\"#F7FAF8\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" filter=\"url(#shadow)\"/><text x=\"490\" y=\"210\" text-anchor=\"middle\" class=\"diagram-label\" fill=\"#5C8A6B\">Infrastructure-First</text><line x1=\"410\" y1=\"225\" x2=\"570\" y2=\"225\" stroke=\"#E5E3DE\" stroke-width=\"1\"/><text x=\"420\" y=\"250\" class=\"diagram-sublabel\">\u2713 Standardized protocols</text><text x=\"420\" y=\"272\" class=\"diagram-sublabel\">\u2713 Unified technology</text><text x=\"420\" y=\"294\" class=\"diagram-sublabel\">\u2713 Systematic training</text><rect x=\"420\" y=\"308\" width=\"140\" height=\"26\" rx=\"6\" fill=\"#5C8A6B\" fill-opacity=\"0.1\"/><text x=\"490\" y=\"326\" text-anchor=\"middle\" class=\"stat-text\" fill=\"#5C8A6B\">Quality maintained</text><text x=\"325\" y=\"368\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"11\" fill=\"#8B909A\" font-style=\"italic\">The path you choose determines whether scaling amplifies success or multiplies problems</text></svg>",
+      "callouts": [
+        {
+          "type": "evidence",
+          "study": "Burns & Pauly, Milbank Quarterly, 2018",
+          "finding": "Healthcare organizations scaling without adequate infrastructure showed 23% higher rates of quality metric deterioration within 3 years."
+        }
+      ]
+    },
+    {
+      "id": "structural-fragmentation",
+      "title": "Structural Fragmentation\u2014The Silent Killer",
+      "content": [
+        {
+          "type": "definition",
+          "term": "Structural Fragmentation",
+          "definition": "When each location develops its own workflows, documentation practices, and patient communication styles, leading to inconsistent patient experience and divergent quality metrics. Think of it like a franchise where every restaurant makes the recipe differently\u2014patients notice, and trust erodes."
+        },
+        {
+          "type": "paragraph",
+          "text": "Fragmentation doesn't announce itself. It creeps in through small decisions: one location interprets lab results slightly differently, another develops its own follow-up protocol, a third creates custom documentation templates. Individually harmless, collectively devastating."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Consequence",
+            "Impact",
+            "Source"
+          ],
+          "rows": [
+            [
+              "Higher chronic disease costs",
+              "20% increase",
+              "Cebul et al., NEJM 2008"
+            ],
+            [
+              "Emergency department utilization",
+              "35% higher",
+              "Frandsen et al., 2015"
+            ],
+            [
+              "Inpatient admissions",
+              "14% higher",
+              "Frandsen et al., 2015"
+            ],
+            [
+              "Patient retention drop",
+              "25% decline",
+              "Industry data"
+            ]
+          ]
+        },
+        {
+          "type": "comparisonText",
+          "items": [
+            {
+              "label": "Unified Systems",
+              "description": "Create a single source of truth\u2014same protocols, seamless data, consistent experience"
+            },
+            {
+              "label": "Fragmented Systems",
+              "description": "Create multiple versions of reality\u2014and patients notice the difference immediately"
+            }
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 350\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.diagram-label { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; fill: #1F2124; font-weight: 600; }.diagram-sublabel { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #5C626B; }.phase-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; }</style><defs><linearGradient id=\"unifiedGrad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#5C8A6B\"/><stop offset=\"100%\" stop-color=\"#6C9A7B\"/></linearGradient><linearGradient id=\"fragmentGrad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#E03E2F\"/><stop offset=\"100%\" stop-color=\"#D4845C\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-color=\"#0A0B0C\" flood-opacity=\"0.1\"/></filter></defs><rect width=\"650\" height=\"350\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"350\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">The Fragmentation Effect on Patient Experience</text><text x=\"170\" y=\"62\" text-anchor=\"middle\" class=\"diagram-label\" fill=\"#5C8A6B\">BEFORE: Unified</text><rect x=\"50\" y=\"75\" width=\"240\" height=\"120\" rx=\"10\" fill=\"#F7FAF8\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" filter=\"url(#shadow)\"/><g transform=\"translate(70, 95)\"><rect width=\"200\" height=\"22\" rx=\"4\" fill=\"url(#unifiedGrad)\"/><text x=\"100\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\">Same protocols everywhere</text></g><g transform=\"translate(70, 122)\"><rect width=\"200\" height=\"22\" rx=\"4\" fill=\"url(#unifiedGrad)\" fill-opacity=\"0.85\"/><text x=\"100\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\">Seamless data access</text></g><g transform=\"translate(70, 149)\"><rect width=\"200\" height=\"22\" rx=\"4\" fill=\"url(#unifiedGrad)\" fill-opacity=\"0.7\"/><text x=\"100\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\">Consistent communication</text></g><path d=\"M 300,135 L 350,135\" stroke=\"#C5A572\" stroke-width=\"3\" marker-end=\"url(#arrowGold)\"/><defs><marker id=\"arrowGold\" markerWidth=\"10\" markerHeight=\"10\" refX=\"9\" refY=\"5\" orient=\"auto\"><path d=\"M 0,0 L 10,5 L 0,10 Z\" fill=\"#C5A572\"/></marker></defs><text x=\"325\" y=\"155\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#C5A572\">TIME</text><text x=\"480\" y=\"62\" text-anchor=\"middle\" class=\"diagram-label\" fill=\"#E03E2F\">AFTER: Fragmented</text><rect x=\"360\" y=\"75\" width=\"240\" height=\"120\" rx=\"10\" fill=\"#FDF8F7\" stroke=\"#E03E2F\" stroke-width=\"1.5\" filter=\"url(#shadow)\"/><g transform=\"translate(380, 95)\"><rect width=\"95\" height=\"22\" rx=\"4\" fill=\"#E03E2F\"/><rect x=\"105\" width=\"95\" height=\"22\" rx=\"4\" fill=\"#D4845C\"/><text x=\"47\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\" font-size=\"9\">Protocol A</text><text x=\"152\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\" font-size=\"9\">Protocol B</text></g><g transform=\"translate(380, 122)\"><rect width=\"65\" height=\"22\" rx=\"4\" fill=\"#E03E2F\" fill-opacity=\"0.7\"/><rect x=\"70\" width=\"65\" height=\"22\" rx=\"4\" fill=\"#D4845C\" fill-opacity=\"0.7\"/><rect x=\"140\" width=\"60\" height=\"22\" rx=\"4\" fill=\"#8B909A\"/><text x=\"32\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\" font-size=\"8\">Silo 1</text><text x=\"102\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\" font-size=\"8\">Silo 2</text><text x=\"170\" y=\"15\" text-anchor=\"middle\" class=\"phase-label\" font-size=\"8\">Silo 3</text></g><g transform=\"translate(380, 149)\"><rect width=\"200\" height=\"22\" rx=\"4\" fill=\"none\" stroke=\"#E03E2F\" stroke-width=\"1\" stroke-dasharray=\"4,3\"/><text x=\"100\" y=\"15\" text-anchor=\"middle\" class=\"diagram-sublabel\" fill=\"#E03E2F\">Inconsistent messaging</text></g><rect x=\"50\" y=\"210\" width=\"550\" height=\"110\" rx=\"10\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"325\" y=\"235\" text-anchor=\"middle\" class=\"diagram-label\">Degradation Pathway</text><g transform=\"translate(80, 255)\"><circle cx=\"0\" cy=\"0\" r=\"20\" fill=\"#5C8A6B\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#FFFFFF\">100%</text><text x=\"0\" y=\"35\" text-anchor=\"middle\" class=\"diagram-sublabel\">Day 1</text></g><path d=\"M 105,255 L 175,255\" stroke=\"#8B909A\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><g transform=\"translate(200, 255)\"><circle cx=\"0\" cy=\"0\" r=\"20\" fill=\"#C5A572\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#FFFFFF\">90%</text><text x=\"0\" y=\"35\" text-anchor=\"middle\" class=\"diagram-sublabel\">Month 6</text></g><path d=\"M 225,255 L 295,255\" stroke=\"#8B909A\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><g transform=\"translate(320, 255)\"><circle cx=\"0\" cy=\"0\" r=\"20\" fill=\"#D4845C\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#FFFFFF\">78%</text><text x=\"0\" y=\"35\" text-anchor=\"middle\" class=\"diagram-sublabel\">Year 1</text></g><path d=\"M 345,255 L 415,255\" stroke=\"#8B909A\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><g transform=\"translate(440, 255)\"><circle cx=\"0\" cy=\"0\" r=\"20\" fill=\"#E03E2F\"/><text x=\"0\" y=\"5\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#FFFFFF\">65%</text><text x=\"0\" y=\"35\" text-anchor=\"middle\" class=\"diagram-sublabel\">Year 2</text></g><path d=\"M 465,255 L 510,255\" stroke=\"#8B909A\" stroke-width=\"1.5\" marker-end=\"url(#arrowGray)\"/><defs><marker id=\"arrowGray\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M 0,0 L 8,4 L 0,8 Z\" fill=\"#8B909A\"/></marker></defs><text x=\"540\" y=\"260\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#8B909A\">Quality</text><text x=\"540\" y=\"272\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#8B909A\">Drift</text></svg>",
+      "callouts": [
+        {
+          "type": "warning",
+          "text": "Fragmented systems increase malpractice risk and staff turnover by 40% during scaling periods. The legal and HR costs alone can exceed the savings from rushing expansion."
+        },
+        {
+          "type": "keyTakeaway",
+          "text": "Fragmentation is often invisible until quality metrics diverge significantly\u2014by then, recovery takes 18-36 months. Prevention is far cheaper than cure."
+        }
+      ]
+    },
+    {
+      "id": "three-pillars-framework",
+      "title": "The Three Pillars of Scalable Operations",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Successful multi-location longevity practices rest on three interdependent pillars. Think of them like a three-legged stool: weakness in any single pillar compromises the entire structure. Before you sign a lease on location number two, honestly assess where you stand on each."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Technology Infrastructure as the Nervous System\u2014Your technology must transmit information instantly, accurately, and bidirectionally across all sites. This means unified patient records, standardized data collection, and seamless access regardless of location.",
+            "Standardization Framework That Enables Personalization\u2014This isn't about making care robotic. It's about standardizing processes (how you diagnose, document, and ensure safety) while personalizing applications (how you communicate, prioritize, and coach).",
+            "Workforce Development as Competitive Advantage\u2014Your people carry your culture. Systematic training, knowledge transfer protocols, and mentorship pathways ensure that what makes your flagship special gets replicated, not diluted."
+          ]
+        },
+        {
+          "type": "highlight",
+          "text": "Rate each pillar 1-10 honestly. If any pillar scores below 7, focus there before expansion planning begins. Scaling amplifies both strengths and weaknesses."
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 400\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.pillar-label { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; fill: #FFFFFF; font-weight: 600; }.pillar-sublabel { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #FFFFFF; fill-opacity: 0.9; }.foundation-label { font-family: 'Inter', system-ui, sans-serif; font-size: 13px; fill: #1F2124; font-weight: 600; }.capstone-label { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; fill: #FFFFFF; font-weight: 600; }</style><defs><linearGradient id=\"pillar1Grad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6B8A9A\"/><stop offset=\"100%\" stop-color=\"#5C7A8A\"/></linearGradient><linearGradient id=\"pillar2Grad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><linearGradient id=\"pillar3Grad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8A7C9A\"/><stop offset=\"100%\" stop-color=\"#7A6C8A\"/></linearGradient><linearGradient id=\"foundationGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#3A3D42\"/><stop offset=\"100%\" stop-color=\"#1F2124\"/></linearGradient><linearGradient id=\"capstoneGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"3\" stdDeviation=\"4\" flood-color=\"#0A0B0C\" flood-opacity=\"0.15\"/></filter><filter id=\"innerGlow\"><feGaussianBlur stdDeviation=\"2\" result=\"blur\"/><feComposite in=\"SourceGraphic\" in2=\"blur\" operator=\"over\"/></filter></defs><rect width=\"650\" height=\"400\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"400\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">The Three Pillars of Scalable Operations</text><rect x=\"100\" y=\"320\" width=\"450\" height=\"50\" rx=\"6\" fill=\"url(#foundationGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"350\" text-anchor=\"middle\" class=\"foundation-label\" fill=\"#FFFFFF\">FOUNDATION: Operational Excellence at Flagship</text><rect x=\"130\" y=\"130\" width=\"100\" height=\"190\" rx=\"6\" fill=\"url(#pillar1Grad)\" filter=\"url(#shadow)\"/><text x=\"180\" y=\"160\" text-anchor=\"middle\" class=\"pillar-label\">Technology</text><text x=\"180\" y=\"175\" text-anchor=\"middle\" class=\"pillar-label\">Infrastructure</text><line x1=\"145\" y1=\"195\" x2=\"215\" y2=\"195\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"180\" y=\"220\" text-anchor=\"middle\" class=\"pillar-sublabel\">Unified data</text><text x=\"180\" y=\"238\" text-anchor=\"middle\" class=\"pillar-sublabel\">Interoperability</text><text x=\"180\" y=\"256\" text-anchor=\"middle\" class=\"pillar-sublabel\">Real-time visibility</text><text x=\"180\" y=\"274\" text-anchor=\"middle\" class=\"pillar-sublabel\">Cross-site access</text><rect x=\"275\" y=\"130\" width=\"100\" height=\"190\" rx=\"6\" fill=\"url(#pillar2Grad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"160\" text-anchor=\"middle\" class=\"pillar-label\">Standardization</text><text x=\"325\" y=\"175\" text-anchor=\"middle\" class=\"pillar-label\">Framework</text><line x1=\"290\" y1=\"195\" x2=\"360\" y2=\"195\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"325\" y=\"220\" text-anchor=\"middle\" class=\"pillar-sublabel\">Protocol library</text><text x=\"325\" y=\"238\" text-anchor=\"middle\" class=\"pillar-sublabel\">Quality standards</text><text x=\"325\" y=\"256\" text-anchor=\"middle\" class=\"pillar-sublabel\">Personalization</text><text x=\"325\" y=\"274\" text-anchor=\"middle\" class=\"pillar-sublabel\">boundaries</text><rect x=\"420\" y=\"130\" width=\"100\" height=\"190\" rx=\"6\" fill=\"url(#pillar3Grad)\" filter=\"url(#shadow)\"/><text x=\"470\" y=\"160\" text-anchor=\"middle\" class=\"pillar-label\">Workforce</text><text x=\"470\" y=\"175\" text-anchor=\"middle\" class=\"pillar-label\">Development</text><line x1=\"435\" y1=\"195\" x2=\"505\" y2=\"195\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"470\" y=\"220\" text-anchor=\"middle\" class=\"pillar-sublabel\">Training systems</text><text x=\"470\" y=\"238\" text-anchor=\"middle\" class=\"pillar-sublabel\">Knowledge transfer</text><text x=\"470\" y=\"256\" text-anchor=\"middle\" class=\"pillar-sublabel\">Culture</text><text x=\"470\" y=\"274\" text-anchor=\"middle\" class=\"pillar-sublabel\">preservation</text><path d=\"M 100,130 L 130,100 L 520,100 L 550,130\" fill=\"none\" stroke=\"#5C8A6B\" stroke-width=\"2\"/><rect x=\"180\" y=\"65\" width=\"290\" height=\"40\" rx=\"6\" fill=\"url(#capstoneGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"90\" text-anchor=\"middle\" class=\"capstone-label\">SUSTAINABLE MULTI-LOCATION GROWTH</text><path d=\"M 180,105 L 180,100 L 130,100\" stroke=\"#5C8A6B\" stroke-width=\"2\" fill=\"none\"/><path d=\"M 470,105 L 470,100 L 520,100\" stroke=\"#5C8A6B\" stroke-width=\"2\" fill=\"none\"/><text x=\"325\" y=\"385\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"11\" fill=\"#8B909A\" font-style=\"italic\">All three pillars must score 7+ before expansion is advisable</text></svg>",
+      "callouts": [
+        {
+          "type": "clinicalNote",
+          "text": "Schedule a quarterly 'scaling readiness review' even if expansion isn't imminent. This keeps infrastructure investment on the agenda and prevents the 'we'll figure it out later' trap that derails so many growing practices."
+        }
+      ]
+    },
+    {
+      "id": "technology-infrastructure",
+      "title": "Pillar One: Technology as the Nervous System",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Your technology infrastructure is the nervous system of multi-location operations\u2014it must transmit information instantly, accurately, and bidirectionally across all sites. Here's the sobering reality: only 30% of healthcare organizations achieve true interoperability. Longevity clinics must be among them, because your patients expect seamless care regardless of which location they visit."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Feature",
+            "Importance",
+            "Why It Matters"
+          ],
+          "rows": [
+            [
+              "Longitudinal data visualization",
+              "Critical",
+              "Track trends over years, not just visits"
+            ],
+            [
+              "Wearable device integration",
+              "Critical",
+              "CGM, sleep trackers, HRV monitors are core data"
+            ],
+            [
+              "Custom biomarker panels",
+              "Critical",
+              "Non-standard reference ranges needed"
+            ],
+            [
+              "Cross-site data access",
+              "Critical",
+              "Seamless care regardless of location"
+            ],
+            [
+              "Patient portal functionality",
+              "High",
+              "Engagement and self-tracking capabilities"
+            ],
+            [
+              "Research data export",
+              "Medium",
+              "Aggregate outcome analysis"
+            ]
+          ]
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Unified device recommendations across all locations\u2014patients shouldn't get different wearable advice depending on which site they visit",
+            "Standardized data interpretation protocols\u2014a glucose pattern means the same thing in LA as it does in NYC",
+            "Consistent alert thresholds\u2014critical values trigger the same response everywhere",
+            "Real-time cross-site accessibility\u2014no waiting for records to 'transfer'"
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 380\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.node-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 500; }.sublabel { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #5C626B; }</style><defs><radialGradient id=\"centerGlow\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0%\" stop-color=\"#C5A572\" stop-opacity=\"0.3\"/><stop offset=\"100%\" stop-color=\"#C5A572\" stop-opacity=\"0\"/></radialGradient><linearGradient id=\"nodeBlue\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6B8A9A\"/><stop offset=\"100%\" stop-color=\"#5C7A8A\"/></linearGradient><linearGradient id=\"nodeGreen\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><linearGradient id=\"nodePurple\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8A7C9A\"/><stop offset=\"100%\" stop-color=\"#7A6C8A\"/></linearGradient><linearGradient id=\"nodeOrange\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#E4946C\"/><stop offset=\"100%\" stop-color=\"#D4845C\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-color=\"#0A0B0C\" flood-opacity=\"0.12\"/></filter></defs><rect width=\"650\" height=\"380\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"380\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Interoperable Technology Architecture</text><line x1=\"325\" y1=\"190\" x2=\"120\" y2=\"100\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><line x1=\"325\" y1=\"190\" x2=\"530\" y2=\"100\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><line x1=\"325\" y1=\"190\" x2=\"120\" y2=\"280\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><line x1=\"325\" y1=\"190\" x2=\"530\" y2=\"280\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><line x1=\"325\" y1=\"190\" x2=\"325\" y2=\"340\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><line x1=\"325\" y1=\"190\" x2=\"180\" y2=\"190\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><g><path d=\"M 315,185 L 130,105\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\" marker-end=\"url(#arrowSmall)\"/><path d=\"M 130,95 L 315,175\" stroke=\"#C5A572\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\" marker-end=\"url(#arrowSmall)\"/></g><defs><marker id=\"arrowSmall\" markerWidth=\"6\" markerHeight=\"6\" refX=\"5\" refY=\"3\" orient=\"auto\"><path d=\"M 0,0 L 6,3 L 0,6 Z\" fill=\"#8B909A\"/></marker></defs><circle cx=\"325\" cy=\"190\" r=\"70\" fill=\"url(#centerGlow)\"/><circle cx=\"325\" cy=\"190\" r=\"50\" fill=\"#C5A572\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"185\" text-anchor=\"middle\" class=\"node-label\">Unified EMR</text><text x=\"325\" y=\"200\" text-anchor=\"middle\" class=\"node-label\">Platform</text><rect x=\"70\" y=\"70\" width=\"100\" height=\"50\" rx=\"8\" fill=\"url(#nodeBlue)\" filter=\"url(#shadow)\"/><text x=\"120\" y=\"100\" text-anchor=\"middle\" class=\"node-label\">Location A</text><text x=\"120\" y=\"135\" text-anchor=\"middle\" class=\"sublabel\">Primary site</text><rect x=\"480\" y=\"70\" width=\"100\" height=\"50\" rx=\"8\" fill=\"url(#nodeBlue)\" filter=\"url(#shadow)\"/><text x=\"530\" y=\"100\" text-anchor=\"middle\" class=\"node-label\">Location B</text><text x=\"530\" y=\"135\" text-anchor=\"middle\" class=\"sublabel\">Expansion site</text><rect x=\"70\" y=\"255\" width=\"100\" height=\"50\" rx=\"8\" fill=\"url(#nodeGreen)\" filter=\"url(#shadow)\"/><text x=\"120\" y=\"285\" text-anchor=\"middle\" class=\"node-label\">Wearables</text><text x=\"120\" y=\"320\" text-anchor=\"middle\" class=\"sublabel\">CGM, HRV, Sleep</text><rect x=\"480\" y=\"255\" width=\"100\" height=\"50\" rx=\"8\" fill=\"url(#nodePurple)\" filter=\"url(#shadow)\"/><text x=\"530\" y=\"285\" text-anchor=\"middle\" class=\"node-label\">Lab Partners</text><text x=\"530\" y=\"320\" text-anchor=\"middle\" class=\"sublabel\">Integrated results</text><rect x=\"275\" y=\"315\" width=\"100\" height=\"45\" rx=\"8\" fill=\"url(#nodeOrange)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"343\" text-anchor=\"middle\" class=\"node-label\">Patient Portal</text><rect x=\"80\" y=\"165\" width=\"100\" height=\"50\" rx=\"8\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"130\" y=\"195\" text-anchor=\"middle\" class=\"sublabel\" fill=\"#1F2124\">Location C</text><text x=\"130\" y=\"208\" text-anchor=\"middle\" class=\"sublabel\">(Future)</text><text x=\"325\" y=\"372\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#8B909A\" font-style=\"italic\">All data flows through central platform\u2014no direct location-to-location connections</text></svg>",
+      "callouts": [
+        {
+          "type": "proTip",
+          "text": "Validate interoperability BEFORE opening your second location. Have a test patient's data entered at one site and verify complete accessibility at another within 24 hours. If it doesn't work perfectly in testing, it won't work in practice."
+        },
+        {
+          "type": "evidence",
+          "study": "Adler-Milstein & Jha, Health Affairs, 2017",
+          "finding": "Only 30% of hospitals could electronically find, send, receive, and integrate patient data from outside sources\u2014highlighting why interoperability must be designed in, not added later."
+        }
+      ]
+    },
+    {
+      "id": "standardization-personalization",
+      "title": "Pillar Two: Standardization That Enables Personalization",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Here's the key insight that separates successful multi-location practices from struggling ones: standardize processes while personalizing applications. This isn't a compromise\u2014it's how you maintain quality at scale while preserving what patients value most about longevity medicine: the feeling that their care is designed specifically for them."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "STANDARDIZE (Process)",
+            "PERSONALIZE (Application)"
+          ],
+          "rows": [
+            [
+              "Diagnostic protocols",
+              "Communication style"
+            ],
+            [
+              "Lab interpretation criteria",
+              "Intervention priorities"
+            ],
+            [
+              "Safety screening procedures",
+              "Follow-up frequency"
+            ],
+            [
+              "Documentation standards",
+              "Coaching approach"
+            ],
+            [
+              "Quality metrics",
+              "Goal setting"
+            ],
+            [
+              "Biomarker reference ranges",
+              "Supplement selection"
+            ]
+          ]
+        },
+        {
+          "type": "quote",
+          "text": "The organizations that scale successfully understand the difference between standardizing care processes and standardizing care itself. The former enables quality; the latter destroys personalization.",
+          "attribution": "Dr. Thomas Lee, Press Ganey"
+        },
+        {
+          "type": "paragraph",
+          "text": "Think of it this way: an advanced lipid panel interpretation should be identical across your sites\u2014the same numbers should trigger the same clinical concern. But how you explain those results to a data-driven engineer versus an anxious first-time patient should be completely different."
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 380\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.circle-label { font-family: 'Inter', system-ui, sans-serif; font-size: 13px; fill: #1F2124; font-weight: 600; }.item-text { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #5C626B; }.overlap-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 600; }</style><defs><linearGradient id=\"blueCircle\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#5C7A8A\" stop-opacity=\"0.25\"/><stop offset=\"100%\" stop-color=\"#5C7A8A\" stop-opacity=\"0.15\"/></linearGradient><linearGradient id=\"greenCircle\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#5C8A6B\" stop-opacity=\"0.25\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\" stop-opacity=\"0.15\"/></linearGradient><linearGradient id=\"overlapGrad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#C5A572\"/><stop offset=\"100%\" stop-color=\"#B59562\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-color=\"#0A0B0C\" flood-opacity=\"0.1\"/></filter></defs><rect width=\"650\" height=\"380\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"380\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Where Standardization and Personalization Meet</text><ellipse cx=\"230\" cy=\"200\" rx=\"160\" ry=\"130\" fill=\"url(#blueCircle)\" stroke=\"#5C7A8A\" stroke-width=\"2\"/><ellipse cx=\"420\" cy=\"200\" rx=\"160\" ry=\"130\" fill=\"url(#greenCircle)\" stroke=\"#5C8A6B\" stroke-width=\"2\"/><text x=\"140\" y=\"95\" text-anchor=\"middle\" class=\"circle-label\" fill=\"#5C7A8A\">STANDARDIZED</text><text x=\"140\" y=\"112\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#5C7A8A\">Elements</text><text x=\"100\" y=\"160\" class=\"item-text\">\u2022 Diagnostic protocols</text><text x=\"100\" y=\"178\" class=\"item-text\">\u2022 Lab interpretation</text><text x=\"100\" y=\"196\" class=\"item-text\">\u2022 Safety screening</text><text x=\"100\" y=\"214\" class=\"item-text\">\u2022 Documentation</text><text x=\"100\" y=\"232\" class=\"item-text\">\u2022 Quality metrics</text><text x=\"510\" y=\"95\" text-anchor=\"middle\" class=\"circle-label\" fill=\"#5C8A6B\">PERSONALIZED</text><text x=\"510\" y=\"112\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#5C8A6B\">Elements</text><text x=\"460\" y=\"160\" class=\"item-text\">\u2022 Communication style</text><text x=\"460\" y=\"178\" class=\"item-text\">\u2022 Intervention priorities</text><text x=\"460\" y=\"196\" class=\"item-text\">\u2022 Follow-up frequency</text><text x=\"460\" y=\"214\" class=\"item-text\">\u2022 Coaching approach</text><text x=\"460\" y=\"232\" class=\"item-text\">\u2022 Goal setting</text><ellipse cx=\"325\" cy=\"200\" rx=\"55\" ry=\"80\" fill=\"url(#overlapGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"180\" text-anchor=\"middle\" class=\"overlap-label\">CORE</text><text x=\"325\" y=\"198\" text-anchor=\"middle\" class=\"overlap-label\">CLINICAL</text><text x=\"325\" y=\"216\" text-anchor=\"middle\" class=\"overlap-label\">EXCELLENCE</text><rect x=\"175\" y=\"320\" width=\"300\" height=\"40\" rx=\"8\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"325\" y=\"345\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"11\" fill=\"#5C626B\">Evidence-based care delivered in a patient-centered manner</text></svg>",
+      "callouts": [
+        {
+          "type": "clinicalNote",
+          "text": "Create a protocol library with color coding: mandatory elements (red), recommended elements (yellow), and discretionary elements (green). This visual system helps clinicians instantly understand their degrees of freedom."
+        },
+        {
+          "type": "keyTakeaway",
+          "text": "80% of clinical decisions can be guided by standardized protocols; 20% require individualized judgment. Design your protocols to clearly delineate which is which\u2014ambiguity creates drift."
+        }
+      ]
+    },
+    {
+      "id": "clinical-governance",
+      "title": "Clinical Governance Structures",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Clinical governance is the organizational mechanism that maintains standards while enabling local adaptation. Without it, each location will inevitably develop its own approach, and you'll lose the ability to learn from aggregate data. Governance isn't bureaucracy\u2014it's the mechanism that prevents drift."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Chief Medical Officer (Central)\u2014Sets overall clinical direction, approves protocols, ensures consistency across the organization",
+            "Clinical Protocol Committee\u2014Reviews evidence, develops protocols, manages update cycles (quarterly minimum)",
+            "Quality Assurance Committee\u2014Monitors metrics, schedules audits, triggers corrective actions when needed",
+            "Site Medical Directors (Local)\u2014Implement protocols, adapt within defined boundaries, report quality data upward"
+          ]
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Protocol compliance rate target: >90%",
+            "Time to protocol update implementation: <30 days",
+            "Quality audit frequency: Quarterly minimum",
+            "Staff competency assessment: Annual minimum"
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 400\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.role-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 600; }.role-sublabel { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #FFFFFF; fill-opacity: 0.85; }.flow-label { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #8B909A; }</style><defs><linearGradient id=\"cmoGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><linearGradient id=\"committeeGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6B8A9A\"/><stop offset=\"100%\" stop-color=\"#5C7A8A\"/></linearGradient><linearGradient id=\"siteGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8A7C9A\"/><stop offset=\"100%\" stop-color=\"#7A6C8A\"/></linearGradient><linearGradient id=\"teamGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-color=\"#0A0B0C\" flood-opacity=\"0.12\"/></filter><marker id=\"arrowDown\" markerWidth=\"8\" markerHeight=\"8\" refX=\"4\" refY=\"8\" orient=\"auto\"><path d=\"M 0,0 L 4,8 L 8,0\" fill=\"none\" stroke=\"#5C8A6B\" stroke-width=\"1.5\"/></marker><marker id=\"arrowUp\" markerWidth=\"8\" markerHeight=\"8\" refX=\"4\" refY=\"0\" orient=\"auto\"><path d=\"M 0,8 L 4,0 L 8,8\" fill=\"none\" stroke=\"#C5A572\" stroke-width=\"1.5\"/></marker></defs><rect width=\"650\" height=\"400\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"400\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Clinical Governance Structure</text><rect x=\"250\" y=\"50\" width=\"150\" height=\"50\" rx=\"10\" fill=\"url(#cmoGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"75\" text-anchor=\"middle\" class=\"role-label\">Chief Medical Officer</text><text x=\"325\" y=\"90\" text-anchor=\"middle\" class=\"role-sublabel\">Central Leadership</text><line x1=\"325\" y1=\"100\" x2=\"325\" y2=\"130\" stroke=\"#5C8A6B\" stroke-width=\"2\" marker-end=\"url(#arrowDown)\"/><rect x=\"80\" y=\"140\" width=\"130\" height=\"55\" rx=\"8\" fill=\"url(#committeeGrad)\" filter=\"url(#shadow)\"/><text x=\"145\" y=\"165\" text-anchor=\"middle\" class=\"role-label\">Protocol Committee</text><text x=\"145\" y=\"180\" text-anchor=\"middle\" class=\"role-sublabel\">Evidence & Standards</text><rect x=\"260\" y=\"140\" width=\"130\" height=\"55\" rx=\"8\" fill=\"url(#committeeGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"165\" text-anchor=\"middle\" class=\"role-label\">Quality Assurance</text><text x=\"325\" y=\"180\" text-anchor=\"middle\" class=\"role-sublabel\">Metrics & Audits</text><rect x=\"440\" y=\"140\" width=\"130\" height=\"55\" rx=\"8\" fill=\"url(#committeeGrad)\" filter=\"url(#shadow)\"/><text x=\"505\" y=\"165\" text-anchor=\"middle\" class=\"role-label\">Training & Dev</text><text x=\"505\" y=\"180\" text-anchor=\"middle\" class=\"role-sublabel\">Competency Building</text><line x1=\"250\" y1=\"75\" x2=\"210\" y2=\"140\" stroke=\"#E5E3DE\" stroke-width=\"1.5\"/><line x1=\"400\" y1=\"75\" x2=\"440\" y2=\"140\" stroke=\"#E5E3DE\" stroke-width=\"1.5\"/><line x1=\"145\" y1=\"195\" x2=\"145\" y2=\"240\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><line x1=\"325\" y1=\"195\" x2=\"325\" y2=\"240\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><line x1=\"505\" y1=\"195\" x2=\"505\" y2=\"240\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><rect x=\"100\" y=\"250\" width=\"100\" height=\"45\" rx=\"8\" fill=\"url(#siteGrad)\" filter=\"url(#shadow)\"/><text x=\"150\" y=\"275\" text-anchor=\"middle\" class=\"role-label\">Site Director A</text><rect x=\"275\" y=\"250\" width=\"100\" height=\"45\" rx=\"8\" fill=\"url(#siteGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"275\" text-anchor=\"middle\" class=\"role-label\">Site Director B</text><rect x=\"450\" y=\"250\" width=\"100\" height=\"45\" rx=\"8\" fill=\"url(#siteGrad)\" filter=\"url(#shadow)\"/><text x=\"500\" y=\"275\" text-anchor=\"middle\" class=\"role-label\">Site Director C</text><line x1=\"150\" y1=\"295\" x2=\"150\" y2=\"325\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" marker-end=\"url(#arrowDown)\"/><line x1=\"325\" y1=\"295\" x2=\"325\" y2=\"325\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" marker-end=\"url(#arrowDown)\"/><line x1=\"500\" y1=\"295\" x2=\"500\" y2=\"325\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" marker-end=\"url(#arrowDown)\"/><rect x=\"100\" y=\"335\" width=\"100\" height=\"35\" rx=\"6\" fill=\"url(#teamGrad)\" filter=\"url(#shadow)\"/><text x=\"150\" y=\"358\" text-anchor=\"middle\" class=\"role-label\">Clinical Team</text><rect x=\"275\" y=\"335\" width=\"100\" height=\"35\" rx=\"6\" fill=\"url(#teamGrad)\" filter=\"url(#shadow)\"/><text x=\"325\" y=\"358\" text-anchor=\"middle\" class=\"role-label\">Clinical Team</text><rect x=\"450\" y=\"335\" width=\"100\" height=\"35\" rx=\"6\" fill=\"url(#teamGrad)\" filter=\"url(#shadow)\"/><text x=\"500\" y=\"358\" text-anchor=\"middle\" class=\"role-label\">Clinical Team</text><path d=\"M 60,280 L 60,160 L 80,160\" stroke=\"#C5A572\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\" marker-end=\"url(#arrowUp)\"/><text x=\"45\" y=\"220\" class=\"flow-label\" transform=\"rotate(-90, 45, 220)\">Quality Data</text><path d=\"M 590,160 L 590,280 L 570,280\" stroke=\"#5C8A6B\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/><text x=\"605\" y=\"220\" class=\"flow-label\" transform=\"rotate(90, 605, 220)\">Protocols</text></svg>",
+      "callouts": [
+        {
+          "type": "evidence",
+          "study": "Bohmer, NEJM, 2016",
+          "finding": "Organizations with strong clinical governance structures showed 25% better adherence to evidence-based practices compared to those with weak or absent governance."
+        },
+        {
+          "type": "proTip",
+          "text": "Allow 20-30% local adaptation within standardized frameworks. This prevents resentment while maintaining core quality standards. Site directors need room to solve local problems\u2014just not room to reinvent your entire approach."
+        }
+      ]
+    },
+    {
+      "id": "workforce-development",
+      "title": "Pillar Three: Workforce Development",
+      "content": [
+        {
+          "type": "definition",
+          "term": "Hub-and-Spoke Staffing Model",
+          "definition": "New locations are staffed initially with experienced personnel from the flagship site who then train local hires, facilitating systematic knowledge transfer. Think of it as transplanting your culture, not just your protocols."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Role",
+            "Hub Staff",
+            "New Hires",
+            "Transition Timeline"
+          ],
+          "rows": [
+            [
+              "Medical Director",
+              "1 (temporary)",
+              "1 (training)",
+              "6-12 months"
+            ],
+            [
+              "Clinicians",
+              "2 (rotating)",
+              "2-3",
+              "4-6 months"
+            ],
+            [
+              "Health Coaches",
+              "1",
+              "2-3",
+              "3-4 months"
+            ],
+            [
+              "Administrative",
+              "1",
+              "2-3",
+              "2-3 months"
+            ]
+          ]
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Shadowing protocols: minimum 40 hours before independent practice",
+            "Co-management of patients: minimum 20 cases with experienced clinician",
+            "Weekly case conferences: mandatory for first 6 months",
+            "Quarterly site visits from hub leadership: ongoing"
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 380\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.phase-title { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 600; }.phase-time { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #FFFFFF; fill-opacity: 0.85; }.item-text { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #5C626B; }.gate-label { font-family: 'Inter', system-ui, sans-serif; font-size: 8px; fill: #C5A572; font-weight: 600; }</style><defs><linearGradient id=\"phase1\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6B8A9A\"/><stop offset=\"100%\" stop-color=\"#5C7A8A\"/></linearGradient><linearGradient id=\"phase2\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8A7C9A\"/><stop offset=\"100%\" stop-color=\"#7A6C8A\"/></linearGradient><linearGradient id=\"phase3\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><linearGradient id=\"phase4\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-color=\"#0A0B0C\" flood-opacity=\"0.12\"/></filter></defs><rect width=\"650\" height=\"380\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"380\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Four-Phase Training Curriculum</text><rect x=\"40\" y=\"60\" width=\"130\" height=\"200\" rx=\"10\" fill=\"url(#phase1)\" filter=\"url(#shadow)\"/><text x=\"105\" y=\"85\" text-anchor=\"middle\" class=\"phase-title\">PHASE 1</text><text x=\"105\" y=\"100\" text-anchor=\"middle\" class=\"phase-time\">Weeks 1-4</text><line x1=\"55\" y1=\"115\" x2=\"155\" y2=\"115\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"105\" y=\"135\" text-anchor=\"middle\" class=\"phase-title\">Foundation</text><rect x=\"55\" y=\"150\" width=\"100\" height=\"95\" rx=\"6\" fill=\"#FFFFFF\" fill-opacity=\"0.15\"/><text x=\"60\" y=\"170\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Culture & values</text><text x=\"60\" y=\"188\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Technology systems</text><text x=\"60\" y=\"206\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 SOPs</text><text x=\"60\" y=\"224\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Compliance</text><path d=\"M 170,160 L 195,160\" stroke=\"#C5A572\" stroke-width=\"2\"/><circle cx=\"182\" cy=\"160\" r=\"8\" fill=\"#FAFAF8\" stroke=\"#C5A572\" stroke-width=\"2\"/><text x=\"182\" y=\"163\" text-anchor=\"middle\" class=\"gate-label\">\u2713</text><rect x=\"195\" y=\"60\" width=\"130\" height=\"200\" rx=\"10\" fill=\"url(#phase2)\" filter=\"url(#shadow)\"/><text x=\"260\" y=\"85\" text-anchor=\"middle\" class=\"phase-title\">PHASE 2</text><text x=\"260\" y=\"100\" text-anchor=\"middle\" class=\"phase-time\">Weeks 5-12</text><line x1=\"210\" y1=\"115\" x2=\"310\" y2=\"115\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"260\" y=\"135\" text-anchor=\"middle\" class=\"phase-title\">Clinical Competency</text><rect x=\"210\" y=\"150\" width=\"100\" height=\"95\" rx=\"6\" fill=\"#FFFFFF\" fill-opacity=\"0.15\"/><text x=\"215\" y=\"170\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Protocols</text><text x=\"215\" y=\"188\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Biomarkers</text><text x=\"215\" y=\"206\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Interventions</text><text x=\"215\" y=\"224\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Communication</text><path d=\"M 325,160 L 350,160\" stroke=\"#C5A572\" stroke-width=\"2\"/><circle cx=\"337\" cy=\"160\" r=\"8\" fill=\"#FAFAF8\" stroke=\"#C5A572\" stroke-width=\"2\"/><text x=\"337\" y=\"163\" text-anchor=\"middle\" class=\"gate-label\">\u2713</text><rect x=\"350\" y=\"60\" width=\"130\" height=\"200\" rx=\"10\" fill=\"url(#phase3)\" filter=\"url(#shadow)\"/><text x=\"415\" y=\"85\" text-anchor=\"middle\" class=\"phase-title\">PHASE 3</text><text x=\"415\" y=\"100\" text-anchor=\"middle\" class=\"phase-time\">Weeks 13-16</text><line x1=\"365\" y1=\"115\" x2=\"465\" y2=\"115\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"415\" y=\"135\" text-anchor=\"middle\" class=\"phase-title\">Integration</text><rect x=\"365\" y=\"150\" width=\"100\" height=\"95\" rx=\"6\" fill=\"#FFFFFF\" fill-opacity=\"0.15\"/><text x=\"370\" y=\"170\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Supervised care</text><text x=\"370\" y=\"188\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Peer observation</text><text x=\"370\" y=\"206\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Mentorship</text><text x=\"370\" y=\"224\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Quality intro</text><path d=\"M 480,160 L 505,160\" stroke=\"#C5A572\" stroke-width=\"2\"/><circle cx=\"492\" cy=\"160\" r=\"8\" fill=\"#FAFAF8\" stroke=\"#C5A572\" stroke-width=\"2\"/><text x=\"492\" y=\"163\" text-anchor=\"middle\" class=\"gate-label\">\u2713</text><rect x=\"505\" y=\"60\" width=\"130\" height=\"200\" rx=\"10\" fill=\"url(#phase4)\" filter=\"url(#shadow)\"/><text x=\"570\" y=\"85\" text-anchor=\"middle\" class=\"phase-title\">PHASE 4</text><text x=\"570\" y=\"100\" text-anchor=\"middle\" class=\"phase-time\">Months 5-6</text><line x1=\"520\" y1=\"115\" x2=\"620\" y2=\"115\" stroke=\"#FFFFFF\" stroke-opacity=\"0.3\" stroke-width=\"1\"/><text x=\"570\" y=\"135\" text-anchor=\"middle\" class=\"phase-title\">Independence</text><rect x=\"520\" y=\"150\" width=\"100\" height=\"95\" rx=\"6\" fill=\"#FFFFFF\" fill-opacity=\"0.15\"/><text x=\"525\" y=\"170\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Graduated autonomy</text><text x=\"525\" y=\"188\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Ongoing mentorship</text><text x=\"525\" y=\"206\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 CE enrollment</text><text x=\"525\" y=\"224\" class=\"item-text\" fill=\"#FFFFFF\">\u2022 Quality tracking</text><rect x=\"100\" y=\"280\" width=\"450\" height=\"70\" rx=\"8\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"325\" y=\"305\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"11\" fill=\"#1F2124\" font-weight=\"600\">Competency Gates Between Phases</text><text x=\"325\" y=\"325\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#5C626B\">Each phase requires demonstrated proficiency before advancement</text><text x=\"325\" y=\"340\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#5C626B\">No shortcuts\u2014rushing training creates quality problems that take years to fix</text></svg>",
+      "callouts": [
+        {
+          "type": "evidence",
+          "study": "Elrod & Fortenberry, BMC Health Services Research, 2017",
+          "finding": "Hub-and-spoke models showed 30% better knowledge transfer compared to independent site development. The investment in experienced staff deployment pays for itself in avoided quality failures."
+        },
+        {
+          "type": "warning",
+          "text": "Hub staff deployment can strain flagship operations. Budget for 2-3 experienced staff to spend 6+ months at each new location. This isn't optional\u2014it's the difference between replicating success and multiplying problems."
+        }
+      ]
+    },
+    {
+      "id": "four-phase-implementation",
+      "title": "The Four-Phase Implementation Sequence",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Successful scaling follows a predictable sequence. Attempting to skip phases or compress timelines is the primary cause of scaling failures. Each phase has specific exit criteria that must be met before proceeding\u2014no exceptions, no matter how eager investors or partners may be."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Operational Excellence (12-24 months)\u2014Achieve stable quality metrics at flagship; document all workflows; build leadership depth. Exit criteria: 12+ months of stable quality metrics.",
+            "Systems Codification (6-12 months)\u2014Create comprehensive SOPs; implement unified technology; develop training curricula. Exit criteria: Technology validated, all SOPs complete and tested.",
+            "Pilot Replication (12-18 months)\u2014Open single new location; validate systems transfer; achieve 90% of flagship metrics. Exit criteria: Pilot achieves 90% of flagship quality within 12 months.",
+            "Scaled Expansion (ongoing)\u2014Systematic rollout at 1-2 locations per year maximum; continuous quality monitoring. Pace matters more than speed."
+          ]
+        },
+        {
+          "type": "highlight",
+          "text": "The 12-Month Stability Rule: Require 12 months of stable quality metrics at flagship before expansion planning begins. This single rule prevents more scaling failures than any other."
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 700 350\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.phase-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 600; }.time-label { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #5C626B; }.criteria-text { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #5C626B; }.month-label { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #8B909A; }</style><defs><linearGradient id=\"phase1Grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#5C7A8A\"/><stop offset=\"100%\" stop-color=\"#6B8A9A\"/></linearGradient><linearGradient id=\"phase2Grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#7A6C8A\"/><stop offset=\"100%\" stop-color=\"#8A7C9A\"/></linearGradient><linearGradient id=\"phase3Grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#C5A572\"/><stop offset=\"100%\" stop-color=\"#D5B582\"/></linearGradient><linearGradient id=\"phase4Grad\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#5C8A6B\"/><stop offset=\"100%\" stop-color=\"#6C9A7B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"2\" flood-color=\"#0A0B0C\" flood-opacity=\"0.1\"/></filter></defs><rect width=\"700\" height=\"350\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"700\" height=\"350\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"350\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">The Four-Phase Scaling Sequence</text><line x1=\"50\" y1=\"120\" x2=\"650\" y2=\"120\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><g><text x=\"50\" y=\"145\" class=\"month-label\">Month 0</text><text x=\"150\" y=\"145\" class=\"month-label\">12</text><text x=\"250\" y=\"145\" class=\"month-label\">24</text><text x=\"350\" y=\"145\" class=\"month-label\">36</text><text x=\"450\" y=\"145\" class=\"month-label\">48</text><text x=\"550\" y=\"145\" class=\"month-label\">60</text><text x=\"650\" y=\"145\" class=\"month-label\">72+</text></g><rect x=\"50\" y=\"70\" width=\"200\" height=\"35\" rx=\"6\" fill=\"url(#phase1Grad)\" filter=\"url(#shadow)\"/><text x=\"150\" y=\"93\" text-anchor=\"middle\" class=\"phase-label\">PHASE 1: Operational Excellence</text><rect x=\"50\" y=\"155\" width=\"200\" height=\"55\" rx=\"6\" fill=\"#F5F4F2\" stroke=\"#5C7A8A\" stroke-width=\"1\"/><text x=\"60\" y=\"175\" class=\"criteria-text\">Exit: 12+ months stable metrics</text><text x=\"60\" y=\"190\" class=\"criteria-text\">All workflows documented</text><text x=\"60\" y=\"205\" class=\"criteria-text\">Leadership depth built</text><circle cx=\"250\" cy=\"87\" r=\"10\" fill=\"#FAFAF8\" stroke=\"#C5A572\" stroke-width=\"2\"/><text x=\"250\" y=\"91\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#C5A572\" font-weight=\"600\">GO</text><rect x=\"180\" y=\"70\" width=\"140\" height=\"35\" rx=\"6\" fill=\"url(#phase2Grad)\" filter=\"url(#shadow)\"/><text x=\"250\" y=\"93\" text-anchor=\"middle\" class=\"phase-label\">PHASE 2: Codification</text><rect x=\"180\" y=\"220\" width=\"140\" height=\"55\" rx=\"6\" fill=\"#F5F4F2\" stroke=\"#7A6C8A\" stroke-width=\"1\"/><text x=\"190\" y=\"240\" class=\"criteria-text\">Exit: Technology validated</text><text x=\"190\" y=\"255\" class=\"criteria-text\">SOPs complete</text><text x=\"190\" y=\"270\" class=\"criteria-text\">Training curricula ready</text><circle cx=\"320\" cy=\"87\" r=\"10\" fill=\"#FAFAF8\" stroke=\"#C5A572\" stroke-width=\"2\"/><text x=\"320\" y=\"91\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#C5A572\" font-weight=\"600\">GO</text><rect x=\"280\" y=\"70\" width=\"180\" height=\"35\" rx=\"6\" fill=\"url(#phase3Grad)\" filter=\"url(#shadow)\"/><text x=\"370\" y=\"93\" text-anchor=\"middle\" class=\"phase-label\">PHASE 3: Pilot Replication</text><rect x=\"330\" y=\"155\" width=\"180\" height=\"55\" rx=\"6\" fill=\"#F5F4F2\" stroke=\"#C5A572\" stroke-width=\"1\"/><text x=\"340\" y=\"175\" class=\"criteria-text\">Exit: Pilot achieves 90%</text><text x=\"340\" y=\"190\" class=\"criteria-text\">of flagship metrics</text><text x=\"340\" y=\"205\" class=\"criteria-text\">Systems transfer validated</text><circle cx=\"460\" cy=\"87\" r=\"10\" fill=\"#FAFAF8\" stroke=\"#C5A572\" stroke-width=\"2\"/><text x=\"460\" y=\"91\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#C5A572\" font-weight=\"600\">GO</text><rect x=\"430\" y=\"70\" width=\"220\" height=\"35\" rx=\"6\" fill=\"url(#phase4Grad)\" filter=\"url(#shadow)\"/><text x=\"540\" y=\"93\" text-anchor=\"middle\" class=\"phase-label\">PHASE 4: Scaled Expansion</text><rect x=\"520\" y=\"220\" width=\"130\" height=\"55\" rx=\"6\" fill=\"#F5F4F2\" stroke=\"#5C8A6B\" stroke-width=\"1\"/><text x=\"530\" y=\"240\" class=\"criteria-text\">Ongoing: 1-2 locations</text><text x=\"530\" y=\"255\" class=\"criteria-text\">per year maximum</text><text x=\"530\" y=\"270\" class=\"criteria-text\">Continuous monitoring</text><rect x=\"100\" y=\"295\" width=\"500\" height=\"35\" rx=\"6\" fill=\"#FDF8F7\" stroke=\"#E03E2F\" stroke-width=\"1\"/><text x=\"350\" y=\"317\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"11\" fill=\"#E03E2F\">\u26a0 Kern et al. documented 2-year \"fragmentation period\" when practices scaled prematurely</text></svg>",
+      "callouts": [
+        {
+          "type": "clinicalNote",
+          "text": "Most clinics underestimate Phase 2. Systems codification typically takes twice as long as expected. Budget accordingly\u2014rushing this phase creates technical debt that compounds with every new location."
+        }
+      ]
+    },
+    {
+      "id": "quality-monitoring",
+      "title": "Quality Monitoring: Preventing Drift",
+      "content": [
+        {
+          "type": "definition",
+          "term": "Quality Drift",
+          "definition": "The natural tendency for quality to decline as organizations scale, with each location developing small variations in practice that compound over time. Like a game of telephone\u2014each small change seems harmless, but the cumulative effect can be dramatic."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Category",
+            "Metric",
+            "Target",
+            "Frequency"
+          ],
+          "rows": [
+            [
+              "Structure",
+              "Protocol documentation currency",
+              "<6 months old",
+              "Quarterly"
+            ],
+            [
+              "Process",
+              "Protocol compliance rate",
+              ">90%",
+              "Monthly"
+            ],
+            [
+              "Process",
+              "Documentation completeness",
+              ">95%",
+              "Weekly"
+            ],
+            [
+              "Outcome",
+              "Patient satisfaction (NPS)",
+              ">70",
+              "Monthly"
+            ],
+            [
+              "Outcome",
+              "Patient retention (12-month)",
+              ">80%",
+              "Quarterly"
+            ],
+            [
+              "Outcome",
+              "Biomarker improvement rate",
+              ">60%",
+              "Quarterly"
+            ]
+          ]
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Patient satisfaction decline >5% month-over-month \u2192 immediate site director review",
+            "Staff turnover increase >10% quarter-over-quarter \u2192 central quality review",
+            "Protocol compliance drop >5% from baseline \u2192 intervention team deployment",
+            "Patient complaints increase >20% \u2192 red alert, immediate action required"
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 380\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.step-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 600; }.step-desc { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #5C626B; }.center-label { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; fill: #1F2124; font-weight: 600; }</style><defs><linearGradient id=\"measureGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6B8A9A\"/><stop offset=\"100%\" stop-color=\"#5C7A8A\"/></linearGradient><linearGradient id=\"compareGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8A7C9A\"/><stop offset=\"100%\" stop-color=\"#7A6C8A\"/></linearGradient><linearGradient id=\"identifyGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><linearGradient id=\"interveneGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#E04E3F\"/><stop offset=\"100%\" stop-color=\"#E03E2F\"/></linearGradient><linearGradient id=\"adjustGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"3\" flood-color=\"#0A0B0C\" flood-opacity=\"0.12\"/></filter><marker id=\"arrowCycle\" markerWidth=\"8\" markerHeight=\"8\" refX=\"4\" refY=\"4\" orient=\"auto\"><circle cx=\"4\" cy=\"4\" r=\"3\" fill=\"#C5A572\"/></marker></defs><rect width=\"650\" height=\"380\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"380\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Quality Monitoring Feedback Loop</text><circle cx=\"325\" cy=\"200\" r=\"60\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\" stroke-width=\"2\"/><text x=\"325\" y=\"195\" text-anchor=\"middle\" class=\"center-label\">CONTINUOUS</text><text x=\"325\" y=\"212\" text-anchor=\"middle\" class=\"center-label\">IMPROVEMENT</text><path d=\"M 325,70 A 130,130 0 0 1 455,200\" stroke=\"#C5A572\" stroke-width=\"2\" fill=\"none\" stroke-dasharray=\"8,4\"/><path d=\"M 455,200 A 130,130 0 0 1 325,330\" stroke=\"#C5A572\" stroke-width=\"2\" fill=\"none\" stroke-dasharray=\"8,4\"/><path d=\"M 325,330 A 130,130 0 0 1 195,200\" stroke=\"#C5A572\" stroke-width=\"2\" fill=\"none\" stroke-dasharray=\"8,4\"/><path d=\"M 195,200 A 130,130 0 0 1 325,70\" stroke=\"#C5A572\" stroke-width=\"2\" fill=\"none\" stroke-dasharray=\"8,4\"/><g transform=\"translate(285, 55)\"><rect x=\"0\" y=\"0\" width=\"80\" height=\"40\" rx=\"8\" fill=\"url(#measureGrad)\" filter=\"url(#shadow)\"/><text x=\"40\" y=\"25\" text-anchor=\"middle\" class=\"step-label\">MEASURE</text></g><text x=\"325\" y=\"110\" text-anchor=\"middle\" class=\"step-desc\">Collect standardized metrics</text><g transform=\"translate(440, 160)\"><rect x=\"0\" y=\"0\" width=\"80\" height=\"40\" rx=\"8\" fill=\"url(#compareGrad)\" filter=\"url(#shadow)\"/><text x=\"40\" y=\"25\" text-anchor=\"middle\" class=\"step-label\">COMPARE</text></g><text x=\"560\" y=\"185\" text-anchor=\"middle\" class=\"step-desc\">Benchmark against</text><text x=\"560\" y=\"198\" text-anchor=\"middle\" class=\"step-desc\">targets &amp; peers</text><g transform=\"translate(395, 290)\"><rect x=\"0\" y=\"0\" width=\"80\" height=\"40\" rx=\"8\" fill=\"url(#identifyGrad)\" filter=\"url(#shadow)\"/><text x=\"40\" y=\"25\" text-anchor=\"middle\" class=\"step-label\">IDENTIFY</text></g><text x=\"435\" y=\"345\" text-anchor=\"middle\" class=\"step-desc\">Flag outliers &amp; warnings</text><g transform=\"translate(175, 290)\"><rect x=\"0\" y=\"0\" width=\"80\" height=\"40\" rx=\"8\" fill=\"url(#interveneGrad)\" filter=\"url(#shadow)\"/><text x=\"40\" y=\"25\" text-anchor=\"middle\" class=\"step-label\">INTERVENE</text></g><text x=\"215\" y=\"345\" text-anchor=\"middle\" class=\"step-desc\">Deploy targeted support</text><g transform=\"translate(130, 160)\"><rect x=\"0\" y=\"0\" width=\"80\" height=\"40\" rx=\"8\" fill=\"url(#adjustGrad)\" filter=\"url(#shadow)\"/><text x=\"40\" y=\"25\" text-anchor=\"middle\" class=\"step-label\">ADJUST</text></g><text x=\"90\" y=\"185\" text-anchor=\"middle\" class=\"step-desc\">Update protocols</text><text x=\"90\" y=\"198\" text-anchor=\"middle\" class=\"step-desc\">from learnings</text><rect x=\"480\" y=\"245\" width=\"140\" height=\"50\" rx=\"6\" fill=\"#FDF8F7\" stroke=\"#E03E2F\" stroke-width=\"1\"/><text x=\"550\" y=\"265\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#E03E2F\" font-weight=\"600\">Intervention Trigger</text><text x=\"550\" y=\"280\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"8\" fill=\"#5C626B\">&gt;5% deviation = action</text></svg>",
+      "callouts": [
+        {
+          "type": "evidence",
+          "study": "Benning et al., Implementation Science, 2011",
+          "finding": "Quality improvement initiatives showed 30% decay in effectiveness within 2 years without active maintenance. Monitoring isn't optional\u2014it's the only thing that prevents regression."
+        },
+        {
+          "type": "proTip",
+          "text": "Implement monthly cross-site chart audits where clinicians from Location A review cases from Location B. External eyes catch drift that internal review misses. This also builds cross-site relationships and shared learning."
+        }
+      ]
+    },
+    {
+      "id": "financial-sustainability",
+      "title": "Financial Sustainability and Unit Economics",
+      "content": [
+        {
+          "type": "highlight",
+          "text": "61% of longevity clinics remain unprofitable. Scaling an unprofitable model doesn't create profit\u2014it amplifies losses. Before you scale, you must understand your unit economics."
+        },
+        {
+          "type": "paragraph",
+          "text": "Before scaling, you must understand your unit economics: patient acquisition cost, lifetime value, fixed versus variable costs, and break-even patient volume. Here's what many founders miss: economies of scale in longevity medicine come primarily from administrative functions, not clinical delivery. The doctor-patient relationship doesn't get cheaper at scale."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Scalability",
+            "Functions",
+            "Cost Reduction Potential"
+          ],
+          "rows": [
+            [
+              "High",
+              "Administrative, Technology, Purchasing",
+              "30-40%"
+            ],
+            [
+              "Medium",
+              "Training Systems, Quality Oversight",
+              "10-30%"
+            ],
+            [
+              "Low",
+              "Clinical Delivery, Patient Relationships",
+              "<10%"
+            ]
+          ]
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Conservative financial projections: 15-20% administrative cost reduction",
+            "Full economies typically realized by Year 3\u2014not Year 1",
+            "New location break-even: 18-24 months is realistic",
+            "Maintain 12 months of operating capital reserve for each new location"
+          ]
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 380\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.layer-label { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #FFFFFF; font-weight: 600; }.layer-pct { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #FFFFFF; fill-opacity: 0.9; }.scale-label { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #5C626B; }.legend-text { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #5C626B; }</style><defs><linearGradient id=\"clinicalGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#E04E3F\"/><stop offset=\"100%\" stop-color=\"#E03E2F\"/></linearGradient><linearGradient id=\"facilityGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D4946C\"/><stop offset=\"100%\" stop-color=\"#D4845C\"/></linearGradient><linearGradient id=\"techGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><linearGradient id=\"suppliesGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8A9C7A\"/><stop offset=\"100%\" stop-color=\"#7A8C6A\"/></linearGradient><linearGradient id=\"adminGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><linearGradient id=\"marketingGrad\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#5C8A7B\"/><stop offset=\"100%\" stop-color=\"#4C7A6B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"2\" flood-color=\"#0A0B0C\" flood-opacity=\"0.1\"/></filter></defs><rect width=\"650\" height=\"380\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"380\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Cost Structure and Scalability</text><rect x=\"100\" y=\"60\" width=\"250\" height=\"90\" rx=\"8\" fill=\"url(#clinicalGrad)\" filter=\"url(#shadow)\"/><text x=\"225\" y=\"100\" text-anchor=\"middle\" class=\"layer-label\">Clinical Staff</text><text x=\"225\" y=\"120\" text-anchor=\"middle\" class=\"layer-pct\">35-45% of revenue</text><rect x=\"100\" y=\"155\" width=\"250\" height=\"40\" rx=\"6\" fill=\"url(#facilityGrad)\" filter=\"url(#shadow)\"/><text x=\"225\" y=\"180\" text-anchor=\"middle\" class=\"layer-label\">Facility (10-15%)</text><rect x=\"100\" y=\"200\" width=\"250\" height=\"30\" rx=\"6\" fill=\"url(#techGrad)\" filter=\"url(#shadow)\"/><text x=\"225\" y=\"220\" text-anchor=\"middle\" class=\"layer-label\">Technology (5-10%)</text><rect x=\"100\" y=\"235\" width=\"250\" height=\"35\" rx=\"6\" fill=\"url(#suppliesGrad)\" filter=\"url(#shadow)\"/><text x=\"225\" y=\"258\" text-anchor=\"middle\" class=\"layer-label\">Supplies/Testing (10-15%)</text><rect x=\"100\" y=\"275\" width=\"250\" height=\"35\" rx=\"6\" fill=\"url(#adminGrad)\" filter=\"url(#shadow)\"/><text x=\"225\" y=\"298\" text-anchor=\"middle\" class=\"layer-label\">Administrative (10-15%)</text><rect x=\"100\" y=\"315\" width=\"250\" height=\"30\" rx=\"6\" fill=\"url(#marketingGrad)\" filter=\"url(#shadow)\"/><text x=\"225\" y=\"335\" text-anchor=\"middle\" class=\"layer-label\">Marketing (5-10%)</text><rect x=\"380\" y=\"60\" width=\"220\" height=\"290\" rx=\"8\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"490\" y=\"85\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"12\" fill=\"#1F2124\" font-weight=\"600\">Scalability Potential</text><line x1=\"400\" y1=\"100\" x2=\"580\" y2=\"100\" stroke=\"#E5E3DE\" stroke-width=\"1\"/><rect x=\"410\" y=\"115\" width=\"160\" height=\"25\" rx=\"4\" fill=\"#E03E2F\" fill-opacity=\"0.2\"/><text x=\"490\" y=\"132\" text-anchor=\"middle\" class=\"scale-label\" fill=\"#E03E2F\">LOW (&lt;10% savings)</text><text x=\"490\" y=\"155\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#8B909A\">Clinical delivery doesn't scale</text><rect x=\"410\" y=\"175\" width=\"160\" height=\"25\" rx=\"4\" fill=\"#C5A572\" fill-opacity=\"0.2\"/><text x=\"490\" y=\"192\" text-anchor=\"middle\" class=\"scale-label\" fill=\"#C5A572\">MEDIUM (10-30%)</text><text x=\"490\" y=\"215\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#8B909A\">Training, quality systems</text><rect x=\"410\" y=\"235\" width=\"160\" height=\"25\" rx=\"4\" fill=\"#5C8A6B\" fill-opacity=\"0.2\"/><text x=\"490\" y=\"252\" text-anchor=\"middle\" class=\"scale-label\" fill=\"#5C8A6B\">HIGH (30-40%)</text><text x=\"490\" y=\"275\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#8B909A\">Admin, tech, purchasing</text><rect x=\"400\" y=\"295\" width=\"180\" height=\"45\" rx=\"6\" fill=\"#FDF8F7\" stroke=\"#E03E2F\" stroke-width=\"1\"/><text x=\"490\" y=\"315\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"10\" fill=\"#E03E2F\" font-weight=\"600\">Key Insight</text><text x=\"490\" y=\"330\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"9\" fill=\"#5C626B\">Largest cost = lowest scalability</text></svg>",
+      "callouts": [
+        {
+          "type": "warning",
+          "text": "Maintain 12 months of operating capital reserve for each new location to survive the ramp-up period without compromising quality. Undercapitalized expansion is the fastest path to quality failure."
+        },
+        {
+          "type": "keyTakeaway",
+          "text": "Scale from a position of strength, not desperation. If your flagship isn't profitable, adding locations won't fix it\u2014it will accelerate the problem."
+        }
+      ]
+    },
+    {
+      "id": "action-plan",
+      "title": "Your Action Plan: From Single to Scalable",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Scaling isn't a single decision\u2014it's a systematic process that begins long before you sign a lease on a second location. Use this framework to assess your readiness and prioritize your next steps. The best time to build scaling infrastructure is before you need it. The second-best time is now."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Assess current state\u2014Rate each pillar (Technology, Standardization, Workforce) 1-10. Be brutally honest.",
+            "Validate profitability\u2014Confirm flagship is profitable for 12+ consecutive months. No exceptions.",
+            "Audit documentation\u2014Identify gaps in SOPs and protocols. Can a new hire follow them without asking questions?",
+            "Evaluate technology\u2014Test interoperability capabilities. Can data flow seamlessly between hypothetical sites?",
+            "Build leadership depth\u2014Identify potential site medical directors and begin development now."
+          ]
+        },
+        {
+          "type": "caseStudy",
+          "title": "Case: Infrastructure-First Expansion",
+          "scenario": "A longevity clinic with strong patient satisfaction (NPS 75) and 18 months of profitability wants to expand. They have comprehensive protocols but use a basic EMR without interoperability features.",
+          "approach": "Delayed expansion by 6-9 months to implement unified EMR, migrate data, and train staff. Used this time to codify remaining protocols and identify hub staff for deployment.",
+          "outcome": "Second location opened with full technology infrastructure, achieved 85% of flagship quality metrics within 6 months, and reached break-even at month 20."
+        }
+      ],
+      "diagramHtml": "<svg viewBox=\"0 0 650 400\" xmlns=\"http://www.w3.org/2000/svg\"><style>.diagram-title { font-family: 'Newsreader', Georgia, serif; font-size: 18px; fill: #0A0B0C; font-weight: 500; }.header-text { font-family: 'Inter', system-ui, sans-serif; font-size: 11px; fill: #5C626B; font-weight: 600; }.cell-text { font-family: 'Inter', system-ui, sans-serif; font-size: 9px; fill: #5C626B; }.row-label { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #1F2124; font-weight: 600; }.score-text { font-family: 'Inter', system-ui, sans-serif; font-size: 10px; fill: #FFFFFF; font-weight: 600; }</style><defs><linearGradient id=\"redCell\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#E04E3F\"/><stop offset=\"100%\" stop-color=\"#E03E2F\"/></linearGradient><linearGradient id=\"orangeCell\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D4946C\"/><stop offset=\"100%\" stop-color=\"#D4845C\"/></linearGradient><linearGradient id=\"yellowCell\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#D5B582\"/><stop offset=\"100%\" stop-color=\"#C5A572\"/></linearGradient><linearGradient id=\"greenCell\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#6C9A7B\"/><stop offset=\"100%\" stop-color=\"#5C8A6B\"/></linearGradient><filter id=\"shadow\"><feDropShadow dx=\"0\" dy=\"1\" stdDeviation=\"2\" flood-color=\"#0A0B0C\" flood-opacity=\"0.08\"/></filter></defs><rect width=\"650\" height=\"400\" fill=\"#FAFAF8\" rx=\"8\"/><rect width=\"650\" height=\"400\" fill=\"none\" stroke=\"#E5E3DE\" rx=\"8\"/><text x=\"325\" y=\"32\" text-anchor=\"middle\" class=\"diagram-title\">Scaling Readiness Assessment Matrix</text><rect x=\"40\" y=\"55\" width=\"120\" height=\"35\" rx=\"4\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"100\" y=\"77\" text-anchor=\"middle\" class=\"header-text\">DIMENSION</text><rect x=\"165\" y=\"55\" width=\"110\" height=\"35\" rx=\"4\" fill=\"url(#redCell)\"/><text x=\"220\" y=\"77\" text-anchor=\"middle\" class=\"score-text\">NOT READY</text><text x=\"220\" y=\"87\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"8\" fill=\"#FFFFFF\">(1-3)</text><rect x=\"280\" y=\"55\" width=\"110\" height=\"35\" rx=\"4\" fill=\"url(#orangeCell)\"/><text x=\"335\" y=\"77\" text-anchor=\"middle\" class=\"score-text\">DEVELOPING</text><text x=\"335\" y=\"87\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"8\" fill=\"#FFFFFF\">(4-6)</text><rect x=\"395\" y=\"55\" width=\"110\" height=\"35\" rx=\"4\" fill=\"url(#yellowCell)\"/><text x=\"450\" y=\"77\" text-anchor=\"middle\" class=\"score-text\">READY</text><text x=\"450\" y=\"87\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"8\" fill=\"#FFFFFF\">(7-8)</text><rect x=\"510\" y=\"55\" width=\"110\" height=\"35\" rx=\"4\" fill=\"url(#greenCell)\"/><text x=\"565\" y=\"77\" text-anchor=\"middle\" class=\"score-text\">EXCELLENT</text><text x=\"565\" y=\"87\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"8\" fill=\"#FFFFFF\">(9-10)</text><rect x=\"40\" y=\"95\" width=\"120\" height=\"60\" rx=\"4\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"100\" y=\"125\" text-anchor=\"middle\" class=\"row-label\">Technology</text><text x=\"100\" y=\"140\" text-anchor=\"middle\" class=\"row-label\">Infrastructure</text><rect x=\"165\" y=\"95\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"175\" y=\"115\" class=\"cell-text\">Basic EMR</text><text x=\"175\" y=\"128\" class=\"cell-text\">No integration</text><text x=\"175\" y=\"141\" class=\"cell-text\">Manual data entry</text><rect x=\"280\" y=\"95\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"290\" y=\"115\" class=\"cell-text\">Some integration</text><text x=\"290\" y=\"128\" class=\"cell-text\">Partial automation</text><text x=\"290\" y=\"141\" class=\"cell-text\">Gaps in data flow</text><rect x=\"395\" y=\"95\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"405\" y=\"115\" class=\"cell-text\">Full interoperability</text><text x=\"405\" y=\"128\" class=\"cell-text\">Wearable integration</text><text x=\"405\" y=\"141\" class=\"cell-text\">Real-time access</text><rect x=\"510\" y=\"95\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"520\" y=\"115\" class=\"cell-text\">Validated cross-site</text><text x=\"520\" y=\"128\" class=\"cell-text\">Automated alerts</text><text x=\"520\" y=\"141\" class=\"cell-text\">Analytics ready</text><rect x=\"40\" y=\"160\" width=\"120\" height=\"60\" rx=\"4\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"100\" y=\"190\" text-anchor=\"middle\" class=\"row-label\">Standardization</text><text x=\"100\" y=\"205\" text-anchor=\"middle\" class=\"row-label\">Framework</text><rect x=\"165\" y=\"160\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"175\" y=\"180\" class=\"cell-text\">Ad hoc protocols</text><text x=\"175\" y=\"193\" class=\"cell-text\">Tribal knowledge</text><text x=\"175\" y=\"206\" class=\"cell-text\">No documentation</text><rect x=\"280\" y=\"160\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"290\" y=\"180\" class=\"cell-text\">Some SOPs exist</text><text x=\"290\" y=\"193\" class=\"cell-text\">Inconsistent use</text><text x=\"290\" y=\"206\" class=\"cell-text\">Gaps in coverage</text><rect x=\"395\" y=\"160\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"405\" y=\"180\" class=\"cell-text\">Complete library</text><text x=\"405\" y=\"193\" class=\"cell-text\">Regular updates</text><text x=\"405\" y=\"206\" class=\"cell-text\">Clear boundaries</text><rect x=\"510\" y=\"160\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"520\" y=\"180\" class=\"cell-text\">Governance active</text><text x=\"520\" y=\"193\" class=\"cell-text\">Continuous QI</text><text x=\"520\" y=\"206\" class=\"cell-text\">Evidence-based</text><rect x=\"40\" y=\"225\" width=\"120\" height=\"60\" rx=\"4\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"100\" y=\"255\" text-anchor=\"middle\" class=\"row-label\">Workforce</text><text x=\"100\" y=\"270\" text-anchor=\"middle\" class=\"row-label\">Development</text><rect x=\"165\" y=\"225\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"175\" y=\"245\" class=\"cell-text\">No training system</text><text x=\"175\" y=\"258\" class=\"cell-text\">Founder-dependent</text><text x=\"175\" y=\"271\" class=\"cell-text\">No bench depth</text><rect x=\"280\" y=\"225\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"290\" y=\"245\" class=\"cell-text\">Basic onboarding</text><text x=\"290\" y=\"258\" class=\"cell-text\">Some mentorship</text><text x=\"290\" y=\"271\" class=\"cell-text\">Limited leaders</text><rect x=\"395\" y=\"225\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"405\" y=\"245\" class=\"cell-text\">Full curriculum</text><text x=\"405\" y=\"258\" class=\"cell-text\">Competency gates</text><text x=\"405\" y=\"271\" class=\"cell-text\">2+ site directors</text><rect x=\"510\" y=\"225\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"520\" y=\"245\" class=\"cell-text\">Hub-spoke ready</text><text x=\"520\" y=\"258\" class=\"cell-text\">Culture codified</text><text x=\"520\" y=\"271\" class=\"cell-text\">Deep bench</text><rect x=\"40\" y=\"290\" width=\"120\" height=\"60\" rx=\"4\" fill=\"#F5F4F2\" stroke=\"#E5E3DE\"/><text x=\"100\" y=\"320\" text-anchor=\"middle\" class=\"row-label\">Financial</text><text x=\"100\" y=\"335\" text-anchor=\"middle\" class=\"row-label\">Sustainability</text><rect x=\"165\" y=\"290\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"175\" y=\"310\" class=\"cell-text\">Unprofitable</text><text x=\"175\" y=\"323\" class=\"cell-text\">Cash flow issues</text><text x=\"175\" y=\"336\" class=\"cell-text\">No reserves</text><rect x=\"280\" y=\"290\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"290\" y=\"310\" class=\"cell-text\">Break-even</text><text x=\"290\" y=\"323\" class=\"cell-text\">Variable months</text><text x=\"290\" y=\"336\" class=\"cell-text\">3-6 mo reserves</text><rect x=\"395\" y=\"290\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"405\" y=\"310\" class=\"cell-text\">12+ mo profitable</text><text x=\"405\" y=\"323\" class=\"cell-text\">Unit economics clear</text><text x=\"405\" y=\"336\" class=\"cell-text\">12 mo reserves</text><rect x=\"510\" y=\"290\" width=\"110\" height=\"60\" rx=\"4\" fill=\"#FFFFFF\" stroke=\"#E5E3DE\" filter=\"url(#shadow)\"/><text x=\"520\" y=\"310\" class=\"cell-text\">Strong margins</text><text x=\"520\" y=\"323\" class=\"cell-text\">Predictable growth</text><text x=\"520\" y=\"336\" class=\"cell-text\">18+ mo reserves</text><rect x=\"165\" y=\"360\" width=\"455\" height=\"25\" rx=\"6\" fill=\"#F7FAF8\" stroke=\"#5C8A6B\" stroke-width=\"1.5\"/><text x=\"392\" y=\"377\" text-anchor=\"middle\" font-family=\"Inter\" font-size=\"11\" fill=\"#5C8A6B\" font-weight=\"600\">All four dimensions must score 7+ before expansion is advisable</text></svg>",
+      "callouts": [
+        {
+          "type": "clinicalNote",
+          "text": "Schedule a quarterly 'scaling readiness review' even if expansion isn't imminent. This keeps infrastructure investment on the agenda and prevents the 'we'll figure it out later' trap that derails so many growing practices."
+        },
+        {
+          "type": "keyTakeaway",
+          "text": "The best time to build scaling infrastructure is before you need it. The second-best time is now. Every month you delay infrastructure investment is a month of compounding technical and operational debt."
+        }
+      ]
+    },
+    {
+      "id": "references",
+      "title": "References & Further Reading",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "Key sources and citations supporting this lecture's clinical and scientific content on multi-location healthcare scaling."
+        },
+        {
+          "type": "numbered",
+          "items": [
+            "Burns LR, Pauly MV. \"Transformation of the Health Care Industry: Curb Your Enthusiasm?\" Milbank Quarterly, 2018. [Documents 23% quality decline with premature scaling]",
+            "Adler-Milstein J, Jha AK. \"HITECH Act Drove Large Gains In Hospital Electronic Health Record Adoption.\" Health Affairs, 2017. [Only 30% achieve true interoperability]",
+            "Kern LM, et al. \"Association Between Practice Size and Quality of Care.\" Health Affairs, 2019. [Documents 2-year fragmentation period in scaling practices]",
+            "Bohmer RMJ. \"The Hard Work of Health Care Transformation.\" New England Journal of Medicine, 2016. [25% better adherence with strong clinical governance]",
+            "Elrod JK, Fortenberry JL. \"The hub-and-spoke organization design.\" BMC Health Services Research, 2017. [30% better knowledge transfer with hub-spoke model]",
+            "Benning A, et al. \"Large scale organisational intervention to improve patient safety.\" Implementation Science, 2011. [30% quality decay without active maintenance]",
+            "Cebul RD, et al. \"Organizational Fragmentation and Care Quality.\" New England Journal of Medicine, 2008. [20% higher costs with fragmented systems]",
+            "Frandsen BR, et al. \"Care Fragmentation, Quality, and Costs.\" American Journal of Managed Care, 2015. [35% higher ED utilization with fragmentation]",
+            "Shortell SM, et al. \"Integrated Health Systems.\" Health Services Research, 2014. [15-20% better outcomes with standardized protocols]"
+          ]
+        }
+      ],
+      "diagramHtml": null,
+      "callouts": [
+        {
+          "type": "proTip",
+          "text": "For deeper exploration of healthcare scaling frameworks, see the comprehensive reference appendix in your course materials, including case studies from Next Health, Fountain Life, and other multi-location longevity practices."
+        }
+      ]
+    }
+  ],
+  "keyTakeaways": [
+    "Structure enables personalization at scale\u2014the paradox you must master before expanding",
+    "All three pillars (Technology, Standardization, Workforce) must score 7+ before expansion is advisable",
+    "The 12-Month Stability Rule: require 12 months of stable quality metrics at flagship before expansion planning",
+    "Economies of scale come from administrative functions, not clinical delivery\u2014set realistic expectations",
+    "Quality drift is inevitable without active monitoring; implement cross-site audits and feedback loops"
+  ],
+  "references": [
+    {
+      "pmid": "29504197",
+      "title": "Transformation of the Health Care Industry: Curb Your Enthusiasm?"
+    },
+    {
+      "pmid": "28784729",
+      "title": "HITECH Act Drove Large Gains In Hospital Electronic Health Record Adoption"
+    },
+    {
+      "pmid": "30715973",
+      "title": "Association Between Practice Size and Quality of Care"
+    },
+    {
+      "pmid": "27557297",
+      "title": "The Hard Work of Health Care Transformation"
+    },
+    {
+      "pmid": "28610564",
+      "title": "The hub-and-spoke organization design: an avenue for serving patients well"
+    },
+    {
+      "pmid": "21496254",
+      "title": "Large scale organisational intervention to improve patient safety in four UK hospitals"
+    }
+  ]
+}
