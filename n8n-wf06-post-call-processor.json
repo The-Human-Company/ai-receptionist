@@ -85,7 +85,7 @@
         "duplicateItem": false,
         "assignments": {
           "assignments": [
-            { "id": "m-flag", "name": "migration_flag", "value": "VAPI_AI_INTAKE", "type": "string" },
+            { "id": "m-flag", "name": "migration_flag", "value": "VAPI_AI_COLLECTED", "type": "string" },
             { "id": "m-date", "name": "migration_date", "value": "={{ $now }}", "type": "string" }
           ]
         },
@@ -157,7 +157,7 @@
             "call_status": "={{ $json.call_status }}",
             "call_duration": "={{ $json.call_duration }}",
             "recording_url": "={{ $json.recording_url }}",
-            "migration_flag": "VAPI_AI_INTAKE",
+            "migration_flag": "VAPI_AI_COLLECTED",
             "migration_date": "={{ $now }}",
             "crm_sync_error": "CRM write failed - data saved to sheet"
           }

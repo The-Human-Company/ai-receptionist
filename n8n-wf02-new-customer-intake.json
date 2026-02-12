@@ -77,7 +77,7 @@
           "value": {
             "call_id": "={{ $json.call_id }}",
             "{{ $json.field_name }}": "={{ $json.field_value }}",
-            "migration_flag": "VAPI_AI_INTAKE",
+            "migration_flag": "VAPI_AI_COLLECTED",
             "updated_at": "={{ $now }}"
           }
         },

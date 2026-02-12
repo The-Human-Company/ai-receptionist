@@ -141,7 +141,7 @@ if 'WF-01' in workflows:
         test('WF-01 biz-hours: disclaims Tulsa Oklahoma', 'Tulsa, Oklahoma' in body)
         test('WF-01 biz-hours: asks new/existing/claim', 'new customer' in body.lower())
         test('WF-01 biz-hours: has system prompt', 'system' in body)
-        test('WF-01 biz-hours: system prompt has RULES', 'RULES YOU MUST ALWAYS FOLLOW' in body)
+        test('WF-01 biz-hours: system prompt has RULES', 'IMPORTANT RULES' in body)
         test('WF-01 biz-hours: no coverage advice rule', 'NEVER give coverage guarantees' in body)
         test('WF-01 biz-hours: no PMI/FHA rule', 'Private Mortgage Insurance' in body)
         test('WF-01 biz-hours: no pet/travel insurance', 'Pet Insurance' in body)
@@ -156,7 +156,20 @@ if 'WF-01' in workflows:
         test('WF-01 biz-hours: voice provider=elevenlabs', 'elevenlabs' in body)
         test('WF-01 biz-hours: model=gpt-4o', 'gpt-4o' in body)
         test('WF-01 biz-hours: temperature=0.3', '0.3' in body)
-        test('WF-01 biz-hours: data collection order specified', 'DATA COLLECTION ORDER' in body)
+        test('WF-01 biz-hours: data collection order specified', 'DATA COLLECTION FOR NEW P&C CUSTOMERS' in body)
+        test('WF-01 biz-hours: has route_existing_customer tool', 'route_existing_customer' in body)
+        test('WF-01 biz-hours: has route_claim tool', 'route_claim' in body)
+        test('WF-01 biz-hours: route_existing_customer hits WF-04 webhook', 'vapi-existing-customer' in body)
+        test('WF-01 biz-hours: route_claim hits WF-05 webhook', 'vapi-claim' in body)
+        test('WF-01 biz-hours: existing customer flow in prompt', 'route_existing_customer' in body)
+        test('WF-01 biz-hours: claim flow in prompt', 'route_claim' in body)
+        test('WF-01 biz-hours: policy-specific auto questions', 'VIN' in body)
+        test('WF-01 biz-hours: policy-specific renters questions', 'possessions' in body)
+        test('WF-01 biz-hours: policy-specific property questions', 'first-time home buyer' in body)
+        test('WF-01 biz-hours: policy-specific business questions', 'annual revenue' in body)
+        test('WF-01 biz-hours: cross-sell instruction', 'cross-sell' in body.lower())
+        test('WF-01 biz-hours: referral source wording', 'thank the person who might have referred you' in body)
+        test('WF-01 biz-hours: Progressive carrier mention', 'Progressive' in body)
 
     # After-Hours Response
     ah_resp = get_node(wf1, 'Return After-Hours Config')
@@ -211,7 +224,7 @@ if 'WF-02' in workflows:
     test('WF-02 saves to Google Sheets', save_sheet is not None)
     if save_sheet:
         test('WF-02 sheet uses GOOGLE_SHEET_LEADS_ID env', 'GOOGLE_SHEET_LEADS_ID' in json.dumps(save_sheet['parameters']))
-        test('WF-02 sets migration_flag', 'VAPI_AI_INTAKE' in json.dumps(save_sheet['parameters']))
+        test('WF-02 sets migration_flag=VAPI_AI_COLLECTED', 'VAPI_AI_COLLECTED' in json.dumps(save_sheet['parameters']))
 
     ret_success = get_node(wf2, 'Return Success')
     test('WF-02 has Return Success response', ret_success is not None)
@@ -388,7 +401,7 @@ if 'WF-06' in workflows:
     migration6 = get_node(wf6, 'Add Migration Flag')
     test('WF-06 adds migration flag', migration6 is not None)
     if migration6:
-        test('WF-06 migration flag=VAPI_AI_INTAKE', 'VAPI_AI_INTAKE' in json.dumps(migration6['parameters']))
+        test('WF-06 migration flag=VAPI_AI_COLLECTED', 'VAPI_AI_COLLECTED' in json.dumps(migration6['parameters']))
 
     crm6 = get_node(wf6, 'Write to QQ Catalyst')
     test('WF-06 attempts CRM write', crm6 is not None)

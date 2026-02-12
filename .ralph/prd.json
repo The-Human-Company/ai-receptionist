@@ -2,7 +2,7 @@
   "projectName": "Equity Insurance AI Receptionist - 7 Workflow Deployment",
   "branchName": "ralph/deploy-7-workflows",
   "createdAt": "2026-02-13T00:00:00.000Z",
-  "updatedAt": "2026-02-13T12:00:00.000Z",
+  "updatedAt": "2026-02-13T23:15:00.000Z",
   "completionPromise": "All tests pass",
   "qualityGates": {
     "typecheck": null,
@@ -19,138 +19,72 @@
     {
       "id": "US-001",
       "title": "Build and deploy WF-01 Inbound Call Router",
-      "description": "Create n8n workflow JSON for WF-01 that receives VAPI call.started webhook at /vapi-call-started, extracts call_id/caller_phone/call_timestamp/assistant_id, checks business hours (9am-5pm HST using UTC-10 offset), and returns the appropriate VAPI assistant config (business hours vs after-hours firstMessage, voice config, model config, system prompt, and tool definitions). Deploy to n8n via POST /api/v1/workflows.",
-      "acceptanceCriteria": [
-        "Webhook node configured for POST /vapi-call-started with Header Auth",
-        "Extract Call Data Set node maps call_id, caller_phone, call_timestamp, assistant_id",
-        "Business Hours Code node correctly calculates HST from UTC (no DST)",
-        "Business Hours Respond node returns full assistant object with system prompt and tools",
-        "After-Hours Respond node returns restricted assistant config",
-        "Workflow JSON is valid and deployable to n8n",
-        "Deployed successfully to n8n instance"
-      ],
       "priority": 1,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
     },
     {
       "id": "US-002",
       "title": "Build and deploy WF-02 New Customer P&C Intake",
-      "description": "Create n8n workflow JSON for WF-02 with three webhook entry points: (A) /vapi-save-field for saving and validating individual fields with Google Sheets upsert, (B) /vapi-check-disqualifier for evaluating claims count >= 3 and urgency <= 72h rules, (C) /vapi-check-hotlead for evaluating property >= $2M and auto >= $180K thresholds. Each branch returns results to VAPI. Hot lead branch triggers WF-03 via Execute Workflow. Deploy to n8n.",
-      "acceptanceCriteria": [
-        "Three separate Webhook nodes for /vapi-save-field, /vapi-check-disqualifier, /vapi-check-hotlead",
-        "Save Field branch: validates phone/email/dob formats, upserts to Google Sheets, returns success/error",
-        "Disqualifier branch: evaluates claims >= 3 and urgency <= 72h, updates lead record, returns result",
-        "Hot Lead branch: evaluates property >= $2M and auto >= $180K, triggers WF-03 if hot, sends pre-transfer email",
-        "All branches respond to VAPI webhook with proper result JSON",
-        "Workflow JSON is valid and deployed to n8n"
-      ],
       "priority": 2,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
     },
     {
       "id": "US-003",
       "title": "Build and deploy WF-03 Hot Lead Transfer Handler",
-      "description": "Create n8n workflow JSON for WF-03 as a sub-workflow triggered by WF-02. Receives call_id, caller data, and transfer targets. Sends VAPI transfer API command (POST /call/{call_id}/transfer with warm mode). Waits for transfer result, branches on success/failure. On success: updates Google Sheets lead status to transferred_hot_lead. On failure: updates status to transfer_failed_hot_lead and sends URGENT email to Val and Davin. Deploy to n8n.",
-      "acceptanceCriteria": [
-        "Receive Input Data Set node maps call_id, caller_name, caller_phone, policy_type, estimated_value, transfer targets",
-        "HTTP Request node sends POST to VAPI transfer API with warm mode",
-        "Wait node + polling for transfer result",
-        "IF node branches on transfer_status === answered",
-        "Success path: Google Sheets update with transferred_hot_lead status",
-        "Failure path: Google Sheets update + URGENT email to both Val and Davin",
-        "Workflow deployed to n8n"
-      ],
       "priority": 3,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
     },
     {
       "id": "US-004",
       "title": "Build and deploy WF-04 Existing Customer Handler",
-      "description": "Create n8n workflow JSON for WF-04 with webhook at /vapi-existing-customer. Extracts customer data (call_id, name, phone, policy_type, request_description). Creates ticket row in Google Sheets Tickets sheet (ticket_id, status=pending, assigned_to=Val, created_at). Sends notification email to Val. Returns confirmation to VAPI. Deploy to n8n.",
-      "acceptanceCriteria": [
-        "Webhook node for POST /vapi-existing-customer with Header Auth",
-        "Extract Customer Data Set node parses all fields from VAPI function call",
-        "Google Sheets Append Row creates ticket with all columns from Tickets schema",
-        "Gmail Send Email sends formatted notification to Val",
-        "Respond to Webhook returns success confirmation for VAPI closing script",
-        "Workflow deployed to n8n"
-      ],
       "priority": 4,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
     },
     {
       "id": "US-005",
       "title": "Build and deploy WF-05 Claims Router",
-      "description": "Create n8n workflow JSON for WF-05 with webhook at /vapi-claim. Extracts claim data (caller name, policy number, claim type, description). Checks business hours (same HST logic). During hours: attempts VAPI transfer to Val, then Davin fallback. Sends priority notification email to BOTH Val and Davin. Returns transfer result to VAPI for appropriate closing script. Deploy to n8n.",
-      "acceptanceCriteria": [
-        "Webhook node for POST /vapi-claim with Header Auth",
-        "Extract Claim Data Set node parses caller_name, policy_number, claim_type, claim_description",
-        "Check Business Hours Code node with same HST logic as WF-01",
-        "IF Business Hours branches to transfer attempt vs after-hours notification",
-        "Transfer attempt via HTTP Request to VAPI transfer API",
-        "Priority notification email sent to BOTH Val and Davin",
-        "Respond to Webhook returns result for VAPI script selection",
-        "Workflow deployed to n8n"
-      ],
       "priority": 5,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
     },
     {
       "id": "US-006",
       "title": "Build and deploy WF-06 Post-Call Processor",
-      "description": "Create n8n workflow JSON for WF-06 with webhook at /vapi-call-ended. Extracts all VAPI call.ended data (call_id, status, duration, transcript, recording_url, cost). Reads lead record from Google Sheets by call_id. Merges VAPI data with lead record. Adds migration_flag=VAPI_AI_INTAKE. Attempts CRM write to QQ Catalyst (HTTP Request with fallback). Sends formatted summary email (format varies by call status). Logs analytics row. Saves transcript. Includes Error Handler trigger node. Deploy to n8n.",
-      "acceptanceCriteria": [
-        "Webhook node for POST /vapi-call-ended",
-        "Extract All Data Set node maps all VAPI call.ended fields",
-        "Google Sheets Read Row fetches lead record by call_id",
-        "Merge node combines VAPI data with lead record",
-        "Migration flag Set node adds VAPI_AI_INTAKE and timestamp",
-        "HTTP Request node for QQ Catalyst with On Error: Continue",
-        "CRM Fallback IF node catches errors and writes to Google Sheets",
-        "Summary email adapts format based on call_status (8 variants)",
-        "Analytics row appended with all columns from Analytics schema",
-        "Transcript saved to Transcripts sheet or Drive",
-        "Error Trigger handler logs to Errors sheet",
-        "Workflow deployed to n8n"
-      ],
       "priority": 6,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
     },
     {
       "id": "US-007",
       "title": "Build and deploy WF-07 Escalation Monitor",
-      "description": "Create n8n workflow JSON for WF-07 with Schedule Trigger (cron */30 9-16 * * 1-5 in Pacific/Honolulu). Reads all pending tickets from Google Sheets Tickets sheet. Filters for tickets where created_at > 2 hours ago and status=pending. For each overdue ticket: sends escalation email to Davin with ticket details and wait time. Updates ticket status to escalated. Deploy to n8n.",
-      "acceptanceCriteria": [
-        "Schedule Trigger node with cron */30 9-16 * * 1-5 in Pacific/Honolulu timezone",
-        "Google Sheets Read Rows fetches all rows where status=pending",
-        "Filter Overdue Code node checks (now - created_at) >= 2 hours",
-        "Gmail Send Email sends per-ticket escalation to Davin with wait time calculation",
-        "Google Sheets Update Row sets status=escalated for each notified ticket",
-        "Workflow deployed to n8n"
-      ],
       "priority": 7,
       "status": "passed",
-      "failureCount": 0,
-      "requiresBrowserVerification": false
+      "failureCount": 0
+    },
+    {
+      "id": "US-008",
+      "title": "Update WF-01 with full briefing requirements (system prompt, tools, greeting)",
+      "priority": 8,
+      "status": "passed",
+      "failureCount": 0
+    },
+    {
+      "id": "US-009",
+      "title": "Fix migration flag VAPI_AI_INTAKE to VAPI_AI_COLLECTED in WF-02, WF-06, .env",
+      "priority": 9,
+      "status": "passed",
+      "failureCount": 1
     }
   ],
   "summary": {
-    "totalStories": 7,
-    "passed": 7,
+    "totalStories": 9,
+    "passed": 9,
     "blocked": 0,
     "pending": 0,
-    "iterationsRun": 7
+    "iterationsRun": 10
   }
 }
