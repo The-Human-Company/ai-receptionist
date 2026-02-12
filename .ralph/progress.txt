@@ -1,0 +1,49 @@
+================================================================================
+RALPH PROGRESS LOG - Equity Insurance AI Receptionist - 7 Workflow Deployment
+Branch: ralph/deploy-7-workflows
+Started: 2026-02-13T00:00:00.000Z
+Completion Promise: All tests pass
+================================================================================
+
+--- CODEBASE PATTERNS (Consolidated) ---
+
+PROJECT TYPE: n8n workflow automation (no package.json build system)
+DEPLOYMENT: n8n REST API at https://n8n.nomanuai.com
+DEPLOY MECHANISM: /deploy-workflow skill (POST /api/v1/workflows) and /update-n8n-workflow skill (PUT)
+
+EXISTING WORKFLOWS ON INSTANCE:
+- 1IX82-PqM5HiZq7sUSfpf: "Equity Insurance - VAPI AI Receptionist (Main)" - 13 nodes, ACTIVE
+- 5LCW3l7WBBOClWIV: "Equity Insurance - Post-Call Notifications & Escalation" - 9 nodes, INACTIVE
+- kVAZboMRFcblG1qX: "WCRAv3 Error Handler" - ACTIVE
+- O4Edwi1Wa1cSqbUz: "Weekly Campaign Report v3" - INACTIVE
+- bFjs13pY08N5Lnct: "Ravi-test" - INACTIVE
+
+WORKFLOW JSON PATTERNS (from existing files):
+- Nodes need: id, name, type, typeVersion, position, parameters
+- Connections object maps node names to output/input connections
+- Webhook nodes use n8n-nodes-base.webhook typeVersion 2
+- Code nodes use n8n-nodes-base.code typeVersion 2
+- Switch nodes use n8n-nodes-base.switch typeVersion 2
+- Set nodes use n8n-nodes-base.set typeVersion 3.4
+- Positions are [x, y] coordinates for visual layout
+- Settings: timezone Pacific/Honolulu, executionOrder v1
+
+n8n API PATTERN:
+- POST /api/v1/workflows to create
+- PUT /api/v1/workflows/{id} to update
+- PATCH /api/v1/workflows/{id} with {"active": true/false} to activate/deactivate
+- Auth via X-N8N-API-KEY header
+- Write large JSON to temp file, curl with -d @tempfile.json
+
+CREDENTIAL REFERENCES:
+- Google Sheets OAuth2, Gmail/SMTP, VAPI HTTP Auth, QQ Catalyst - all use placeholders
+- Credential nodes reference by name, configured in n8n Settings > Credentials
+
+BUSINESS RULES:
+- Business hours: 9am-5pm HST (UTC-10, no DST)
+- Hot lead: Property >= $2M or Auto >= $180K
+- Disqualifier: Claims >= 3/year or urgency <= 72h
+- Migration flag: VAPI_AI_INTAKE on all records
+- Escalation: Tickets pending > 2 hours -> email Davin
+
+================================================================================

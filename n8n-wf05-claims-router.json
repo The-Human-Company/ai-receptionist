@@ -1,0 +1,165 @@
+{
+  "name": "WF-05 Claims Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-claim",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf05-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "vapi-claim"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            { "id": "c-call_id", "name": "call_id", "value": "={{ $json.message.functionCall.parameters.call_id }}", "type": "string" },
+            { "id": "c-name", "name": "caller_name", "value": "={{ $json.message.functionCall.parameters.caller_name }}", "type": "string" },
+            { "id": "c-phone", "name": "caller_phone", "value": "={{ $json.message.functionCall.parameters.caller_phone }}", "type": "string" },
+            { "id": "c-policy_num", "name": "policy_number", "value": "={{ $json.message.functionCall.parameters.policy_number }}", "type": "string" },
+            { "id": "c-claim_type", "name": "claim_type", "value": "={{ $json.message.functionCall.parameters.claim_type }}", "type": "string" },
+            { "id": "c-desc", "name": "claim_description", "value": "={{ $json.message.functionCall.parameters.claim_description }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf05-extract-data",
+      "name": "Extract Claim Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst utcHours = now.getUTCHours();\nconst utcDay = now.getUTCDay();\nlet hstHours = utcHours - 10;\nlet hstDay = utcDay;\nif (hstHours < 0) {\n  hstHours += 24;\n  hstDay = (hstDay - 1 + 7) % 7;\n}\n\nconst isWeekday = hstDay >= 1 && hstDay <= 5;\nconst isWithinHours = hstHours >= 9 && hstHours < 17;\nconst isBusinessHours = isWeekday && isWithinHours;\n\nreturn [{ json: { ...items[0].json, isBusinessHours, hstHours, hstDay } }];"
+      },
+      "id": "wf05-check-hours",
+      "name": "Check Business Hours",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [710, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "biz-hours",
+              "leftValue": "={{ $json.isBusinessHours }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf05-if-hours",
+      "name": "IF Business Hours",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.VAPI_API_BASE }}/call/{{ $json.call_id }}/transfer",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"destination\": { \"type\": \"number\", \"number\": \"{{ $env.TRANSFER_PRIMARY_PHONE }}\" }, \"mode\": \"warm\" }",
+        "options": { "timeout": 30000 }
+      },
+      "id": "wf05-transfer",
+      "name": "Send VAPI Transfer Command",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vapi-http-cred",
+          "name": "VAPI HTTP Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.NOTIFY_EMAIL_VAL }}, {{ $env.NOTIFY_EMAIL_DAVIN }}",
+        "subject": "=CLAIM — {{ $json.claim_type }} — {{ $json.caller_name }} — {{ $json.isBusinessHours ? 'TRANSFER ATTEMPTED' : 'AFTER HOURS' }}",
+        "emailType": "text",
+        "message": "=Caller: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy #: {{ $json.policy_number || 'Not provided' }}\nClaim Type: {{ $json.claim_type }}\nDescription: {{ $json.claim_description }}\nTime: {{ $now }}\nPriority: HIGH\n\nPlease follow up as soon as possible."
+      },
+      "id": "wf05-priority-notification",
+      "name": "Send Priority Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1200, 420],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-cred",
+          "name": "SMTP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"result\": { \"claim_received\": true, \"transfer_attempted\": {{ $json.isBusinessHours }}, \"message\": \"{{ $json.isBusinessHours ? 'Transfer initiated to claims agent' : 'After hours - priority notification sent' }}\" } }",
+        "options": {}
+      },
+      "id": "wf05-respond",
+      "name": "Respond to VAPI",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Extract Claim Data", "type": "main", "index": 0 }]]
+    },
+    "Extract Claim Data": {
+      "main": [[{ "node": "Check Business Hours", "type": "main", "index": 0 }]]
+    },
+    "Check Business Hours": {
+      "main": [[{ "node": "IF Business Hours", "type": "main", "index": 0 }]]
+    },
+    "IF Business Hours": {
+      "main": [
+        [
+          { "node": "Send VAPI Transfer Command", "type": "main", "index": 0 },
+          { "node": "Send Priority Notification", "type": "main", "index": 0 }
+        ],
+        [{ "node": "Send Priority Notification", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send VAPI Transfer Command": {
+      "main": [[{ "node": "Respond to VAPI", "type": "main", "index": 0 }]]
+    },
+    "Send Priority Notification": {
+      "main": [[{ "node": "Respond to VAPI", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

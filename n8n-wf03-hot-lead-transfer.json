@@ -1,0 +1,191 @@
+{
+  "name": "WF-03 Hot Lead Transfer Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            { "id": "t-call_id", "name": "call_id", "value": "={{ $json.call_id }}", "type": "string" },
+            { "id": "t-caller_name", "name": "caller_name", "value": "={{ $json.caller_name }}", "type": "string" },
+            { "id": "t-caller_phone", "name": "caller_phone", "value": "={{ $json.caller_phone }}", "type": "string" },
+            { "id": "t-policy_type", "name": "policy_type", "value": "={{ $json.policy_type }}", "type": "string" },
+            { "id": "t-estimated_value", "name": "estimated_value", "value": "={{ $json.estimated_value }}", "type": "number" },
+            { "id": "t-transfer_primary", "name": "transfer_to_primary", "value": "={{ $env.TRANSFER_PRIMARY_PHONE }}", "type": "string" },
+            { "id": "t-transfer_secondary", "name": "transfer_to_secondary", "value": "={{ $env.TRANSFER_SECONDARY_PHONE }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf03-receive-input",
+      "name": "Receive Input Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.VAPI_API_BASE }}/call/{{ $json.call_id }}/transfer",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"destination\": { \"type\": \"number\", \"number\": \"{{ $json.transfer_to_primary }}\" }, \"mode\": \"warm\" }",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "wf03-send-transfer",
+      "name": "Send VAPI Transfer Command",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vapi-http-cred",
+          "name": "VAPI HTTP Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "id": "wf03-wait",
+      "name": "Wait for Transfer Result",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [730, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "transfer-check",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "answered",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf03-if-success",
+      "name": "IF Transfer Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_LEADS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Leads", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "call_status": "transferred_hot_lead",
+            "transfer_target": "={{ $json.transfer_to_primary }}",
+            "transfer_time": "={{ $now }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf03-update-success",
+      "name": "Update Lead (Success)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1220, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_LEADS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Leads", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "call_status": "transfer_failed_hot_lead",
+            "priority": "critical"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf03-update-failure",
+      "name": "Update Lead (Failure)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1220, 400],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.NOTIFY_EMAIL_VAL }}, {{ $env.NOTIFY_EMAIL_DAVIN }}",
+        "subject": "=URGENT: HOT LEAD TRANSFER FAILED — {{ $json.caller_name }} — CALLBACK REQUIRED",
+        "emailType": "text",
+        "message": "=Transfer to {{ $json.transfer_to_primary }} and {{ $json.transfer_to_secondary }} FAILED.\n\nCaller: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy: {{ $json.policy_type }}\nValue: ${{ $json.estimated_value }}\n\nIMMEDIATE CALLBACK REQUIRED."
+      },
+      "id": "wf03-urgent-email",
+      "name": "Send URGENT Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1470, 400],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-cred",
+          "name": "SMTP Credentials"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Receive Input Data": {
+      "main": [[{ "node": "Send VAPI Transfer Command", "type": "main", "index": 0 }]]
+    },
+    "Send VAPI Transfer Command": {
+      "main": [[{ "node": "Wait for Transfer Result", "type": "main", "index": 0 }]]
+    },
+    "Wait for Transfer Result": {
+      "main": [[{ "node": "IF Transfer Success", "type": "main", "index": 0 }]]
+    },
+    "IF Transfer Success": {
+      "main": [
+        [{ "node": "Update Lead (Success)", "type": "main", "index": 0 }],
+        [{ "node": "Update Lead (Failure)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Update Lead (Failure)": {
+      "main": [[{ "node": "Send URGENT Notification", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

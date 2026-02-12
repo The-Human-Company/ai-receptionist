@@ -1,0 +1,158 @@
+{
+  "name": "WF-01 Inbound Call Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-call-started",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf01-webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "vapi-call-started"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "call_id",
+              "name": "call_id",
+              "value": "={{ $json.message.call.id }}",
+              "type": "string"
+            },
+            {
+              "id": "caller_phone",
+              "name": "caller_phone",
+              "value": "={{ $json.message.call.customer.number }}",
+              "type": "string"
+            },
+            {
+              "id": "call_timestamp",
+              "name": "call_timestamp",
+              "value": "={{ $json.message.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "assistant_id",
+              "name": "assistant_id",
+              "value": "={{ $json.message.call.assistantId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf01-extract-call-data",
+      "name": "Extract Call Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if current time is within business hours (9am-5pm HST)\nconst now = new Date();\n\n// Hawaii Standard Time = UTC - 10 (no daylight saving ever)\nconst utcHours = now.getUTCHours();\nconst utcDay = now.getUTCDay(); // 0=Sun, 1=Mon ... 6=Sat\nlet hstHours = utcHours - 10;\nlet hstDay = utcDay;\nif (hstHours < 0) {\n  hstHours += 24;\n  hstDay = (hstDay - 1 + 7) % 7;\n}\n\nconst isWeekday = hstDay >= 1 && hstDay <= 5;\nconst isWithinHours = hstHours >= 9 && hstHours < 17;\nconst isBusinessHours = isWeekday && isWithinHours;\n\nreturn [{\n  json: {\n    ...items[0].json,\n    isBusinessHours,\n    hstHours,\n    hstDay\n  }\n}];"
+      },
+      "id": "wf01-check-hours",
+      "name": "Check Business Hours",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [710, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "biz-hours-check",
+              "leftValue": "={{ $json.isBusinessHours }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf01-if-business-hours",
+      "name": "IF Business Hours",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"assistant\": {\n    \"firstMessage\": \"Hello, thank you for calling Equity Insurance. I am your AI receptionist. Just so you know, Equity Insurance is based in Honolulu, Hawaii, and we are not affiliated with or associated with any other Equity Insurance, including Equity Insurance in Tulsa, Oklahoma. To help you as quickly as possible, please let me know: Are you a new customer looking for a quote, an existing customer needing assistance, or are you calling about a claim?\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"temperature\": 0.3,\n      \"maxTokens\": 500,\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"You are the AI receptionist for Equity Insurance, a 3rd-generation family-owned independent insurance agency based in Honolulu, Hawaii. You are professional, warm, and friendly. You are not a licensed agent. You collect information and schedule follow-ups with human agents.\\n\\nRULES YOU MUST ALWAYS FOLLOW:\\n1. You must NEVER give coverage guarantees, bind policies, underwrite, or offer specific coverage advice.\\n2. You must NEVER discuss Private Mortgage Insurance, Federal loans, or Freddie Mac. Mortgage Protection is acceptable.\\n3. You must ALWAYS state early in the call: We are not affiliated with or associated with Equity Insurance in Tulsa, Oklahoma.\\n4. If you are unsure about anything, say: That is a great question. I will make sure our agent addresses that when they follow up with you.\\n5. Products we NO LONGER offer: Pet Insurance, Travel Insurance.\\n6. We work with multiple insurance carriers. Quotes take 24 to 72 hours.\\n7. Minimum premium is $150 per year for a basic renters policy.\\n8. If a caller asks for Davin regarding a P&C inquiry, say: Davin is currently assisting other clients, but I can gather your information now to speed up the quoting process for you.\\n9. If a caller mentions Life Insurance or Medicare, immediately transfer to Davin.\\n10. At any time, the caller can press pound to reach a live agent during business hours.\\n\\nDATA COLLECTION ORDER FOR NEW P&C CUSTOMERS:\\nCollect in this order: Full Name (ask to spell), Phone Number (repeat back until confirmed), Email (for sending quote, optional), Mailing Address (double-check spelling), Date of Birth, Occupation, Type of Insurance (Auto/Renters/Property/Business), Referral Source (who referred you, we would like to thank them), Claims History (past 5 years), Coverage Urgency (when do you need coverage to start).\\n\\nAfter collecting claims and urgency, call the check_disqualifier function. If disqualified, deliver the polite redirect and end the intake. After collecting property value or auto value, call the check_hot_lead function. If hot lead, deliver the transfer script.\\n\\nAfter all data is collected and the lead is qualified, offer ONE cross-sell question based on the policy type. Then summarize all collected data and ask the caller to confirm. Then deliver the closing script.\"\n        }\n      ]\n    },\n    \"voice\": {\n      \"provider\": \"elevenlabs\",\n      \"voiceId\": \"EXAVITQu4vr4xnSDxMaL\",\n      \"stability\": 0.7,\n      \"similarityBoost\": 0.8,\n      \"style\": 0.3\n    },\n    \"serverUrl\": \"https://solarexpresss.app.n8n.cloud/webhook/vapi-save-field\",\n    \"tools\": [\n      {\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"save_field\",\n          \"description\": \"Save a collected data field to the system\",\n          \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"call_id\": { \"type\": \"string\" },\n              \"field_name\": { \"type\": \"string\", \"enum\": [\"caller_name\",\"caller_phone\",\"caller_email\",\"caller_address\",\"caller_dob\",\"caller_occupation\",\"policy_type\",\"referral_source\",\"claims_count\",\"claims_details\",\"urgency_timeline\",\"current_coverage\",\"shopping_reason\",\"auto_vehicle_info\",\"auto_vin\",\"auto_lien_type\",\"auto_lienholder\",\"auto_violations\",\"auto_household_drivers\",\"auto_title_names\",\"renter_address\",\"renter_possessions_value\",\"renter_mgmt_company\",\"renter_addl_insured\",\"property_address\",\"property_first_buyer\",\"property_value\",\"property_coverage_needs\",\"property_policy_age\",\"biz_name\",\"biz_ein\",\"biz_start_date\",\"biz_revenue\",\"biz_industry\",\"biz_contact\",\"cross_sell_interest\",\"cross_sell_types\"] },\n              \"field_value\": { \"type\": \"string\" }\n            },\n            \"required\": [\"call_id\",\"field_name\",\"field_value\"]\n          }\n        },\n        \"server\": { \"url\": \"https://solarexpresss.app.n8n.cloud/webhook/vapi-save-field\" }\n      },\n      {\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"check_disqualifier\",\n          \"description\": \"Check if the caller is disqualified based on claims or urgency\",\n          \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"call_id\": { \"type\": \"string\" },\n              \"claims_count_worst_year\": { \"type\": \"integer\" },\n              \"urgency_hours\": { \"type\": \"integer\" }\n            },\n            \"required\": [\"call_id\",\"claims_count_worst_year\",\"urgency_hours\"]\n          }\n        },\n        \"server\": { \"url\": \"https://solarexpresss.app.n8n.cloud/webhook/vapi-check-disqualifier\" }\n      },\n      {\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"check_hot_lead\",\n          \"description\": \"Check if the caller qualifies as a high-value hot lead\",\n          \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"call_id\": { \"type\": \"string\" },\n              \"policy_type\": { \"type\": \"string\" },\n              \"estimated_value\": { \"type\": \"number\" }\n            },\n            \"required\": [\"call_id\",\"policy_type\",\"estimated_value\"]\n          }\n        },\n        \"server\": { \"url\": \"https://solarexpresss.app.n8n.cloud/webhook/vapi-check-hotlead\" }\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "wf01-return-biz-hours",
+      "name": "Return Business Hours Config",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"assistant\": {\n    \"firstMessage\": \"You have reached Equity Insurance outside of our regular office hours, from 9 AM to 5 PM Hawaii Standard Time. If you know your party extension, you may dial it at any time. Otherwise, press pound to continue with our AI receptionist for general inquiries, or stay on the line to leave a voicemail. We will return your call on the next business day.\",\n    \"model\": {\n      \"provider\": \"openai\",\n      \"model\": \"gpt-4o\",\n      \"temperature\": 0.3,\n      \"maxTokens\": 500,\n      \"messages\": [\n        {\n          \"role\": \"system\",\n          \"content\": \"You are the AI receptionist for Equity Insurance, a 3rd-generation family-owned independent insurance agency based in Honolulu, Hawaii. This call is AFTER HOURS. Keep the interaction brief. Collect only: Full Name, Phone Number, and Reason for Calling. Then deliver the closing script: Thank you for calling Equity Insurance. A member of our team will follow up with you on the next business day. Have a wonderful evening.\\n\\nRULES: You must NEVER give coverage advice, bind policies, or make any promises. You must state early: We are not affiliated with Equity Insurance in Tulsa, Oklahoma.\\n\\nAfter collecting name, phone, and reason, call the save_field function for each field, then end the conversation politely.\"\n        }\n      ]\n    },\n    \"voice\": {\n      \"provider\": \"elevenlabs\",\n      \"voiceId\": \"EXAVITQu4vr4xnSDxMaL\",\n      \"stability\": 0.7,\n      \"similarityBoost\": 0.8,\n      \"style\": 0.3\n    },\n    \"serverUrl\": \"https://solarexpresss.app.n8n.cloud/webhook/vapi-save-field\",\n    \"tools\": [\n      {\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"save_field\",\n          \"description\": \"Save a collected data field to the system\",\n          \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"call_id\": { \"type\": \"string\" },\n              \"field_name\": { \"type\": \"string\", \"enum\": [\"caller_name\",\"caller_phone\",\"reason_for_calling\"] },\n              \"field_value\": { \"type\": \"string\" }\n            },\n            \"required\": [\"call_id\",\"field_name\",\"field_value\"]\n          }\n        },\n        \"server\": { \"url\": \"https://solarexpresss.app.n8n.cloud/webhook/vapi-save-field\" }\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "wf01-return-after-hours",
+      "name": "Return After-Hours Config",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 420]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Extract Call Data", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract Call Data": {
+      "main": [
+        [{ "node": "Check Business Hours", "type": "main", "index": 0 }]
+      ]
+    },
+    "Check Business Hours": {
+      "main": [
+        [{ "node": "IF Business Hours", "type": "main", "index": 0 }]
+      ]
+    },
+    "IF Business Hours": {
+      "main": [
+        [{ "node": "Return Business Hours Config", "type": "main", "index": 0 }],
+        [{ "node": "Return After-Hours Config", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

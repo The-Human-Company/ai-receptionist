@@ -1,0 +1,133 @@
+{
+  "name": "WF-04 Existing Customer Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-existing-customer",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf04-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "vapi-existing-customer"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            { "id": "e-call_id", "name": "call_id", "value": "={{ $json.message.functionCall.parameters.call_id }}", "type": "string" },
+            { "id": "e-name", "name": "caller_name", "value": "={{ $json.message.functionCall.parameters.caller_name }}", "type": "string" },
+            { "id": "e-phone", "name": "caller_phone", "value": "={{ $json.message.functionCall.parameters.caller_phone }}", "type": "string" },
+            { "id": "e-policy", "name": "policy_type", "value": "={{ $json.message.functionCall.parameters.policy_type }}", "type": "string" },
+            { "id": "e-desc", "name": "request_description", "value": "={{ $json.message.functionCall.parameters.request_description }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf04-extract-data",
+      "name": "Extract Customer Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_TICKETS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Tickets", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.call_id }}_existing",
+            "call_id": "={{ $json.call_id }}",
+            "caller_name": "={{ $json.caller_name }}",
+            "caller_phone": "={{ $json.caller_phone }}",
+            "policy_type": "={{ $json.policy_type }}",
+            "request_description": "={{ $json.request_description }}",
+            "created_at": "={{ $now }}",
+            "status": "pending",
+            "escalated": "false",
+            "assigned_to": "Val",
+            "acknowledged_at": "",
+            "completed_at": ""
+          }
+        },
+        "options": { "cellFormat": "USER_ENTERED" }
+      },
+      "id": "wf04-create-ticket",
+      "name": "Create Ticket Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [710, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.NOTIFY_EMAIL_VAL }}",
+        "subject": "=[Existing Customer] {{ $json.caller_name }} — {{ $json.policy_type }} — Callback Requested",
+        "emailType": "text",
+        "message": "=Name: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy Type: {{ $json.policy_type }}\nRequest: {{ $json.request_description }}\nTime: {{ $now }}\n\nPlease follow up and update the ticket status in the tracking sheet."
+      },
+      "id": "wf04-email-val",
+      "name": "Send Notification to Val",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [940, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-cred",
+          "name": "SMTP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"result\": \"success\", \"message\": \"Ticket created, notification sent to Val\" }",
+        "options": {}
+      },
+      "id": "wf04-respond",
+      "name": "Respond to VAPI",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1170, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Extract Customer Data", "type": "main", "index": 0 }]]
+    },
+    "Extract Customer Data": {
+      "main": [[{ "node": "Create Ticket Row", "type": "main", "index": 0 }]]
+    },
+    "Create Ticket Row": {
+      "main": [[{ "node": "Send Notification to Val", "type": "main", "index": 0 }]]
+    },
+    "Send Notification to Val": {
+      "main": [[{ "node": "Respond to VAPI", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

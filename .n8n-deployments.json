@@ -6,7 +6,8 @@
       "lastDeployed": "2026-02-10T02:05:06.277Z",
       "name": "Equity Insurance - VAPI AI Receptionist (Main)",
       "nodeCount": 13,
-      "active": true
+      "active": true,
+      "note": "Legacy monolithic workflow - kept as backup"
     },
     "notifications-escalation": {
       "workflowId": "5LCW3l7WBBOClWIV",
@@ -15,7 +16,70 @@
       "name": "Equity Insurance - Post-Call Notifications & Escalation",
       "nodeCount": 9,
       "active": false,
-      "note": "Needs SMTP credentials configured on n8n instance before activation"
+      "note": "Legacy notification workflow - kept as backup"
+    },
+    "wf01-inbound-call-router": {
+      "workflowId": "mghU5hDPImnGTMKe",
+      "sourceFile": "n8n-wf01-inbound-call-router.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-01 Inbound Call Router",
+      "nodeCount": 6,
+      "active": false,
+      "webhookPath": "/vapi-call-started"
+    },
+    "wf02-new-customer-intake": {
+      "workflowId": "BEOQVaIituRIqug9",
+      "sourceFile": "n8n-wf02-new-customer-intake.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-02 New Customer P&C Intake",
+      "nodeCount": 17,
+      "active": false,
+      "webhookPaths": ["/vapi-save-field", "/vapi-check-disqualifier", "/vapi-check-hotlead"]
+    },
+    "wf03-hot-lead-transfer": {
+      "workflowId": "AxGXJxHIDQJILOtQ",
+      "sourceFile": "n8n-wf03-hot-lead-transfer.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-03 Hot Lead Transfer Handler",
+      "nodeCount": 7,
+      "active": false,
+      "note": "Sub-workflow triggered by WF-02 hot lead detection"
+    },
+    "wf04-existing-customer": {
+      "workflowId": "BNsx9bdXMBKfJjCe",
+      "sourceFile": "n8n-wf04-existing-customer.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-04 Existing Customer Handler",
+      "nodeCount": 5,
+      "active": false,
+      "webhookPath": "/vapi-existing-customer"
+    },
+    "wf05-claims-router": {
+      "workflowId": "ZAoSyxR2U2lH2a7b",
+      "sourceFile": "n8n-wf05-claims-router.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-05 Claims Router",
+      "nodeCount": 7,
+      "active": false,
+      "webhookPath": "/vapi-claim"
+    },
+    "wf06-post-call-processor": {
+      "workflowId": "nKwYydxwd8n58ExN",
+      "sourceFile": "n8n-wf06-post-call-processor.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-06 Post-Call Processor",
+      "nodeCount": 15,
+      "active": false,
+      "webhookPath": "/vapi-call-ended"
+    },
+    "wf07-escalation-monitor": {
+      "workflowId": "aTOUUPC13xwUH6PI",
+      "sourceFile": "n8n-wf07-escalation-monitor.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-07 Escalation Monitor",
+      "nodeCount": 5,
+      "active": false,
+      "note": "Cron: */30 9-16 * * 1-5 Pacific/Honolulu"
     }
   }
 }

@@ -1,0 +1,128 @@
+{
+  "name": "WF-07 Escalation Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/30 9-16 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "wf07-cron",
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_TICKETS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Tickets", "mode": "name" },
+        "filtersUI": {
+          "values": [
+            { "lookupColumn": "status", "lookupValue": "pending" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf07-read-tickets",
+      "name": "Read Pending Tickets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [480, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const tickets = items;\nconst now = new Date();\nconst thresholdMs = 2 * 60 * 60 * 1000; // 2 hours in milliseconds\n\nconst overdue = tickets.filter(t => {\n  const created = new Date(t.json.created_at);\n  return (now - created) >= thresholdMs && t.json.status === 'pending';\n});\n\nreturn overdue.length > 0 ? overdue : [];"
+      },
+      "id": "wf07-filter-overdue",
+      "name": "Filter Overdue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [710, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.NOTIFY_EMAIL_DAVIN }}",
+        "subject": "=ESCALATION: {{ $json.caller_name }} waiting {{ Math.round((Date.now() - new Date($json.created_at).getTime()) / 3600000) }} hours for callback",
+        "emailType": "text",
+        "message": "=Ticket ID: {{ $json.ticket_id }}\nCaller: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy: {{ $json.policy_type }}\nRequest: {{ $json.request_description }}\nCreated: {{ $json.created_at }}\nTime Waiting: {{ Math.round((Date.now() - new Date($json.created_at).getTime()) / 3600000) }} hours\n\nPlease follow up immediately or update the ticket status."
+      },
+      "id": "wf07-escalation-email",
+      "name": "Send Escalation to Davin",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [940, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-cred",
+          "name": "SMTP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_TICKETS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Tickets", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ticket_id": "={{ $json.ticket_id }}",
+            "status": "escalated",
+            "escalated": "true",
+            "escalated_at": "={{ $now }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf07-update-ticket",
+      "name": "Update Ticket Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1170, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [[{ "node": "Read Pending Tickets", "type": "main", "index": 0 }]]
+    },
+    "Read Pending Tickets": {
+      "main": [[{ "node": "Filter Overdue", "type": "main", "index": 0 }]]
+    },
+    "Filter Overdue": {
+      "main": [[{ "node": "Send Escalation to Davin", "type": "main", "index": 0 }]]
+    },
+    "Send Escalation to Davin": {
+      "main": [[{ "node": "Update Ticket Status", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

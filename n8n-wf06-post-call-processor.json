@@ -1,0 +1,386 @@
+{
+  "name": "WF-06 Post-Call Processor",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-call-ended",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf06-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "vapi-call-ended"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            { "id": "p-call_id", "name": "call_id", "value": "={{ $json.message.call.id }}", "type": "string" },
+            { "id": "p-status", "name": "call_status", "value": "={{ $json.message.call.status }}", "type": "string" },
+            { "id": "p-duration", "name": "call_duration", "value": "={{ $json.message.call.duration }}", "type": "number" },
+            { "id": "p-transcript", "name": "transcript", "value": "={{ $json.message.call.transcript }}", "type": "string" },
+            { "id": "p-recording", "name": "recording_url", "value": "={{ $json.message.call.recordingUrl }}", "type": "string" },
+            { "id": "p-ended_reason", "name": "ended_reason", "value": "={{ $json.message.call.endedReason }}", "type": "string" },
+            { "id": "p-caller_phone", "name": "caller_phone", "value": "={{ $json.message.call.customer.number }}", "type": "string" },
+            { "id": "p-cost", "name": "cost", "value": "={{ $json.message.call.cost }}", "type": "number" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf06-extract-data",
+      "name": "Extract All Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_LEADS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Leads", "mode": "name" },
+        "filtersUI": {
+          "values": [
+            { "lookupColumn": "call_id", "lookupValue": "={{ $json.call_id }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf06-read-lead",
+      "name": "Read Lead Record",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [710, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            { "field1": "call_id", "field2": "call_id" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf06-merge",
+      "name": "Merge Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            { "id": "m-flag", "name": "migration_flag", "value": "VAPI_AI_INTAKE", "type": "string" },
+            { "id": "m-date", "name": "migration_date", "value": "={{ $now }}", "type": "string" }
+          ]
+        },
+        "options": { "includeBinary": false }
+      },
+      "id": "wf06-add-migration",
+      "name": "Add Migration Flag",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1170, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.QQ_CATALYST_API_URL || 'https://placeholder-crm-api.example.com' }}/contacts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "wf06-crm-write",
+      "name": "Write to QQ Catalyst",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qq-catalyst-cred",
+          "name": "QQ Catalyst API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "crm-error-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf06-crm-fallback-check",
+      "name": "CRM Write Fallback",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1630, 200]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_LEADS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Leads", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "call_status": "={{ $json.call_status }}",
+            "call_duration": "={{ $json.call_duration }}",
+            "recording_url": "={{ $json.recording_url }}",
+            "migration_flag": "VAPI_AI_INTAKE",
+            "migration_date": "={{ $now }}",
+            "crm_sync_error": "CRM write failed - data saved to sheet"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf06-fallback-sheet",
+      "name": "Fallback to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1860, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = items[0].json;\nlet subject = '';\nlet body = '';\nconst status = d.call_status || 'unknown';\nconst name = d.caller_name || 'Unknown Caller';\nconst ptype = d.policy_type || 'N/A';\n\nif (d.hot_lead) {\n  subject = `[HOT LEAD TRANSFERRED] ${name} — $${d.estimated_value}`;\n  body = `Hot lead transferred. Value: $${d.estimated_value}. Policy: ${ptype}.`;\n} else if (d.disqualified) {\n  subject = `[DISQUALIFIED] ${name} — ${ptype} — ${d.disqualifier_reason}`;\n  body = `Disqualified: ${d.disqualifier_reason}. Optional follow-up if warranted.`;\n} else if (status === 'transfer_failed_hot_lead') {\n  subject = `[TRANSFER FAILED] ${name} — CALLBACK REQUIRED`;\n  body = `Transfer failed. IMMEDIATE callback within 1 hour.`;\n} else if (d.claim_type) {\n  subject = `[CLAIM] ${name} — ${d.claim_type}`;\n  body = `Claim: ${d.claim_type}. ${d.claim_description || ''}`;\n} else if (d.request_description) {\n  subject = `[EXISTING] ${name} — ${d.request_description}`;\n  body = `Existing customer request: ${d.request_description}`;\n} else if (d.ended_reason === 'hangup') {\n  subject = `[PARTIAL] ${name} — Caller hung up`;\n  body = `Partial intake. Consider follow-up.`;\n} else {\n  subject = `[QUALIFIED] New AI Lead — ${name} — ${ptype}`;\n  body = `Qualified lead. Follow up within 24-72 hours.`;\n}\n\nbody += `\\n\\nCall Duration: ${d.call_duration || 0}s`;\nbody += `\\nPhone: ${d.caller_phone || 'N/A'}`;\nbody += `\\nPolicy Type: ${ptype}`;\nbody += `\\nRecording: ${d.recording_url || 'N/A'}`;\nbody += `\\n\\nFull data available in the Leads sheet.`;\n\nreturn [{ json: { ...d, email_subject: subject, email_body: body } }];"
+      },
+      "id": "wf06-build-email",
+      "name": "Build Summary Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1400, 450]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.NOTIFY_EMAIL_VAL }}, {{ $env.NOTIFY_EMAIL_DAVIN }}",
+        "subject": "={{ $json.email_subject }}",
+        "emailType": "text",
+        "message": "={{ $json.email_body }}"
+      },
+      "id": "wf06-send-summary",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1630, 450],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-cred",
+          "name": "SMTP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ANALYTICS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Analytics", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.format('yyyy-MM-dd') }}",
+            "time": "={{ $now.format('HH:mm:ss') }}",
+            "day_of_week": "={{ $now.format('EEEE') }}",
+            "call_duration_seconds": "={{ $json.call_duration }}",
+            "caller_phone_masked": "=***{{ $json.caller_phone ? $json.caller_phone.slice(-4) : '0000' }}",
+            "policy_type": "={{ $json.policy_type || 'N/A' }}",
+            "intent": "={{ $json.intent || 'unknown' }}",
+            "qualification_status": "={{ $json.disqualified ? 'disqualified' : ($json.hot_lead ? 'hot_lead' : 'qualified') }}",
+            "transfer_status": "={{ $json.call_status }}",
+            "cross_sell_offered": "={{ $json.cross_sell_offered || false }}",
+            "cross_sell_accepted": "={{ $json.cross_sell_interest || false }}",
+            "referral_source": "={{ $json.referral_source || '' }}",
+            "business_hours": "={{ $json.isBusinessHours || true }}",
+            "priority": "={{ $json.priority || 'normal' }}"
+          }
+        },
+        "options": { "cellFormat": "USER_ENTERED" }
+      },
+      "id": "wf06-log-analytics",
+      "name": "Log Analytics Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1860, 450],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_LEADS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Transcripts", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "date": "={{ $now.format('yyyy-MM-dd') }}",
+            "caller_name": "={{ $json.caller_name || 'Unknown' }}",
+            "transcript_text": "={{ $json.transcript }}",
+            "recording_url": "={{ $json.recording_url }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf06-save-transcript",
+      "name": "Save Transcript",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [2090, 450],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"result\": \"success\", \"message\": \"Post-call processing complete\" }",
+        "options": {}
+      },
+      "id": "wf06-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2320, 300]
+    },
+    {
+      "parameters": {},
+      "id": "wf06-error-handler",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ERRORS_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Errors", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $now }}",
+            "workflow_id": "WF-06",
+            "workflow_name": "Post-Call Processor",
+            "node_name": "={{ $json.execution?.lastNodeExecuted || 'unknown' }}",
+            "error_message": "={{ $json.execution?.error?.message || 'Unknown error' }}",
+            "call_id": "={{ $json.execution?.data?.call_id || 'unknown' }}",
+            "resolution_status": "open",
+            "resolved_at": "",
+            "notes": ""
+          }
+        },
+        "options": {}
+      },
+      "id": "wf06-log-error",
+      "name": "Log Error to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [530, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Extract All Data", "type": "main", "index": 0 }]]
+    },
+    "Extract All Data": {
+      "main": [[
+        { "node": "Read Lead Record", "type": "main", "index": 0 }
+      ]]
+    },
+    "Read Lead Record": {
+      "main": [[{ "node": "Merge Data", "type": "main", "index": 0 }]]
+    },
+    "Merge Data": {
+      "main": [[{ "node": "Add Migration Flag", "type": "main", "index": 0 }]]
+    },
+    "Add Migration Flag": {
+      "main": [[
+        { "node": "Write to QQ Catalyst", "type": "main", "index": 0 },
+        { "node": "Build Summary Email", "type": "main", "index": 0 }
+      ]]
+    },
+    "Write to QQ Catalyst": {
+      "main": [[{ "node": "CRM Write Fallback", "type": "main", "index": 0 }]]
+    },
+    "CRM Write Fallback": {
+      "main": [
+        [{ "node": "Fallback to Google Sheet", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Build Summary Email": {
+      "main": [[{ "node": "Send Summary Email", "type": "main", "index": 0 }]]
+    },
+    "Send Summary Email": {
+      "main": [[{ "node": "Log Analytics Row", "type": "main", "index": 0 }]]
+    },
+    "Log Analytics Row": {
+      "main": [[{ "node": "Save Transcript", "type": "main", "index": 0 }]]
+    },
+    "Save Transcript": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "Error Trigger": {
+      "main": [[{ "node": "Log Error to Sheet", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}
