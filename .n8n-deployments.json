@@ -21,13 +21,13 @@
     "wf01-inbound-call-router": {
       "workflowId": "mghU5hDPImnGTMKe",
       "sourceFile": "n8n-wf01-inbound-call-router.json",
-      "lastDeployed": "2026-02-13T23:15:00.000Z",
+      "lastDeployed": "2026-02-14T00:01:00.000Z",
       "name": "WF-01 Inbound Call Router",
       "nodeCount": 6,
       "active": false,
       "webhookPath": "/vapi-call-started",
       "vapiTools": ["save_field", "check_disqualifier", "check_hot_lead", "route_existing_customer", "route_claim"],
-      "note": "Updated with full briefing requirements: Val greeting, 5 VAPI tools, policy-specific intake"
+      "note": "Updated with Briefing Session #1 corrections: email REQUIRED, shopping reason, current coverage, transfer triggers, service culture, claims detail, property grandfathering, business EIN/revenue, auto lienholder, renters address"
     },
     "wf02-new-customer-intake": {
       "workflowId": "BEOQVaIituRIqug9",

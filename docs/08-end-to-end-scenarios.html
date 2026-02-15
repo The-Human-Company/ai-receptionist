@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Receptionist — End-to-End Call Scenarios</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+h4 { font-size: 14px; font-weight: 600; margin: 18px 0 8px; }
+p { margin-bottom: 12px; font-size: 14px; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+.diagram { margin: 24px 0; text-align: center; overflow-x: auto; }
+svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+th { font-weight: 600; background: #f8f8f8; }
+tr:hover { background: #fafafa; }
+.step-list { list-style: none; padding: 0; margin: 16px 0; }
+.step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+.step-list li strong { display: inline-block; min-width: 80px; }
+.dialog { margin: 16px 0; padding: 0; list-style: none; }
+.dialog li { padding: 10px 16px; margin-bottom: 4px; font-size: 13px; border-radius: 6px; max-width: 85%; }
+.dialog .ai { background: #f0f4f8; border-left: 3px solid #333; margin-right: auto; }
+.dialog .caller { background: #f8f8f0; border-left: 3px solid #999; margin-left: 15%; }
+.dialog .system { background: #fff8e1; border-left: 3px solid #f9a825; font-style: italic; font-size: 12px; max-width: 100%; }
+.dialog .label { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+.scenario-box { border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+.scenario-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.scenario-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #333; color: #fff; border-radius: 50%; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.badge-new { background: #e8f5e9; color: #2e7d32; }
+.badge-existing { background: #e3f2fd; color: #1565c0; }
+.badge-claim { background: #fce4ec; color: #c62828; }
+.badge-hot { background: #fff3e0; color: #e65100; }
+.badge-after { background: #f3e5f5; color: #7b1fa2; }
+.timeline { position: relative; padding-left: 30px; margin: 20px 0; }
+.timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #ddd; }
+.timeline-item { position: relative; margin-bottom: 16px; }
+.timeline-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #333; border: 2px solid #fff; }
+.timeline-item .time { font-size: 11px; color: #999; font-weight: 600; }
+.timeline-item .event { font-size: 13px; }
+.timeline-item .detail { font-size: 12px; color: #666; margin-top: 2px; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<h1>End-to-End Call Scenarios</h1>
+<p class="subtitle">Complete caller journey walkthroughs &mdash; from phone ring to follow-up</p>
+
+<!-- ============================================================ -->
+<!-- MASTER FLOW DIAGRAM -->
+<!-- ============================================================ -->
+<h2>Complete System Flow</h2>
+<p>This diagram shows the entire journey of an inbound call — from the moment someone dials Equity Insurance's main number through every automation step, VAPI conversation, data save, notification, and follow-up action.</p>
+
+<div class="diagram">
+<svg width="1100" height="1260" viewBox="0 0 1100 1260">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1565c0"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2e7d32"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#c62828"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e65100"/>
+    </marker>
+  </defs>
+
+  <!-- ===== ROW 1: PHONE SYSTEM ===== -->
+  <text x="550" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="#999" letter-spacing="2">PHONE SYSTEM</text>
+
+  <!-- Caller -->
+  <rect x="30" y="40" width="150" height="55" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="105" y="63" text-anchor="middle" font-size="13" font-weight="600">Caller Dials</text>
+  <text x="105" y="79" text-anchor="middle" font-size="10" fill="#666">+1 808-593-7746</text>
+
+  <line x1="180" y1="67" x2="240" y2="67" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Talkroute -->
+  <rect x="240" y="40" width="170" height="55" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="325" y="63" text-anchor="middle" font-size="13" font-weight="600">Talkroute PBX</text>
+  <text x="325" y="79" text-anchor="middle" font-size="10" fill="#666">Extension / Directory</text>
+
+  <line x1="410" y1="67" x2="470" y2="67" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- VAPI -->
+  <rect x="470" y="35" width="220" height="65" rx="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="580" y="58" text-anchor="middle" font-size="14" font-weight="700">VAPI.ai</text>
+  <text x="580" y="74" text-anchor="middle" font-size="10" fill="#666">Voice AI + GPT-4o + ElevenLabs</text>
+  <text x="580" y="88" text-anchor="middle" font-size="10" fill="#666">Warm female voice, conversational</text>
+
+  <!-- Press # -->
+  <rect x="750" y="40" width="160" height="55" rx="6" fill="#fff" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="830" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#999">Press # anytime</text>
+  <text x="830" y="76" text-anchor="middle" font-size="10" fill="#999">Transfer to human</text>
+  <line x1="690" y1="67" x2="750" y2="67" stroke="#999" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+  <!-- ===== ROW 2: VAPI GREETING + CLASSIFICATION ===== -->
+  <text x="550" y="134" text-anchor="middle" font-size="11" font-weight="700" fill="#999" letter-spacing="2">VAPI CONVERSATION</text>
+
+  <line x1="580" y1="100" x2="580" y2="145" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Greeting -->
+  <rect x="420" y="148" width="320" height="50" rx="6" fill="#f0f4f8" stroke="#333" stroke-width="1.5"/>
+  <text x="580" y="169" text-anchor="middle" font-size="12" font-weight="600">AI Greeting</text>
+  <text x="580" y="184" text-anchor="middle" font-size="10" fill="#666">"Aloha! Equity Insurance, how can I help you today?"</text>
+
+  <!-- Webhook to n8n -->
+  <rect x="800" y="148" width="140" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="870" y="168" text-anchor="middle" font-size="11" font-weight="600">WF-01</text>
+  <text x="870" y="182" text-anchor="middle" font-size="9" fill="#666">Call Router (webhook)</text>
+  <line x1="740" y1="173" x2="800" y2="173" stroke="#333" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <text x="770" y="166" text-anchor="middle" font-size="8" fill="#666">call-started</text>
+
+  <!-- Classification -->
+  <line x1="580" y1="198" x2="580" y2="228" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="430" y="230" width="300" height="45" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="580" y="250" text-anchor="middle" font-size="12" font-weight="600">VAPI Classifies Caller Intent</text>
+  <text x="580" y="264" text-anchor="middle" font-size="10" fill="#666">New customer? Existing customer? Claim?</text>
+
+  <!-- ===== ROW 3: THREE BRANCHES ===== -->
+  <text x="550" y="310" text-anchor="middle" font-size="11" font-weight="700" fill="#999" letter-spacing="2">CALL ROUTING (3 BRANCHES)</text>
+
+  <!-- Branch lines from classification -->
+  <line x1="480" y1="275" x2="170" y2="330" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <line x1="580" y1="275" x2="580" y2="330" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <line x1="680" y1="275" x2="950" y2="330" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+
+  <!-- ===== BRANCH A: NEW CUSTOMER (LEFT) ===== -->
+  <rect x="30" y="332" width="280" height="50" rx="6" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="170" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">NEW CUSTOMER</text>
+  <text x="170" y="370" text-anchor="middle" font-size="10" fill="#2e7d32">P&amp;C Insurance Quote</text>
+
+  <line x1="170" y1="382" x2="170" y2="405" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- Data Collection -->
+  <rect x="40" y="408" width="260" height="125" rx="5" fill="#fff" stroke="#2e7d32" stroke-width="1"/>
+  <text x="170" y="428" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">VAPI Collects Data (12 Fields)</text>
+  <text x="58" y="446" font-size="9" fill="#666">1. Full Name  2. Phone  3. Email (REQ)</text>
+  <text x="58" y="459" font-size="9" fill="#666">4. Mailing Address  5. Date of Birth</text>
+  <text x="58" y="472" font-size="9" fill="#666">6. Occupation  7. Insurance Type</text>
+  <text x="58" y="485" font-size="9" fill="#666">8. Referral Source  9. Shopping Reason</text>
+  <text x="58" y="498" font-size="9" fill="#666">10. Current Coverage  11-12. Policy Q's</text>
+  <text x="58" y="515" font-size="9" fill="#333" font-weight="600">Each field &#8594; save_field tool &#8594; WF-02</text>
+
+  <!-- WF-02 save flow -->
+  <line x1="170" y1="533" x2="170" y2="556" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="40" y="558" width="260" height="45" rx="5" fill="#fff" stroke="#2e7d32" stroke-width="1"/>
+  <text x="170" y="576" text-anchor="middle" font-size="11" font-weight="600">WF-02: Save to Google Sheets</text>
+  <text x="170" y="592" text-anchor="middle" font-size="9" fill="#666">Leads sheet + VAPI_AI_COLLECTED flag</text>
+
+  <!-- Qualification checks -->
+  <line x1="170" y1="603" x2="170" y2="624" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="40" y="626" width="260" height="60" rx="5" fill="#fff" stroke="#2e7d32" stroke-width="1"/>
+  <text x="170" y="648" text-anchor="middle" font-size="11" font-weight="600">Qualification Checks</text>
+  <text x="170" y="664" text-anchor="middle" font-size="9" fill="#666">check_disqualifier: 3+ claims or 72hr urgency</text>
+  <text x="170" y="677" text-anchor="middle" font-size="9" fill="#666">check_hot_lead: Property &gt;$2M or Auto &gt;$180K</text>
+
+  <!-- Hot Lead Branch -->
+  <line x1="300" y1="656" x2="350" y2="656" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+  <rect x="350" y="636" width="130" height="40" rx="5" fill="#fff3e0" stroke="#e65100" stroke-width="1"/>
+  <text x="415" y="653" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">HOT LEAD?</text>
+  <text x="415" y="667" text-anchor="middle" font-size="9" fill="#e65100">WF-03 Transfer</text>
+
+  <!-- Normal close -->
+  <line x1="170" y1="686" x2="170" y2="708" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="40" y="710" width="260" height="45" rx="5" fill="#fff" stroke="#2e7d32" stroke-width="1"/>
+  <text x="170" y="728" text-anchor="middle" font-size="11" font-weight="600">VAPI Cross-sells &amp; Closes</text>
+  <text x="170" y="744" text-anchor="middle" font-size="9" fill="#666">"Val will call you back within 24 hours. Mahalo!"</text>
+
+  <!-- ===== BRANCH B: EXISTING CUSTOMER (CENTER) ===== -->
+  <rect x="430" y="332" width="300" height="50" rx="6" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="580" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#1565c0">EXISTING CUSTOMER</text>
+  <text x="580" y="370" text-anchor="middle" font-size="10" fill="#1565c0">Policy question / Change request</text>
+
+  <line x1="580" y1="382" x2="580" y2="405" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Collect request -->
+  <rect x="440" y="408" width="280" height="80" rx="5" fill="#fff" stroke="#1565c0" stroke-width="1"/>
+  <text x="580" y="430" text-anchor="middle" font-size="11" font-weight="600" fill="#1565c0">VAPI Collects Request Info</text>
+  <text x="458" y="450" font-size="9" fill="#666">&#8226; Caller name &amp; phone</text>
+  <text x="458" y="463" font-size="9" fill="#666">&#8226; Policy type (auto, home, etc.)</text>
+  <text x="458" y="476" font-size="9" fill="#666">&#8226; Description of what they need</text>
+
+  <!-- route_existing_customer tool -->
+  <line x1="580" y1="488" x2="580" y2="510" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="440" y="512" width="280" height="45" rx="5" fill="#fff" stroke="#1565c0" stroke-width="1"/>
+  <text x="580" y="530" text-anchor="middle" font-size="11" font-weight="600">route_existing_customer tool</text>
+  <text x="580" y="546" text-anchor="middle" font-size="9" fill="#666">Webhook &#8594; WF-04</text>
+
+  <line x1="580" y1="557" x2="580" y2="578" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- WF-04 actions -->
+  <rect x="440" y="580" width="280" height="75" rx="5" fill="#fff" stroke="#1565c0" stroke-width="1"/>
+  <text x="580" y="600" text-anchor="middle" font-size="11" font-weight="600">WF-04: Existing Customer Handler</text>
+  <text x="458" y="618" font-size="9" fill="#666">1. Create ticket (status: pending)</text>
+  <text x="458" y="631" font-size="9" fill="#666">2. Email notification to Val</text>
+  <text x="458" y="644" font-size="9" fill="#666">3. Assigned to Val for callback</text>
+
+  <line x1="580" y1="655" x2="580" y2="676" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="440" y="678" width="280" height="45" rx="5" fill="#fff" stroke="#1565c0" stroke-width="1"/>
+  <text x="580" y="696" text-anchor="middle" font-size="11" font-weight="600">VAPI Confirms &amp; Closes</text>
+  <text x="580" y="712" text-anchor="middle" font-size="9" fill="#666">"Val will call you back soon. Mahalo!"</text>
+
+  <!-- ===== BRANCH C: CLAIM (RIGHT) ===== -->
+  <rect x="810" y="332" width="260" height="50" rx="6" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="940" y="352" text-anchor="middle" font-size="13" font-weight="700" fill="#c62828">CLAIM</text>
+  <text x="940" y="370" text-anchor="middle" font-size="10" fill="#c62828">Report an incident / File a claim</text>
+
+  <line x1="940" y1="382" x2="940" y2="405" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+
+  <!-- Collect claim info -->
+  <rect x="810" y="408" width="260" height="95" rx="5" fill="#fff" stroke="#c62828" stroke-width="1"/>
+  <text x="940" y="430" text-anchor="middle" font-size="11" font-weight="600" fill="#c62828">VAPI Collects Claim Details</text>
+  <text x="828" y="450" font-size="9" fill="#666">&#8226; Caller name &amp; phone</text>
+  <text x="828" y="463" font-size="9" fill="#666">&#8226; Policy number (if known)</text>
+  <text x="828" y="476" font-size="9" fill="#666">&#8226; Claim type (auto, property, etc.)</text>
+  <text x="828" y="489" font-size="9" fill="#666">&#8226; What happened (description)</text>
+
+  <!-- route_claim tool -->
+  <line x1="940" y1="503" x2="940" y2="524" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+
+  <rect x="810" y="526" width="260" height="45" rx="5" fill="#fff" stroke="#c62828" stroke-width="1"/>
+  <text x="940" y="544" text-anchor="middle" font-size="11" font-weight="600">route_claim tool</text>
+  <text x="940" y="560" text-anchor="middle" font-size="9" fill="#666">Webhook &#8594; WF-05</text>
+
+  <line x1="940" y1="571" x2="940" y2="592" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+
+  <!-- WF-05 actions -->
+  <rect x="810" y="594" width="260" height="90" rx="5" fill="#fff" stroke="#c62828" stroke-width="1"/>
+  <text x="940" y="614" text-anchor="middle" font-size="11" font-weight="600">WF-05: Claims Router</text>
+  <text x="828" y="632" font-size="9" fill="#666">Check business hours (9-5 HST):</text>
+  <text x="828" y="648" font-size="9" fill="#2e7d32" font-weight="600">During hours: Warm transfer to Val</text>
+  <text x="828" y="664" font-size="9" fill="#e65100" font-weight="600">After hours: Priority email to Val &amp; Davin</text>
+  <text x="828" y="677" font-size="9" fill="#666">Always: URGENT notification sent</text>
+
+  <!-- ===== ROW 4: POST-CALL PROCESSING ===== -->
+  <text x="550" y="790" text-anchor="middle" font-size="11" font-weight="700" fill="#999" letter-spacing="2">POST-CALL PROCESSING (ALL BRANCHES)</text>
+
+  <!-- Lines converging to WF-06 -->
+  <line x1="170" y1="755" x2="170" y2="800" stroke="#333" stroke-width="1"/>
+  <line x1="580" y1="723" x2="580" y2="800" stroke="#333" stroke-width="1"/>
+  <line x1="940" y1="684" x2="940" y2="800" stroke="#333" stroke-width="1"/>
+  <line x1="170" y1="800" x2="940" y2="800" stroke="#333" stroke-width="1"/>
+  <line x1="550" y1="800" x2="550" y2="820" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- WF-06 -->
+  <rect x="340" y="822" width="420" height="55" rx="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="550" y="844" text-anchor="middle" font-size="13" font-weight="700">WF-06: Post-Call Processor</text>
+  <text x="550" y="862" text-anchor="middle" font-size="10" fill="#666">Triggered by VAPI call-ended webhook &mdash; runs for EVERY call</text>
+
+  <line x1="550" y1="877" x2="550" y2="898" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- WF-06 pipeline -->
+  <rect x="140" y="900" width="820" height="120" rx="6" fill="#fafafa" stroke="#e0e0e0" stroke-width="1"/>
+
+  <rect x="160" y="920" width="120" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="220" y="944" text-anchor="middle" font-size="9" font-weight="600">Read Lead Data</text>
+  <line x1="280" y1="940" x2="310" y2="940" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <rect x="310" y="920" width="120" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="370" y="938" text-anchor="middle" font-size="9" font-weight="600">Add Migration</text>
+  <text x="370" y="950" text-anchor="middle" font-size="8" fill="#666">VAPI_AI_COLLECTED</text>
+  <line x1="430" y1="940" x2="460" y2="940" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <rect x="460" y="920" width="120" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="520" y="938" text-anchor="middle" font-size="9" font-weight="600">CRM Write</text>
+  <text x="520" y="950" text-anchor="middle" font-size="8" fill="#666">(with fallback)</text>
+  <line x1="580" y1="940" x2="610" y2="940" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <rect x="610" y="920" width="120" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="670" y="938" text-anchor="middle" font-size="9" font-weight="600">Email Summary</text>
+  <text x="670" y="950" text-anchor="middle" font-size="8" fill="#666">(8 variants)</text>
+  <line x1="730" y1="940" x2="760" y2="940" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <rect x="760" y="920" width="120" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="820" y="938" text-anchor="middle" font-size="9" font-weight="600">Analytics +</text>
+  <text x="820" y="950" text-anchor="middle" font-size="8" fill="#666">Transcript Save</text>
+
+  <text x="550" y="1008" text-anchor="middle" font-size="10" fill="#666">Stores: Google Sheets (Leads, Analytics, Errors) &bull; QQ Catalyst CRM &bull; Email (Val/Davin)</text>
+
+  <!-- ===== ROW 5: ESCALATION ===== -->
+  <text x="550" y="1050" text-anchor="middle" font-size="11" font-weight="700" fill="#999" letter-spacing="2">ONGOING MONITORING</text>
+
+  <rect x="340" y="1064" width="420" height="55" rx="6" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="550" y="1086" text-anchor="middle" font-size="13" font-weight="700">WF-07: Escalation Monitor</text>
+  <text x="550" y="1104" text-anchor="middle" font-size="10" fill="#666">Cron: Every 30 min, Mon-Fri 9am-4:30pm HST</text>
+
+  <line x1="550" y1="1119" x2="550" y2="1140" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="260" y="1142" width="580" height="90" rx="6" fill="#fafafa" stroke="#e0e0e0" stroke-width="1"/>
+  <text x="550" y="1168" text-anchor="middle" font-size="12" font-weight="600">Pending ticket &gt; 2 hours old?</text>
+  <text x="390" y="1194" text-anchor="middle" font-size="11" fill="#c62828" font-weight="600">YES: Email escalation to Davin</text>
+  <text x="390" y="1212" text-anchor="middle" font-size="9" fill="#666">Ticket status updated to "escalated"</text>
+  <text x="710" y="1194" text-anchor="middle" font-size="11" fill="#2e7d32" font-weight="600">NO: No action needed</text>
+  <text x="710" y="1212" text-anchor="middle" font-size="9" fill="#666">Check again in 30 minutes</text>
+
+  <!-- Divider line -->
+  <line x1="550" y1="1184" x2="550" y2="1222" stroke="#e0e0e0" stroke-width="1"/>
+</svg>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 1: NEW CUSTOMER — HAPPY PATH -->
+<!-- ============================================================ -->
+<h2>Scenario Walkthroughs</h2>
+
+<div class="scenario-box">
+<div class="scenario-header">
+  <span class="scenario-num">1</span>
+  <div>
+    <h3 style="margin:0">New Customer — Standard P&amp;C Quote</h3>
+    <span class="badge badge-new">New Customer</span>
+    <span style="font-size:12px; color:#666; margin-left:8px;">Business hours, qualifies normally, no hot lead trigger</span>
+  </div>
+</div>
+
+<h4>Caller Profile</h4>
+<p>Sarah Tanaka, a homeowner in Kailua, wants to shop for a better home insurance rate after her renewal went up.</p>
+
+<h4>Conversation</h4>
+<ul class="dialog">
+  <li class="system"><span class="label">System</span>Phone rings at Equity Insurance main line (+1 808-593-7746). Talkroute forwards to VAPI. WF-01 returns assistant config via webhook.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! My name is the virtual assistant for Equity Insurance Inc. here in Honolulu. We are always of service. How can I help you today?</li>
+  <li class="caller"><span class="label">Caller</span>Hi, I'm looking to get a quote on home insurance. My current rate just went way up.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>I'd be happy to help you get a competitive home insurance quote! Let me collect some information so our agent Val can put together the best options for you. First, may I have your full name? And could you spell it for me?</li>
+  <li class="caller"><span class="label">Caller</span>Sarah Tanaka. S-A-R-A-H, T-A-N-A-K-A.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>save_field</strong> tool &#8594; WF-02 webhook /vapi-save-field &#8594; Writes "full_name: Sarah Tanaka" to Google Sheets Leads row with VAPI_AI_COLLECTED flag</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Thank you, Sarah! And what's the best phone number to reach you?</li>
+  <li class="caller"><span class="label">Caller</span>808-555-0142.</li>
+  <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves phone, repeats back for confirmation</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>That's 808-555-0142, is that correct? Great. And what's your email address? We'll need that to send you the quote.</li>
+  <li class="caller"><span class="label">Caller</span>sarah.tanaka@gmail.com</li>
+  <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves email (REQUIRED field)</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Perfect. What's your mailing address?</li>
+  <li class="caller"><span class="label">Caller</span>42 Kailua Road, Kailua, Hawaii 96734.</li>
+  <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves mailing address</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Got it. And your date of birth?</li>
+  <li class="caller"><span class="label">Caller</span>March 15, 1985.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>And what do you do for work? This helps us check for any professional discounts.</li>
+  <li class="caller"><span class="label">Caller</span>I'm a school teacher at Kailua Elementary.</li>
+  <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves occupation (may qualify for P&amp;C credits)</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Great, teachers sometimes qualify for special rates! Now, you mentioned home insurance — are you looking at just homeowner's, or are you interested in any other types of coverage too?</li>
+  <li class="caller"><span class="label">Caller</span>Mainly home, but I'd be open to bundling auto if the price is right.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Absolutely, bundling can often save you money. How did you hear about Equity Insurance?</li>
+  <li class="caller"><span class="label">Caller</span>My neighbor recommended you.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>That's wonderful! And why are you shopping for insurance right now — was it just the rate increase on renewal?</li>
+  <li class="caller"><span class="label">Caller</span>Yeah, my renewal went up about 30% and I want to see what else is out there.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>That's understandable. Who is your current carrier, and do you know roughly what you're paying now?</li>
+  <li class="caller"><span class="label">Caller</span>I'm with First Insurance, paying about $3,200 a year now.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Thank you. Now let me ask a few questions specific to your home. What's the address of the property you'd like to insure?</li>
+  <li class="caller"><span class="label">Caller</span>Same as my mailing address — 42 Kailua Road.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>And how long have you had your current homeowner's policy?</li>
+  <li class="caller"><span class="label">Caller</span>About 8 years.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>check_disqualifier</strong> &#8594; WF-02: Checks claims history — Sarah has 0 claims. No disqualifier.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Have you had any claims filed in the last few years, and if so, could you tell me what happened?</li>
+  <li class="caller"><span class="label">Caller</span>No claims at all.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>check_hot_lead</strong> &#8594; WF-02: Home value ~$800K (under $2M threshold). Not a hot lead — standard flow.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Excellent, that works in your favor! By the way, since you're bundling, have you thought about an umbrella policy for extra liability protection? It's very affordable when bundled.</li>
+  <li class="caller"><span class="label">Caller</span>Maybe — I'll talk to Val about it.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Perfect! Sarah, I have everything we need. Our agent Val Char will review your information and call you back within 24 hours to go over your options. Is there anything else I can help you with?</li>
+  <li class="caller"><span class="label">Caller</span>No, that's it. Thanks!</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Mahalo for calling Equity Insurance, Sarah! Val will be in touch soon. Have a wonderful day!</li>
+  <li class="system"><span class="label">System</span>Call ends. VAPI sends <strong>call-ended</strong> webhook &#8594; <strong>WF-06 Post-Call Processor</strong> fires: reads lead data, adds VAPI_AI_COLLECTED flag, writes to CRM, builds email summary ("NEW LEAD — Property — Sarah Tanaka"), sends to Val, logs analytics, saves transcript.</li>
+</ul>
+
+<h4>Timeline</h4>
+<div class="timeline">
+  <div class="timeline-item"><span class="time">0:00</span><div class="event">Phone rings, Talkroute forwards to VAPI</div></div>
+  <div class="timeline-item"><span class="time">0:02</span><div class="event">WF-01 returns assistant config (greeting, tools, system prompt)</div></div>
+  <div class="timeline-item"><span class="time">0:05</span><div class="event">AI greets caller, begins classification</div></div>
+  <div class="timeline-item"><span class="time">0:15</span><div class="event">Caller identified as new customer — data collection begins</div></div>
+  <div class="timeline-item"><span class="time">0:15–3:30</span><div class="event">12 data fields collected via save_field &#8594; WF-02 (each saved in real-time)</div></div>
+  <div class="timeline-item"><span class="time">3:30</span><div class="event">check_disqualifier &#8594; WF-02: PASS (0 claims)</div></div>
+  <div class="timeline-item"><span class="time">3:35</span><div class="event">check_hot_lead &#8594; WF-02: Standard (under threshold)</div></div>
+  <div class="timeline-item"><span class="time">3:45</span><div class="event">Cross-sell mention (umbrella policy)</div></div>
+  <div class="timeline-item"><span class="time">4:00</span><div class="event">Call ends. VAPI fires call-ended webhook</div></div>
+  <div class="timeline-item"><span class="time">4:01</span><div class="event">WF-06: Lead data read + migration flag added</div></div>
+  <div class="timeline-item"><span class="time">4:02</span><div class="event">WF-06: CRM write (Google Sheets + QQ Catalyst fallback)</div></div>
+  <div class="timeline-item"><span class="time">4:03</span><div class="event">WF-06: Email sent to Val — "NEW LEAD — Property — Sarah Tanaka"</div></div>
+  <div class="timeline-item"><span class="time">4:04</span><div class="event">WF-06: Analytics logged, transcript saved</div></div>
+  <div class="timeline-item"><span class="time">Next day</span><div class="event">Val calls Sarah back with quote options</div></div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 2: HOT LEAD -->
+<!-- ============================================================ -->
+<div class="scenario-box">
+<div class="scenario-header">
+  <span class="scenario-num">2</span>
+  <div>
+    <h3 style="margin:0">Hot Lead — High-Value Property Transfer</h3>
+    <span class="badge badge-hot">Hot Lead</span>
+    <span style="font-size:12px; color:#666; margin-left:8px;">Business hours, property &gt;$2M triggers immediate transfer</span>
+  </div>
+</div>
+
+<h4>Caller Profile</h4>
+<p>James Wong, owns a $3.2M oceanfront property in Kahala. Looking to switch carriers after dissatisfaction with claims handling.</p>
+
+<h4>Conversation</h4>
+<ul class="dialog">
+  <li class="system"><span class="label">System</span>Call comes in at 10:30am HST (Tuesday). Standard flow through Talkroute &#8594; VAPI &#8594; WF-01.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! How can I help you today?</li>
+  <li class="caller"><span class="label">Caller</span>I need to get home insurance for my property in Kahala. It's a beachfront home.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>I'd love to help with that! Let me gather some details. Could I get your full name?</li>
+  <li class="caller"><span class="label">Caller</span>James Wong. J-A-M-E-S W-O-N-G.</li>
+  <li class="system"><span class="label">System</span>Data collection proceeds — name, phone, email, address collected via save_field &#8594; WF-02</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>... And approximately what is the value of the property?</li>
+  <li class="caller"><span class="label">Caller</span>It was appraised at about 3.2 million.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>check_hot_lead</strong> &#8594; WF-02: Property value $3.2M &gt; $2M threshold = <strong>HOT LEAD DETECTED!</strong></li>
+  <li class="system"><span class="label">System</span>WF-02 triggers <strong>WF-03 Hot Lead Transfer Handler</strong>:<br/>
+    1. VAPI Transfer API called — warm transfer to Val (+1 808-780-0473)<br/>
+    2. 5-second wait for connection<br/>
+    3. URGENT email sent to Val AND Davin: "HOT LEAD — Property $3.2M — James Wong — TRANSFER NOW"</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Mr. Wong, thank you for that information. Given the value of your property, I'd like to connect you directly with our agent Val Char right now so she can give you her full attention. One moment please while I transfer you.</li>
+  <li class="system"><span class="label">System</span>Call transfers to Val's line. If transfer fails, WF-03 sends URGENT fallback email: "TRANSFER FAILED — James Wong — CALL BACK IMMEDIATELY"</li>
+</ul>
+
+<h4>Timeline</h4>
+<div class="timeline">
+  <div class="timeline-item"><span class="time">0:00–1:30</span><div class="event">Standard data collection (name, phone, email, address)</div></div>
+  <div class="timeline-item"><span class="time">1:35</span><div class="event">Property value disclosed: $3.2M</div></div>
+  <div class="timeline-item"><span class="time">1:36</span><div class="event">check_hot_lead &#8594; WF-02: HOT LEAD! Triggers WF-03</div></div>
+  <div class="timeline-item"><span class="time">1:37</span><div class="event">WF-03: VAPI Transfer API called (warm transfer to Val)</div></div>
+  <div class="timeline-item"><span class="time">1:38</span><div class="event">WF-03: URGENT email sent to Val + Davin</div></div>
+  <div class="timeline-item"><span class="time">1:42</span><div class="event">Transfer connects — Val picks up, AI hands off</div></div>
+  <div class="timeline-item"><span class="time">Post-call</span><div class="event">WF-06: Full post-call processing, lead flagged as HOT</div></div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 3: EXISTING CUSTOMER -->
+<!-- ============================================================ -->
+<div class="scenario-box">
+<div class="scenario-header">
+  <span class="scenario-num">3</span>
+  <div>
+    <h3 style="margin:0">Existing Customer — Policy Change Request</h3>
+    <span class="badge badge-existing">Existing Customer</span>
+    <span style="font-size:12px; color:#666; margin-left:8px;">Business hours, callback ticket created</span>
+  </div>
+</div>
+
+<h4>Caller Profile</h4>
+<p>Mike Pham, long-time Equity Insurance client with an auto policy. Wants to add a new vehicle.</p>
+
+<h4>Conversation</h4>
+<ul class="dialog">
+  <li class="system"><span class="label">System</span>Call arrives at 2:15pm HST. Talkroute &#8594; VAPI &#8594; WF-01.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! How can I help you today?</li>
+  <li class="caller"><span class="label">Caller</span>Hi, I'm already a customer. I just bought a new car and need to add it to my policy.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Congratulations on the new car! I'd be happy to help get that process started. Could I have your name?</li>
+  <li class="caller"><span class="label">Caller</span>Mike Pham.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>And what's the best number to reach you, Mike?</li>
+  <li class="caller"><span class="label">Caller</span>808-555-0298.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>What type of policy do you have with us?</li>
+  <li class="caller"><span class="label">Caller</span>Auto insurance.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>And could you tell me a bit more about what you need? Just adding a new vehicle to the existing auto policy?</li>
+  <li class="caller"><span class="label">Caller</span>Yeah, I got a 2026 Toyota Tacoma. Need to add it and maybe adjust my coverage limits.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>route_existing_customer</strong> tool &#8594; WF-04 webhook /vapi-existing-customer:<br/>
+    1. Creates ticket in Google Sheets Tickets tab (status: pending, assigned_to: Val)<br/>
+    2. Sends email to Val: "[Existing Customer] Mike Pham — Auto — Callback Requested"<br/>
+    3. Returns success confirmation to VAPI</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Perfect, Mike. I've created a request for you. Our agent Val Char handles auto policies and she'll call you back as soon as possible to get that Tacoma added to your policy. Is there anything else?</li>
+  <li class="caller"><span class="label">Caller</span>No, that's all. Thanks!</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Mahalo, Mike! Val will be in touch. Have a great day!</li>
+  <li class="system"><span class="label">System</span>Call ends &#8594; WF-06 processes post-call data. Ticket now sits in "pending" status.</li>
+  <li class="system"><span class="label">System</span>If Val hasn't followed up in 2 hours: <strong>WF-07 Escalation Monitor</strong> detects the pending ticket and emails Davin: "ESCALATION: Mike Pham waiting 2+ hours for callback." Ticket status updates to "escalated."</li>
+</ul>
+
+<h4>Timeline</h4>
+<div class="timeline">
+  <div class="timeline-item"><span class="time">0:00</span><div class="event">Call arrives, VAPI greets</div></div>
+  <div class="timeline-item"><span class="time">0:10</span><div class="event">Caller identified as existing customer</div></div>
+  <div class="timeline-item"><span class="time">0:30–1:00</span><div class="event">Collects name, phone, policy type, request description</div></div>
+  <div class="timeline-item"><span class="time">1:05</span><div class="event">route_existing_customer &#8594; WF-04: Ticket created + Val notified</div></div>
+  <div class="timeline-item"><span class="time">1:15</span><div class="event">Call ends &#8594; WF-06 post-call processing</div></div>
+  <div class="timeline-item"><span class="time">+2 hours</span><div class="event">WF-07: If still pending, escalation email to Davin</div></div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 4: CLAIMS -->
+<!-- ============================================================ -->
+<div class="scenario-box">
+<div class="scenario-header">
+  <span class="scenario-num">4</span>
+  <div>
+    <h3 style="margin:0">Claims Report — Auto Accident</h3>
+    <span class="badge badge-claim">Claim</span>
+    <span style="font-size:12px; color:#666; margin-left:8px;">During business hours, warm transfer attempted</span>
+  </div>
+</div>
+
+<h4>Caller Profile</h4>
+<p>Lisa Nakamura, Equity Insurance client. Her car was rear-ended on the H-1 freeway this morning.</p>
+
+<h4>Conversation</h4>
+<ul class="dialog">
+  <li class="system"><span class="label">System</span>Call arrives at 11:45am HST. Standard routing through to VAPI.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! How can I help you today?</li>
+  <li class="caller"><span class="label">Caller</span>I need to file a claim. I was in a car accident this morning.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>I'm sorry to hear about the accident, Lisa. I hope you're okay. Let me get the details so we can get this handled right away. First, may I have your name?</li>
+  <li class="caller"><span class="label">Caller</span>Lisa Nakamura.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>And your phone number?</li>
+  <li class="caller"><span class="label">Caller</span>808-555-0371.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Do you have your policy number handy?</li>
+  <li class="caller"><span class="label">Caller</span>I think it's EQ-2024-A-0847.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>And this is an auto claim — could you tell me what happened?</li>
+  <li class="caller"><span class="label">Caller</span>I was stopped in traffic on H-1 near the Pearl City exit and someone rear-ended me. Pretty significant damage to the back of my car. I'm okay but my bumper and trunk are smashed.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>route_claim</strong> tool &#8594; WF-05 webhook /vapi-claim:<br/>
+    1. Check Business Hours: 11:45am HST = YES (within 9am-5pm Mon-Fri)<br/>
+    2. <strong>Warm transfer initiated</strong> via VAPI Transfer API to Val (+1 808-780-0473)<br/>
+    3. <strong>Priority notification sent</strong> to Val AND Davin: "CLAIM — Auto — Lisa Nakamura — TRANSFER ATTEMPTED"<br/>
+    4. Responds to VAPI: { claim_received: true, transfer_attempted: true }</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Lisa, I've documented everything. Given the urgency, I'm connecting you directly with our team right now so they can help you immediately. One moment please.</li>
+  <li class="system"><span class="label">System</span>Call transfers to Val. WF-06 post-call processor runs after call ends.</li>
+</ul>
+
+<h4>Timeline</h4>
+<div class="timeline">
+  <div class="timeline-item"><span class="time">0:00</span><div class="event">Call arrives, VAPI greets</div></div>
+  <div class="timeline-item"><span class="time">0:10</span><div class="event">Caller indicates claim — AI collects details</div></div>
+  <div class="timeline-item"><span class="time">0:45</span><div class="event">Name, phone, policy number, claim type, description collected</div></div>
+  <div class="timeline-item"><span class="time">0:50</span><div class="event">route_claim &#8594; WF-05: Business hours check = YES</div></div>
+  <div class="timeline-item"><span class="time">0:51</span><div class="event">WF-05: Warm transfer initiated + priority email sent</div></div>
+  <div class="timeline-item"><span class="time">0:55</span><div class="event">Transfer connects to Val's line</div></div>
+  <div class="timeline-item"><span class="time">Post-call</span><div class="event">WF-06: Processes call data, logs analytics</div></div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 5: AFTER HOURS CLAIM -->
+<!-- ============================================================ -->
+<div class="scenario-box">
+<div class="scenario-header">
+  <span class="scenario-num">5</span>
+  <div>
+    <h3 style="margin:0">After-Hours Claim — No Transfer Available</h3>
+    <span class="badge badge-claim">Claim</span>
+    <span class="badge badge-after">After Hours</span>
+    <span style="font-size:12px; color:#666; margin-left:8px;">Evening call, priority notification only</span>
+  </div>
+</div>
+
+<h4>Caller Profile</h4>
+<p>Tom Reyes, calls at 7:30pm HST on a Wednesday about water damage from a burst pipe at his rental property.</p>
+
+<h4>Conversation</h4>
+<ul class="dialog">
+  <li class="system"><span class="label">System</span>Call arrives at 7:30pm HST. After business hours (past 5pm). VAPI answers — WF-01 returns after-hours assistant config.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! Our office is currently closed — our hours are Monday through Friday, 9am to 5pm Hawaii time. However, I can still help you. How can I assist?</li>
+  <li class="caller"><span class="label">Caller</span>I have an emergency — there's a burst pipe at my rental property and there's water everywhere.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>I'm sorry to hear that. Let me get the details documented right away so our team can follow up first thing in the morning. What's your name?</li>
+  <li class="caller"><span class="label">Caller</span>Tom Reyes.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Your phone number?</li>
+  <li class="caller"><span class="label">Caller</span>808-555-0512.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Do you know your policy number?</li>
+  <li class="caller"><span class="label">Caller</span>I don't have it on me right now.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>That's okay, we can look it up. Can you describe what happened?</li>
+  <li class="caller"><span class="label">Caller</span>A pipe burst in the upstairs bathroom of my rental property on Kapahulu Ave. Water is leaking through the ceiling into the ground floor. I've shut off the main water.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>route_claim</strong> &#8594; WF-05:<br/>
+    1. Check Business Hours: 7:30pm HST = NO (past 5pm)<br/>
+    2. <strong>No transfer attempted</strong> (after hours)<br/>
+    3. <strong>Priority notification sent</strong> to Val AND Davin: "CLAIM — Property — Tom Reyes — AFTER HOURS"<br/>
+    4. Responds: { claim_received: true, transfer_attempted: false, message: "After hours - priority notification sent" }</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Tom, I've documented everything and sent a priority notification to our team. Someone will contact you first thing tomorrow morning. In the meantime, you've done the right thing shutting off the water. If you can, document the damage with photos — that'll help speed up the process. Is there anything else?</li>
+  <li class="caller"><span class="label">Caller</span>No, just please have someone call me early.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Absolutely. Your information is flagged as urgent. Mahalo for calling, Tom. We'll be in touch first thing in the morning.</li>
+</ul>
+
+<h4>Timeline</h4>
+<div class="timeline">
+  <div class="timeline-item"><span class="time">7:30pm</span><div class="event">Call arrives — after hours greeting</div></div>
+  <div class="timeline-item"><span class="time">7:31pm</span><div class="event">Claim identified — emergency water damage</div></div>
+  <div class="timeline-item"><span class="time">7:33pm</span><div class="event">route_claim &#8594; WF-05: After hours — no transfer</div></div>
+  <div class="timeline-item"><span class="time">7:33pm</span><div class="event">WF-05: Priority email sent to Val AND Davin</div></div>
+  <div class="timeline-item"><span class="time">7:35pm</span><div class="event">Call ends &#8594; WF-06 post-call processing</div></div>
+  <div class="timeline-item"><span class="time">Next morning 9:00am</span><div class="event">Val/Davin follow up with Tom</div></div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 6: DISQUALIFIED CALLER -->
+<!-- ============================================================ -->
+<div class="scenario-box">
+<div class="scenario-header">
+  <span class="scenario-num">6</span>
+  <div>
+    <h3 style="margin:0">Disqualified Caller — Too Many Claims</h3>
+    <span class="badge badge-new">New Customer</span>
+    <span style="font-size:12px; color:#666; margin-left:8px;">Business hours, disqualifier triggered (3+ claims/year)</span>
+  </div>
+</div>
+
+<h4>Caller Profile</h4>
+<p>Kevin Park, looking for auto insurance. Has had 4 claims in the past year.</p>
+
+<h4>Conversation</h4>
+<ul class="dialog">
+  <li class="system"><span class="label">System</span>Standard routing. Data collection begins normally.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>... And have you had any claims in the last few years? Could you tell me what happened with each?</li>
+  <li class="caller"><span class="label">Caller</span>Yeah, I had four claims this past year. Two fender benders, a windshield, and someone keyed my car.</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>check_disqualifier</strong> &#8594; WF-02: 4 claims in past year &gt; 3 threshold = <strong>DISQUALIFIED</strong>. Response: { qualified: false, reason: "excess_claims" }</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>I appreciate you sharing that, Kevin. Based on the claims history, we may not be the best fit for your coverage needs right now, but I want to make sure you find the right coverage. I'd recommend reaching out to the Hawaii Insurance Division at (808) 586-2790 — they can help connect you with carriers who specialize in your situation. Is there anything else I can help with?</li>
+  <li class="caller"><span class="label">Caller</span>Oh, okay. Thanks anyway.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Of course. Best of luck, Kevin. Have a good day!</li>
+  <li class="system"><span class="label">System</span>Call ends &#8594; WF-06 processes (logs as disqualified lead, no notification to Val).</li>
+</ul>
+</div>
+
+<!-- ============================================================ -->
+<!-- DATA FLOW SUMMARY -->
+<!-- ============================================================ -->
+<h2>Data Flow Summary</h2>
+<p>Every piece of data collected by the AI flows through a specific path. Here's where everything ends up:</p>
+
+<div class="diagram">
+<svg width="1000" height="400" viewBox="0 0 1000 400">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 7" refX="9" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Source: VAPI Conversation -->
+  <rect x="30" y="140" width="180" height="80" rx="6" fill="#f0f4f8" stroke="#333" stroke-width="2"/>
+  <text x="120" y="170" text-anchor="middle" font-size="14" font-weight="700">VAPI Call</text>
+  <text x="120" y="188" text-anchor="middle" font-size="10" fill="#666">12 data fields</text>
+  <text x="120" y="202" text-anchor="middle" font-size="10" fill="#666">+ transcript + analytics</text>
+
+  <!-- Arrow to center hub -->
+  <line x1="210" y1="180" x2="310" y2="180" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- n8n Hub -->
+  <rect x="310" y="120" width="180" height="120" rx="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="400" y="155" text-anchor="middle" font-size="14" font-weight="700">n8n</text>
+  <text x="400" y="175" text-anchor="middle" font-size="11" fill="#666">WF-02 Save Field</text>
+  <text x="400" y="192" text-anchor="middle" font-size="11" fill="#666">WF-04 Ticket Create</text>
+  <text x="400" y="209" text-anchor="middle" font-size="11" fill="#666">WF-06 Post-Call</text>
+  <text x="400" y="226" text-anchor="middle" font-size="11" fill="#666">WF-07 Escalation</text>
+
+  <!-- Google Sheets -->
+  <line x1="490" y1="145" x2="600" y2="80" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="600" y="40" width="200" height="80" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="700" y="65" text-anchor="middle" font-size="12" font-weight="600">Google Sheets</text>
+  <text x="700" y="82" text-anchor="middle" font-size="10" fill="#666">Leads | Tickets | Analytics | Errors</text>
+  <text x="700" y="98" text-anchor="middle" font-size="9" fill="#999">VAPI_AI_COLLECTED flag on every row</text>
+
+  <!-- Email -->
+  <line x1="490" y1="180" x2="600" y2="180" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="600" y="145" width="200" height="70" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="700" y="170" text-anchor="middle" font-size="12" font-weight="600">Email Notifications</text>
+  <text x="700" y="188" text-anchor="middle" font-size="10" fill="#666">Val (P&amp;C leads &amp; existing)</text>
+  <text x="700" y="202" text-anchor="middle" font-size="10" fill="#666">Davin (hot leads &amp; escalations)</text>
+
+  <!-- QQ Catalyst -->
+  <line x1="490" y1="215" x2="600" y2="280" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="600" y="250" width="200" height="60" rx="6" fill="#fff" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="700" y="275" text-anchor="middle" font-size="12" font-weight="600" fill="#999">QQ Catalyst CRM</text>
+  <text x="700" y="293" text-anchor="middle" font-size="10" fill="#999">API access pending</text>
+
+  <!-- VAPI Transfer -->
+  <line x1="490" y1="230" x2="600" y2="360" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="600" y="335" width="200" height="55" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="700" y="358" text-anchor="middle" font-size="12" font-weight="600">VAPI Transfer API</text>
+  <text x="700" y="375" text-anchor="middle" font-size="10" fill="#666">Hot leads + claims &#8594; Val's phone</text>
+
+  <!-- Migration flag note -->
+  <rect x="830" y="55" width="150" height="40" rx="4" fill="#fff3e0" stroke="#e65100" stroke-width="1"/>
+  <text x="905" y="72" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">VAPI_AI_COLLECTED</text>
+  <text x="905" y="85" text-anchor="middle" font-size="9" fill="#e65100">on ALL AI data</text>
+  <line x1="800" y1="78" x2="830" y2="78" stroke="#e65100" stroke-width="1" marker-end="url(#arr)"/>
+</svg>
+</div>
+
+<!-- ============================================================ -->
+<!-- WHAT WORKFLOWS DO WHAT -->
+<!-- ============================================================ -->
+<h2>Quick Reference: Which Workflow Handles What</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>When This Happens</th>
+      <th>This Workflow Runs</th>
+      <th>What It Does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Someone calls the main number</td>
+      <td><strong>WF-01</strong> Inbound Call Router</td>
+      <td>Returns VAPI assistant config (prompt, tools, voice, greeting)</td>
+    </tr>
+    <tr>
+      <td>AI collects a data field from caller</td>
+      <td><strong>WF-02</strong> New Customer Intake</td>
+      <td>Saves field to Google Sheets, validates, runs qualification checks</td>
+    </tr>
+    <tr>
+      <td>Property &gt;$2M or Auto &gt;$180K detected</td>
+      <td><strong>WF-03</strong> Hot Lead Transfer</td>
+      <td>Warm transfers call to Val, sends URGENT email to Val + Davin</td>
+    </tr>
+    <tr>
+      <td>Existing customer needs help</td>
+      <td><strong>WF-04</strong> Existing Customer</td>
+      <td>Creates callback ticket, emails Val, ticket tracks status</td>
+    </tr>
+    <tr>
+      <td>Someone reports a claim</td>
+      <td><strong>WF-05</strong> Claims Router</td>
+      <td>During hours: warm transfer + notify. After hours: notify only</td>
+    </tr>
+    <tr>
+      <td>Any call ends (ALL calls)</td>
+      <td><strong>WF-06</strong> Post-Call Processor</td>
+      <td>Migration flag, CRM write, email summary, analytics, transcript</td>
+    </tr>
+    <tr>
+      <td>Every 30 min (Mon-Fri 9am-4:30pm)</td>
+      <td><strong>WF-07</strong> Escalation Monitor</td>
+      <td>Checks for pending tickets &gt;2hrs old, escalates to Davin</td>
+    </tr>
+  </tbody>
+</table>
+
+<footer>
+  Equity Insurance AI Receptionist &mdash; End-to-End Scenario Documentation<br/>
+  Generated February 2026 &bull; 7 Workflows &bull; All scenarios based on deployed n8n automation
+</footer>
+
+</body>
+</html>

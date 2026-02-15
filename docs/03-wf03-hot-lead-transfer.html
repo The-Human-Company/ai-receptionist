@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF-03 Hot Lead Transfer Handler</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+p { margin-bottom: 12px; font-size: 14px; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+.diagram { margin: 24px 0; text-align: center; }
+svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+th { font-weight: 600; background: #f8f8f8; }
+.step-list { list-style: none; padding: 0; margin: 16px 0; }
+.step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+.step-list li strong { display: inline-block; min-width: 120px; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<h1>WF-03 Hot Lead Transfer Handler</h1>
+<p class="subtitle">Sub-workflow (called by WF-02) &mdash; 7 Nodes &mdash; n8n ID: AxGXJxHIDQJILOtQ</p>
+
+<h2>Flow Diagram</h2>
+<div class="diagram">
+<svg width="1050" height="340" viewBox="0 0 1050 340">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- Node 1: Receive Input Data -->
+  <rect x="10" y="110" width="140" height="55" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="80" y="133" text-anchor="middle" font-size="11" font-weight="600">Receive Input</text>
+  <text x="80" y="148" text-anchor="middle" font-size="9" fill="#666">call_id, caller_name,</text>
+  <text x="80" y="159" text-anchor="middle" font-size="9" fill="#666">phone, policy_type, value</text>
+
+  <!-- Arrow 1-2 -->
+  <line x1="150" y1="137" x2="180" y2="137" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Node 2: Send VAPI Transfer Command -->
+  <rect x="180" y="110" width="155" height="55" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="257" y="130" text-anchor="middle" font-size="11" font-weight="600">Send VAPI Transfer</text>
+  <text x="257" y="145" text-anchor="middle" font-size="9" fill="#666">POST /call/{id}/transfer</text>
+  <text x="257" y="156" text-anchor="middle" font-size="9" fill="#666">warm mode, primary phone</text>
+
+  <!-- Arrow 2-3 -->
+  <line x1="335" y1="137" x2="365" y2="137" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Node 3: Wait 5 Seconds -->
+  <rect x="365" y="117" width="105" height="40" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="417" y="142" text-anchor="middle" font-size="11" font-weight="600">Wait 5 sec</text>
+
+  <!-- Arrow 3-4 -->
+  <line x1="470" y1="137" x2="500" y2="137" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Node 4: IF Transfer Success -->
+  <polygon points="570,100 640,137 570,174 500,137" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="570" y="134" text-anchor="middle" font-size="10" font-weight="600">Transfer</text>
+  <text x="570" y="147" text-anchor="middle" font-size="10" font-weight="600">Success?</text>
+
+  <!-- SUCCESS branch (upper) -->
+  <line x1="605" y1="118" x2="605" y2="50" stroke="#333" stroke-width="1.5"/>
+  <line x1="605" y1="50" x2="700" y2="50" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="648" y="43" text-anchor="middle" font-size="10" fill="#2e7d32" font-weight="600">YES</text>
+
+  <!-- Node 5: Update Lead (Success) -->
+  <rect x="700" y="25" width="180" height="50" rx="5" fill="#fff" stroke="#2e7d32" stroke-width="1.5"/>
+  <text x="790" y="46" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">Update Lead</text>
+  <text x="790" y="60" text-anchor="middle" font-size="9" fill="#666">status=transferred_hot_lead</text>
+  <text x="790" y="71" text-anchor="middle" font-size="9" fill="#666">transfer_target, transfer_time</text>
+
+  <!-- FAILURE branch (lower) -->
+  <line x1="605" y1="156" x2="605" y2="230" stroke="#333" stroke-width="1.5"/>
+  <line x1="605" y1="230" x2="660" y2="230" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="648" y="223" text-anchor="middle" font-size="10" fill="#c62828" font-weight="600">NO</text>
+
+  <!-- Node 6: Update Lead (Failure) -->
+  <rect x="660" y="205" width="180" height="50" rx="5" fill="#fff" stroke="#c62828" stroke-width="1.5"/>
+  <text x="750" y="226" text-anchor="middle" font-size="11" font-weight="600" fill="#c62828">Update Lead</text>
+  <text x="750" y="240" text-anchor="middle" font-size="9" fill="#666">status=transfer_failed_hot_lead</text>
+  <text x="750" y="251" text-anchor="middle" font-size="9" fill="#666">priority=critical</text>
+
+  <!-- Arrow 6-7 -->
+  <line x1="750" y1="255" x2="750" y2="280" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Node 7: Send URGENT Notification -->
+  <rect x="660" y="280" width="180" height="50" rx="5" fill="#fff" stroke="#c62828" stroke-width="1.5"/>
+  <text x="750" y="300" text-anchor="middle" font-size="11" font-weight="600" fill="#c62828">Send URGENT Email</text>
+  <text x="750" y="314" text-anchor="middle" font-size="9" fill="#666">Val + Davin: IMMEDIATE</text>
+  <text x="750" y="325" text-anchor="middle" font-size="9" fill="#666">CALLBACK REQUIRED</text>
+</svg>
+</div>
+
+<h2>Step-by-Step Process</h2>
+<ul class="step-list">
+  <li><strong>1. Receive Input Data</strong> Called as sub-workflow by WF-02 when a hot lead is detected. Receives: <code>call_id</code>, <code>caller_name</code>, <code>caller_phone</code>, <code>policy_type</code>, <code>estimated_value</code>. Also reads <code>TRANSFER_PRIMARY_PHONE</code> and <code>TRANSFER_SECONDARY_PHONE</code> from environment variables.</li>
+  <li><strong>2. Send VAPI Transfer Command</strong> HTTP POST to VAPI API: <code>/call/{call_id}/transfer</code> with destination number (primary phone <code>+18087800473</code>) and warm transfer mode. 30-second timeout.</li>
+  <li><strong>3. Wait for Transfer Result</strong> Pauses 5 seconds to allow the transfer to complete and the status to update.</li>
+  <li><strong>4. IF Transfer Success</strong> Checks if the transfer status is <code>"answered"</code>. Routes to success or failure path accordingly.</li>
+  <li><strong>5. Success Path</strong> Updates Google Sheets lead record: <code>status=transferred_hot_lead</code>, records <code>transfer_target</code> and <code>transfer_time</code>.</li>
+  <li><strong>6. Failure Path</strong> Updates Google Sheets lead record: <code>status=transfer_failed_hot_lead</code>, <code>priority=critical</code>.</li>
+  <li><strong>7. Send URGENT Notification</strong> On failure, sends email to both Val and Davin with subject: <em>"URGENT: HOT LEAD TRANSFER FAILED &mdash; {name} &mdash; CALLBACK REQUIRED"</em> including all caller details.</li>
+</ul>
+
+<h2>Trigger Thresholds</h2>
+<p>WF-03 is invoked by WF-02 when a caller's estimated asset value meets or exceeds the following thresholds:</p>
+<table>
+<tr><th>Policy Type</th><th>Threshold</th><th>Action</th></tr>
+<tr><td>Property</td><td>&ge; $2,000,000</td><td>Immediate warm transfer to live agent via VAPI</td></tr>
+<tr><td>Auto</td><td>&ge; $180,000</td><td>Immediate warm transfer to live agent via VAPI</td></tr>
+</table>
+
+<h2>Node Details</h2>
+<table>
+<tr><th>#</th><th>Node Name</th><th>Type</th><th>Description</th></tr>
+<tr><td>1</td><td>Receive Input Data</td><td>Sub-workflow Trigger</td><td>Entry point; receives <code>call_id</code>, <code>caller_name</code>, <code>caller_phone</code>, <code>policy_type</code>, <code>estimated_value</code>, and reads transfer phone numbers from environment</td></tr>
+<tr><td>2</td><td>Send VAPI Transfer Command</td><td>HTTP Request</td><td>POST to <code>/call/{call_id}/transfer</code> with destination <code>+18087800473</code>, warm transfer mode, 30-second timeout</td></tr>
+<tr><td>3</td><td>Wait for Transfer Result</td><td>Wait</td><td>Pauses execution for 5 seconds to allow transfer status to resolve</td></tr>
+<tr><td>4</td><td>IF Transfer Success</td><td>IF</td><td>Evaluates whether transfer status equals <code>"answered"</code>; branches to success or failure path</td></tr>
+<tr><td>5</td><td>Update Lead (Success)</td><td>Google Sheets</td><td>Updates lead row: <code>status=transferred_hot_lead</code>, writes <code>transfer_target</code> and <code>transfer_time</code></td></tr>
+<tr><td>6</td><td>Update Lead (Failure)</td><td>Google Sheets</td><td>Updates lead row: <code>status=transfer_failed_hot_lead</code>, <code>priority=critical</code></td></tr>
+<tr><td>7</td><td>Send URGENT Notification</td><td>Send Email (SMTP)</td><td>Emails Val (<code>val@equityinsurance.services</code>) and Davin with subject <em>"URGENT: HOT LEAD TRANSFER FAILED &mdash; {name} &mdash; CALLBACK REQUIRED"</em> containing all caller details</td></tr>
+</table>
+
+<footer>
+Equity Insurance AI Receptionist &mdash; WF-03 Documentation &mdash; Generated 2026-02-14
+</footer>
+
+</body>
+</html>

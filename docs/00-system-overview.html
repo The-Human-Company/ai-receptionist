@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Receptionist — System Overview</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+p { margin-bottom: 12px; font-size: 14px; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+.diagram { margin: 24px 0; text-align: center; }
+svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+th { font-weight: 600; background: #f8f8f8; }
+tr:hover { background: #fafafa; }
+.step-list { list-style: none; padding: 0; margin: 16px 0; }
+.step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+.step-list li strong { display: inline-block; min-width: 80px; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.badge-active { background: #e8f5e9; color: #2e7d32; }
+.badge-webhook { background: #e3f2fd; color: #1565c0; }
+.badge-cron { background: #f3e5f5; color: #7b1fa2; }
+.badge-sub { background: #fff3e0; color: #e65100; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<h1>Equity Insurance AI Receptionist</h1>
+<p class="subtitle">System Architecture Overview &mdash; 7-Workflow n8n Automation</p>
+
+<h2>System Architecture</h2>
+<p>The AI Receptionist is a voice-powered call handling system for Equity Insurance Inc., a 3rd-generation family-owned insurance agency in Honolulu, Hawaii. Inbound calls on the main line (+1 808-593-7746) are routed through Talkroute to VAPI.ai, which handles voice interaction and LLM processing. n8n orchestrates all backend automation across 7 specialized workflows.</p>
+
+<div class="diagram">
+<svg width="960" height="520" viewBox="0 0 960 520">
+  <!-- Phone System Layer -->
+  <rect x="20" y="20" width="140" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="90" y="50" text-anchor="middle" font-size="13" font-weight="600">Caller</text>
+
+  <line x1="160" y1="45" x2="210" y2="45" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="210" y="20" width="140" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="280" y="42" text-anchor="middle" font-size="12" font-weight="600">Talkroute</text>
+  <text x="280" y="56" text-anchor="middle" font-size="10" fill="#666">+1 808-593-7746</text>
+
+  <line x1="350" y1="45" x2="400" y2="45" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="400" y="20" width="160" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="480" y="42" text-anchor="middle" font-size="12" font-weight="600">VAPI.ai + ElevenLabs</text>
+  <text x="480" y="56" text-anchor="middle" font-size="10" fill="#666">Voice AI + LLM</text>
+
+  <!-- n8n Orchestrator Box -->
+  <rect x="20" y="110" width="920" height="390" rx="8" fill="#fff" stroke="#333" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="40" y="135" font-size="14" font-weight="700" fill="#333">n8n Orchestration Layer</text>
+
+  <!-- WF-01 -->
+  <rect x="50" y="155" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="150" y="180" text-anchor="middle" font-size="12" font-weight="600">WF-01</text>
+  <text x="150" y="196" text-anchor="middle" font-size="10" fill="#666">Inbound Call Router</text>
+
+  <!-- Arrow from VAPI to WF-01 -->
+  <line x1="480" y1="70" x2="480" y2="95" stroke="#333" stroke-width="1.5"/>
+  <line x1="480" y1="95" x2="150" y2="95" stroke="#333" stroke-width="1.5"/>
+  <line x1="150" y1="95" x2="150" y2="155" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="315" y="90" text-anchor="middle" font-size="9" fill="#666">/vapi-call-started</text>
+
+  <!-- WF-02 -->
+  <rect x="300" y="155" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="400" y="180" text-anchor="middle" font-size="12" font-weight="600">WF-02</text>
+  <text x="400" y="196" text-anchor="middle" font-size="10" fill="#666">New Customer P&C Intake</text>
+
+  <!-- WF-03 -->
+  <rect x="300" y="250" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="400" y="275" text-anchor="middle" font-size="12" font-weight="600">WF-03</text>
+  <text x="400" y="291" text-anchor="middle" font-size="10" fill="#666">Hot Lead Transfer</text>
+
+  <!-- WF-04 -->
+  <rect x="550" y="155" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="650" y="180" text-anchor="middle" font-size="12" font-weight="600">WF-04</text>
+  <text x="650" y="196" text-anchor="middle" font-size="10" fill="#666">Existing Customer Handler</text>
+
+  <!-- WF-05 -->
+  <rect x="550" y="250" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="650" y="275" text-anchor="middle" font-size="12" font-weight="600">WF-05</text>
+  <text x="650" y="291" text-anchor="middle" font-size="10" fill="#666">Claims Router</text>
+
+  <!-- WF-06 -->
+  <rect x="50" y="350" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="150" y="375" text-anchor="middle" font-size="12" font-weight="600">WF-06</text>
+  <text x="150" y="391" text-anchor="middle" font-size="10" fill="#666">Post-Call Processor</text>
+
+  <!-- WF-07 -->
+  <rect x="300" y="350" width="200" height="60" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="400" y="375" text-anchor="middle" font-size="12" font-weight="600">WF-07</text>
+  <text x="400" y="391" text-anchor="middle" font-size="10" fill="#666">Escalation Monitor</text>
+
+  <!-- Data Stores -->
+  <rect x="600" y="350" width="150" height="55" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="675" y="372" text-anchor="middle" font-size="11" font-weight="600">Google Sheets</text>
+  <text x="675" y="388" text-anchor="middle" font-size="9" fill="#666">Leads / Tickets / Analytics</text>
+
+  <rect x="780" y="350" width="140" height="55" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="850" y="372" text-anchor="middle" font-size="11" font-weight="600">Email (SMTP)</text>
+  <text x="850" y="388" text-anchor="middle" font-size="9" fill="#666">Val + Davin Alerts</text>
+
+  <!-- Connections: WF-01 to WF-02 -->
+  <line x1="250" y1="185" x2="300" y2="185" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="275" y="178" text-anchor="middle" font-size="8" fill="#666">tools</text>
+
+  <!-- WF-01 to WF-04 -->
+  <path d="M250,175 Q275,165 275,155 Q275,145 400,145 Q650,145 650,155" fill="none" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- WF-01 to WF-05 -->
+  <path d="M250,195 Q275,225 275,240 Q275,250 550,270" fill="none" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- WF-02 to WF-03 -->
+  <line x1="400" y1="215" x2="400" y2="250" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="415" y="235" font-size="8" fill="#666">sub-wf</text>
+
+  <!-- VAPI to WF-06 -->
+  <path d="M560,55 Q900,55 900,130 Q900,340 250,380" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="870" y="200" font-size="8" fill="#666" transform="rotate(90,870,200)">/vapi-call-ended</text>
+
+  <!-- WF-07 to Sheets -->
+  <line x1="500" y1="380" x2="600" y2="380" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Sheets connections -->
+  <line x1="400" y1="215" x2="400" y2="330" stroke="#333" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="400" y1="330" x2="600" y2="365" stroke="#333" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<h2>Workflow Inventory</h2>
+<table>
+<tr><th>Workflow</th><th>Trigger</th><th>Nodes</th><th>Webhook Path</th><th>Purpose</th></tr>
+<tr><td><strong>WF-01</strong> Inbound Call Router</td><td><span class="badge badge-webhook">Webhook</span></td><td>6</td><td>/vapi-call-started</td><td>Receives call, checks business hours, returns VAPI assistant config</td></tr>
+<tr><td><strong>WF-02</strong> New Customer P&C Intake</td><td><span class="badge badge-webhook">Webhook</span></td><td>17</td><td>/vapi-save-field, /vapi-check-disqualifier, /vapi-check-hotlead</td><td>Saves fields, checks disqualifiers, detects hot leads</td></tr>
+<tr><td><strong>WF-03</strong> Hot Lead Transfer</td><td><span class="badge badge-sub">Sub-workflow</span></td><td>7</td><td>&mdash;</td><td>Transfers hot leads to live agent, handles failure</td></tr>
+<tr><td><strong>WF-04</strong> Existing Customer</td><td><span class="badge badge-webhook">Webhook</span></td><td>5</td><td>/vapi-existing-customer</td><td>Creates ticket, notifies Val</td></tr>
+<tr><td><strong>WF-05</strong> Claims Router</td><td><span class="badge badge-webhook">Webhook</span></td><td>7</td><td>/vapi-claim</td><td>Routes claims with transfer during hours</td></tr>
+<tr><td><strong>WF-06</strong> Post-Call Processor</td><td><span class="badge badge-webhook">Webhook</span></td><td>15</td><td>/vapi-call-ended</td><td>Merges data, CRM write, email summary, analytics</td></tr>
+<tr><td><strong>WF-07</strong> Escalation Monitor</td><td><span class="badge badge-cron">Cron</span></td><td>5</td><td>&mdash;</td><td>Every 30min: checks overdue tickets, escalates to Davin</td></tr>
+</table>
+
+<h2>Call Flow — Three Branches</h2>
+<div class="diagram">
+<svg width="900" height="320" viewBox="0 0 900 320">
+  <rect x="330" y="10" width="220" height="45" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="440" y="38" text-anchor="middle" font-size="13" font-weight="600">Inbound Call (WF-01)</text>
+
+  <line x1="440" y1="55" x2="440" y2="85" stroke="#333" stroke-width="1.5"/>
+
+  <rect x="370" y="85" width="140" height="35" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="440" y="108" text-anchor="middle" font-size="11">Classify Caller</text>
+
+  <!-- Branch A -->
+  <line x1="370" y1="102" x2="140" y2="102" stroke="#333" stroke-width="1"/>
+  <line x1="140" y1="102" x2="140" y2="150" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="250" y="96" text-anchor="middle" font-size="10" fill="#666">New Customer</text>
+
+  <rect x="40" y="150" width="200" height="45" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="140" y="170" text-anchor="middle" font-size="11" font-weight="600">Collect 12 Data Fields</text>
+  <text x="140" y="184" text-anchor="middle" font-size="9" fill="#666">WF-02: save_field</text>
+
+  <line x1="140" y1="195" x2="140" y2="220" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <rect x="40" y="220" width="200" height="35" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="140" y="242" text-anchor="middle" font-size="10">Check Disqualifiers + Hot Lead</text>
+
+  <line x1="140" y1="255" x2="60" y2="290" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="50" y="300" font-size="10" fill="#666">Disqualified: Polite redirect</text>
+
+  <line x1="140" y1="255" x2="140" y2="290" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="140" y="305" text-anchor="middle" font-size="10" fill="#666">Qualified: Cross-sell + Close</text>
+
+  <line x1="140" y1="255" x2="220" y2="290" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="225" y="300" font-size="10" fill="#666">Hot Lead: WF-03 Transfer</text>
+
+  <!-- Branch B -->
+  <line x1="440" y1="120" x2="440" y2="150" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="445" y="140" font-size="10" fill="#666">Existing</text>
+
+  <rect x="340" y="150" width="200" height="45" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="440" y="170" text-anchor="middle" font-size="11" font-weight="600">Create Ticket + Notify</text>
+  <text x="440" y="184" text-anchor="middle" font-size="9" fill="#666">WF-04: route_existing_customer</text>
+
+  <line x1="440" y1="195" x2="440" y2="220" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <rect x="340" y="220" width="200" height="35" rx="4" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="440" y="242" text-anchor="middle" font-size="10">Email Val, 2hr escalation to Davin</text>
+
+  <!-- Branch C -->
+  <line x1="510" y1="102" x2="730" y2="102" stroke="#333" stroke-width="1"/>
+  <line x1="730" y1="102" x2="730" y2="150" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="625" y="96" text-anchor="middle" font-size="10" fill="#666">Claim</text>
+
+  <rect x="630" y="150" width="200" height="45" rx="5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="730" y="170" text-anchor="middle" font-size="11" font-weight="600">Route to Claims Agent</text>
+  <text x="730" y="184" text-anchor="middle" font-size="9" fill="#666">WF-05: route_claim</text>
+
+  <line x1="730" y1="195" x2="660" y2="225" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="640" y="240" font-size="10" fill="#666">During hours: Transfer + Notify</text>
+
+  <line x1="730" y1="195" x2="800" y2="225" stroke="#333" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="780" y="240" font-size="10" fill="#666">After hours: Notify only</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<h2>Technology Stack</h2>
+<table>
+<tr><th>Component</th><th>Technology</th><th>Role</th></tr>
+<tr><td>Voice AI</td><td>VAPI.ai + ElevenLabs</td><td>Speech recognition, LLM processing, voice synthesis (Female, Warm)</td></tr>
+<tr><td>Phone System</td><td>Talkroute</td><td>Main line with extensions and directory</td></tr>
+<tr><td>Orchestration</td><td>n8n (Cloud)</td><td>Workflow automation, webhook handling, business logic</td></tr>
+<tr><td>Data Store</td><td>Google Sheets (4 sheets)</td><td>Leads, Tickets, Analytics, Errors</td></tr>
+<tr><td>CRM</td><td>QQ Catalyst (pending)</td><td>Primary CRM with migration flag VAPI_AI_COLLECTED</td></tr>
+<tr><td>Notifications</td><td>SMTP Email</td><td>Val and Davin alerts with priority levels</td></tr>
+<tr><td>Timezone</td><td>Pacific/Honolulu (HST)</td><td>UTC-10, no daylight saving, business hours 9am-5pm Mon-Fri</td></tr>
+</table>
+
+<h2>Data Collection — 12 Fields</h2>
+<ol style="font-size:14px; padding-left:24px; margin:16px 0;">
+<li><strong>Full Name</strong> &mdash; ask caller to spell it</li>
+<li><strong>Phone Number</strong> &mdash; repeat back and confirm</li>
+<li><strong>Email Address</strong> &mdash; REQUIRED, for sending the quote</li>
+<li><strong>Mailing Address</strong> &mdash; double-check spelling</li>
+<li><strong>Date of Birth</strong></li>
+<li><strong>Occupation</strong> &mdash; qualifies for P&C credits</li>
+<li><strong>Type of Insurance</strong> &mdash; Auto, Renters, Property, or Business</li>
+<li><strong>Referral Source</strong> &mdash; "we would like to thank the person who referred you"</li>
+<li><strong>Shopping Reason</strong> &mdash; why are they in market / what happened with previous policy</li>
+<li><strong>Current Coverage</strong> &mdash; current carrier and what they are paying</li>
+<li><strong>Claims History</strong> &mdash; past 5 years, detail for each claim</li>
+<li><strong>Coverage Urgency</strong> &mdash; when coverage needs to start</li>
+</ol>
+
+<h2>Business Rules</h2>
+<table>
+<tr><th>Rule</th><th>Threshold</th><th>Action</th></tr>
+<tr><td>Claims Disqualifier</td><td>3+ claims in worst year</td><td>Polite redirect to state insurance dept</td></tr>
+<tr><td>Urgency Disqualifier</td><td>&le;72 hours (property)</td><td>Polite redirect</td></tr>
+<tr><td>Hot Lead — Property</td><td>&ge;$2,000,000 value</td><td>Immediate transfer to agent (WF-03)</td></tr>
+<tr><td>Hot Lead — Auto</td><td>&ge;$180,000 value</td><td>Immediate transfer to agent (WF-03)</td></tr>
+<tr><td>Escalation</td><td>2+ hours pending</td><td>Escalate ticket to Davin (WF-07)</td></tr>
+<tr><td>Transfer Trigger</td><td>Caller asks for person by name</td><td>Immediate transfer</td></tr>
+<tr><td>Transfer Trigger</td><td>Caller upset or complaining</td><td>Immediate transfer</td></tr>
+<tr><td>Transfer Trigger</td><td>Caller ready to buy now</td><td>Immediate transfer</td></tr>
+</table>
+
+<footer>
+Equity Insurance AI Receptionist &mdash; System Documentation &mdash; Generated 2026-02-14
+</footer>
+
+</body>
+</html>

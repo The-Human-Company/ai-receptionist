@@ -95,7 +95,8 @@
       "Bash(GOG_KEYRING_PASSWORD=ngm GOG_ACCOUNT=anant@nextgenerationmedicine.co gog gmail search:*)",
       "Bash(GOG_KEYRING_PASSWORD=ngm GOG_ACCOUNT=anant@nextgenerationmedicine.co gog gmail thread:*)",
       "mcp__playwright__browser_navigate",
-      "Bash(pdftotext:*)"
+      "Bash(pdftotext:*)",
+      "Bash(pandoc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

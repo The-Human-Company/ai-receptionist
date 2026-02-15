@@ -2,7 +2,7 @@
   "projectName": "Equity Insurance AI Receptionist - 7 Workflow Deployment",
   "branchName": "ralph/deploy-7-workflows",
   "createdAt": "2026-02-13T00:00:00.000Z",
-  "updatedAt": "2026-02-13T23:15:00.000Z",
+  "updatedAt": "2026-02-14T03:00:00.000Z",
   "completionPromise": "All tests pass",
   "qualityGates": {
     "typecheck": null,
@@ -78,13 +78,27 @@
       "priority": 9,
       "status": "passed",
       "failureCount": 1
+    },
+    {
+      "id": "US-010",
+      "title": "Fix WF-01 system prompt per Briefing Session #1 deep analysis (7 gaps)",
+      "priority": 10,
+      "status": "passed",
+      "failureCount": 0
+    },
+    {
+      "id": "US-011",
+      "title": "Create workflow documentation with SVG diagrams, step-by-step process, and node details for all 7 workflows + system overview",
+      "priority": 11,
+      "status": "passed",
+      "failureCount": 0
     }
   ],
   "summary": {
-    "totalStories": 9,
-    "passed": 9,
+    "totalStories": 11,
+    "passed": 11,
     "blocked": 0,
     "pending": 0,
-    "iterationsRun": 10
+    "iterationsRun": 12
   }
 }

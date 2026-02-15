@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-06 Post-Call Processor — Equity Insurance AI Receptionist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+        h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+        p { margin-bottom: 12px; font-size: 14px; }
+        .subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+        .diagram { margin: 24px 0; text-align: center; }
+        svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+        th { font-weight: 600; background: #f8f8f8; }
+        .step-list { list-style: none; padding: 0; margin: 16px 0; }
+        .step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+        .step-list li strong { display: inline-block; min-width: 120px; }
+        footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+
+    <h1>WF-06 Post-Call Processor</h1>
+    <p class="subtitle">Webhook: POST /vapi-call-ended &mdash; 15 Nodes &mdash; n8n ID: nKwYydxwd8n58ExN</p>
+
+    <p>This is the most complex workflow. It processes all data after a call ends &mdash; merging VAPI end-of-call data with the lead record collected during the call, writing to the CRM, sending summary emails, and logging analytics.</p>
+
+    <h2>Flow Diagram</h2>
+    <div class="diagram">
+        <svg width="1020" height="580" viewBox="0 0 1020 580" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- Row 1 label -->
+            <text x="10" y="22" font-size="10" font-weight="600" fill="#999">ROW 1 — Data Ingestion &amp; Merge</text>
+
+            <!-- Node 1: Webhook Trigger -->
+            <rect x="10" y="35" width="170" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="95" y="57" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Webhook Trigger</text>
+            <text x="95" y="73" text-anchor="middle" font-size="10" fill="#666">POST /vapi-call-ended</text>
+
+            <!-- Arrow 1→2 -->
+            <line x1="180" y1="60" x2="210" y2="60" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 2: Extract All Data -->
+            <rect x="210" y="35" width="200" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="310" y="53" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Extract All Data</text>
+            <text x="310" y="67" text-anchor="middle" font-size="9" fill="#666">call_id, transcript, recording_url,</text>
+            <text x="310" y="79" text-anchor="middle" font-size="9" fill="#666">duration, cost, end_reason, summary</text>
+
+            <!-- Arrow 2→3 -->
+            <line x1="410" y1="60" x2="440" y2="60" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 3: Read Lead Record -->
+            <rect x="440" y="35" width="190" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="535" y="53" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Read Lead Record</text>
+            <text x="535" y="69" text-anchor="middle" font-size="10" fill="#666">Google Sheets lookup by call_id</text>
+
+            <!-- Arrow 3→4 -->
+            <line x1="630" y1="60" x2="660" y2="60" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 4: Merge Data -->
+            <rect x="660" y="35" width="180" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="750" y="53" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Merge Data</text>
+            <text x="750" y="69" text-anchor="middle" font-size="10" fill="#666">Combine VAPI + lead data</text>
+
+            <!-- Arrow Row1→Row2 (down from Merge Data) -->
+            <line x1="750" y1="85" x2="750" y2="120" stroke="#333" stroke-width="1.5" />
+            <line x1="750" y1="120" x2="165" y2="120" stroke="#333" stroke-width="1.5" />
+            <line x1="165" y1="120" x2="165" y2="155" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Row 2 label -->
+            <text x="10" y="148" font-size="10" font-weight="600" fill="#999">ROW 2 — CRM Write</text>
+
+            <!-- Node 5: Add Migration Flag -->
+            <rect x="10" y="155" width="220" height="50" rx="8" ry="8" fill="#f0f0ff" stroke="#4a4a8a" stroke-width="1.5" />
+            <text x="120" y="175" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Add Migration Flag</text>
+            <text x="120" y="191" text-anchor="middle" font-size="9" fill="#666">VAPI_AI_COLLECTED + migration_date</text>
+
+            <!-- Arrow 5→6 -->
+            <line x1="230" y1="180" x2="260" y2="180" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 6: Write to QQ Catalyst -->
+            <rect x="260" y="155" width="210" height="50" rx="8" ry="8" fill="#f0f0ff" stroke="#4a4a8a" stroke-width="1.5" />
+            <text x="365" y="175" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Write to QQ Catalyst</text>
+            <text x="365" y="191" text-anchor="middle" font-size="10" fill="#666">HTTP POST to CRM API</text>
+
+            <!-- Arrow Row2→Row3 (down from QQ Catalyst) -->
+            <line x1="365" y1="205" x2="365" y2="240" stroke="#333" stroke-width="1.5" />
+            <line x1="365" y1="240" x2="165" y2="240" stroke="#333" stroke-width="1.5" />
+            <line x1="165" y1="240" x2="165" y2="275" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Row 3 label -->
+            <text x="10" y="268" font-size="10" font-weight="600" fill="#999">ROW 3 — CRM Fallback</text>
+
+            <!-- Node 7: CRM Write Fallback -->
+            <rect x="10" y="275" width="210" height="50" rx="8" ry="8" fill="#fff8f0" stroke="#c0392b" stroke-width="1.5" />
+            <text x="115" y="295" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">CRM Write Fallback</text>
+            <text x="115" y="311" text-anchor="middle" font-size="10" fill="#666">IF node: check for errors</text>
+
+            <!-- Arrow 7→8 (on error) -->
+            <line x1="220" y1="300" x2="260" y2="300" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowhead)" />
+            <text x="236" y="293" font-size="9" font-weight="600" fill="#c0392b">ERROR</text>
+
+            <!-- Node 8: Fallback to Google Sheet -->
+            <rect x="260" y="275" width="230" height="50" rx="8" ry="8" fill="#fff8f0" stroke="#c0392b" stroke-width="1.5" />
+            <text x="375" y="295" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Fallback to Google Sheet</text>
+            <text x="375" y="311" text-anchor="middle" font-size="10" fill="#666">Save with crm_sync_error note</text>
+
+            <!-- Arrow Row3→Row4 (down from CRM Fallback, continuing pipeline from QQ Catalyst) -->
+            <line x1="365" y1="205" x2="365" y2="228" stroke="#333" stroke-width="1" stroke-dasharray="4,3" />
+            <!-- Main pipeline continues from QQ Catalyst down to Row 4 -->
+            <line x1="470" y1="180" x2="530" y2="180" stroke="#333" stroke-width="1.5" />
+            <line x1="530" y1="180" x2="530" y2="360" stroke="#333" stroke-width="1.5" />
+            <line x1="530" y1="360" x2="165" y2="360" stroke="#333" stroke-width="1.5" />
+            <line x1="165" y1="360" x2="165" y2="395" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Row 4 label -->
+            <text x="10" y="388" font-size="10" font-weight="600" fill="#999">ROW 4 — Notify &amp; Log</text>
+
+            <!-- Node 9: Build Summary Email -->
+            <rect x="10" y="395" width="210" height="50" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="115" y="413" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Build Summary Email</text>
+            <text x="115" y="429" text-anchor="middle" font-size="9" fill="#666">JS: 8 email variants by lead type</text>
+
+            <!-- Arrow 9→10 -->
+            <line x1="220" y1="420" x2="250" y2="420" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 10: Send Summary Email -->
+            <rect x="250" y="395" width="180" height="50" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="340" y="413" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Send Summary Email</text>
+            <text x="340" y="429" text-anchor="middle" font-size="10" fill="#666">SMTP to Val / Davin</text>
+
+            <!-- Arrow 10→11 -->
+            <line x1="430" y1="420" x2="460" y2="420" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 11: Log Analytics Row -->
+            <rect x="460" y="395" width="190" height="50" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="555" y="413" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Log Analytics Row</text>
+            <text x="555" y="429" text-anchor="middle" font-size="10" fill="#666">Google Sheets Analytics</text>
+
+            <!-- Arrow 11→12 -->
+            <line x1="650" y1="420" x2="680" y2="420" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 12: Save Transcript -->
+            <rect x="680" y="395" width="180" height="50" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="770" y="413" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a1a">Save Transcript</text>
+            <text x="770" y="429" text-anchor="middle" font-size="10" fill="#666">Google Sheets Leads</text>
+
+            <!-- Bottom: Error Handler -->
+            <text x="10" y="498" font-size="10" font-weight="600" fill="#999">ERROR HANDLER</text>
+
+            <!-- Node 13: Error Trigger -->
+            <rect x="10" y="510" width="180" height="50" rx="8" ry="8" fill="#ffeaea" stroke="#c0392b" stroke-width="1.5" />
+            <text x="100" y="530" text-anchor="middle" font-size="11" font-weight="600" fill="#c0392b">Error Trigger</text>
+            <text x="100" y="546" text-anchor="middle" font-size="10" fill="#666">Catches unhandled errors</text>
+
+            <!-- Arrow 13→14 -->
+            <line x1="190" y1="535" x2="220" y2="535" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 14: Log Error to Sheet -->
+            <rect x="220" y="510" width="210" height="50" rx="8" ry="8" fill="#ffeaea" stroke="#c0392b" stroke-width="1.5" />
+            <text x="325" y="530" text-anchor="middle" font-size="11" font-weight="600" fill="#c0392b">Log Error to Sheet</text>
+            <text x="325" y="546" text-anchor="middle" font-size="10" fill="#666">Google Sheets Errors</text>
+        </svg>
+    </div>
+
+    <h2>Step-by-Step Process</h2>
+    <ol class="step-list">
+        <li>
+            <strong>Webhook Trigger</strong>
+            VAPI sends POST to /vapi-call-ended when call terminates.
+        </li>
+        <li>
+            <strong>Extract All Data</strong>
+            Extracts: call_id (call.id), transcript, recording_url (recordingUrl), duration, cost, end_reason, summary, caller_phone, call_status from VAPI payload.
+        </li>
+        <li>
+            <strong>Read Lead Record</strong>
+            Reads the existing lead row from Google Sheets Leads table by call_id to get all fields collected during the call.
+        </li>
+        <li>
+            <strong>Merge Data</strong>
+            Combines VAPI end-of-call data with the lead record data into a single object.
+        </li>
+        <li>
+            <strong>Add Migration Flag</strong>
+            Sets migration_flag=VAPI_AI_COLLECTED and migration_date=now for CRM migration tracking.
+        </li>
+        <li>
+            <strong>Write to QQ Catalyst</strong>
+            HTTP POST to CRM API endpoint with all merged data. CRM access is pending, so this may fail gracefully.
+        </li>
+        <li>
+            <strong>CRM Write Fallback</strong>
+            IF node checking if CRM write failed (catches HTTP errors).
+        </li>
+        <li>
+            <strong>Fallback to Google Sheet</strong>
+            On CRM failure, saves complete data to Google Sheets with crm_sync_error note.
+        </li>
+        <li>
+            <strong>Build Summary Email</strong>
+            JavaScript code node that builds one of 8 email variants: HOT LEAD (transferred or transfer failed), DISQUALIFIED lead, TRANSFER FAILED, CLAIM call, EXISTING customer, PARTIAL intake (incomplete data), QUALIFIED lead (standard successful intake), After-hours message.
+        </li>
+        <li>
+            <strong>Send Summary Email</strong>
+            Sends the built email to Val and/or Davin depending on the email variant type.
+        </li>
+        <li>
+            <strong>Log Analytics Row</strong>
+            Appends analytics data to Google Sheets Analytics: call_id, duration, cost, call_status, policy_type, lead_quality.
+        </li>
+        <li>
+            <strong>Save Transcript</strong>
+            Updates the lead's row in Google Sheets Leads with the full transcript text.
+        </li>
+        <li>
+            <strong>Error Trigger</strong>
+            n8n error trigger catches any unhandled errors in the workflow.
+        </li>
+        <li>
+            <strong>Log Error to Sheet</strong>
+            Saves error details (workflow, node, message, timestamp) to Google Sheets Errors.
+        </li>
+    </ol>
+
+    <h2>Email Variants</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Subject Pattern</th>
+                <th>Recipients</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>HOT LEAD</td>
+                <td>HOT LEAD &mdash; {policy_type} ${value}</td>
+                <td>Val + Davin</td>
+                <td>Urgent</td>
+            </tr>
+            <tr>
+                <td>DISQUALIFIED</td>
+                <td>DISQUALIFIED &mdash; {reason}</td>
+                <td>Val</td>
+                <td>Normal</td>
+            </tr>
+            <tr>
+                <td>TRANSFER FAILED</td>
+                <td>TRANSFER FAILED &mdash; {name}</td>
+                <td>Val + Davin</td>
+                <td>Critical</td>
+            </tr>
+            <tr>
+                <td>CLAIM</td>
+                <td>CLAIM &mdash; {claim_type} &mdash; {name}</td>
+                <td>Val + Davin</td>
+                <td>High</td>
+            </tr>
+            <tr>
+                <td>EXISTING</td>
+                <td>EXISTING CUSTOMER &mdash; {name}</td>
+                <td>Val</td>
+                <td>Normal</td>
+            </tr>
+            <tr>
+                <td>PARTIAL</td>
+                <td>PARTIAL INTAKE &mdash; {name}</td>
+                <td>Val</td>
+                <td>Low</td>
+            </tr>
+            <tr>
+                <td>QUALIFIED</td>
+                <td>NEW LEAD &mdash; {policy_type} &mdash; {name}</td>
+                <td>Val</td>
+                <td>Normal</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Data Stores Used</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Sheet</th>
+                <th>Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Leads</td>
+                <td>Read existing data, save transcript, fallback CRM write</td>
+            </tr>
+            <tr>
+                <td>Analytics</td>
+                <td>Log call metrics (duration, cost, status)</td>
+            </tr>
+            <tr>
+                <td>Errors</td>
+                <td>Log workflow errors for debugging</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Node Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Node Name</th>
+                <th>Type</th>
+                <th>Key Parameters</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Webhook Trigger</td>
+                <td>n8n-nodes-base.webhook (v2)</td>
+                <td>POST /vapi-call-ended, headerAuth, responseMode: lastNode</td>
+            </tr>
+            <tr>
+                <td>Extract All Data</td>
+                <td>n8n-nodes-base.set (v3.4)</td>
+                <td>Manual mode, extracts call_id, transcript, recording_url, duration, cost, end_reason, summary, caller_phone, call_status</td>
+            </tr>
+            <tr>
+                <td>Read Lead Record</td>
+                <td>n8n-nodes-base.googleSheets (v4.5)</td>
+                <td>Read operation, Leads sheet, filter by call_id column match</td>
+            </tr>
+            <tr>
+                <td>Merge Data</td>
+                <td>n8n-nodes-base.merge (v3)</td>
+                <td>Combine by position, merges VAPI payload fields with lead record fields into single object</td>
+            </tr>
+            <tr>
+                <td>Add Migration Flag</td>
+                <td>n8n-nodes-base.set (v3.4)</td>
+                <td>Sets migration_flag=VAPI_AI_COLLECTED, migration_date={{ $now.toISO() }}</td>
+            </tr>
+            <tr>
+                <td>Write to QQ Catalyst</td>
+                <td>n8n-nodes-base.httpRequest (v4.2)</td>
+                <td>POST to CRM API endpoint, JSON body with all merged data, error handling: continue on fail</td>
+            </tr>
+            <tr>
+                <td>CRM Write Fallback</td>
+                <td>n8n-nodes-base.if (v2)</td>
+                <td>Checks if previous HTTP node returned error (status != 200), routes to fallback on true</td>
+            </tr>
+            <tr>
+                <td>Fallback to Google Sheet</td>
+                <td>n8n-nodes-base.googleSheets (v4.5)</td>
+                <td>Append operation, Leads sheet, adds crm_sync_error=true and error_message fields</td>
+            </tr>
+            <tr>
+                <td>Build Summary Email</td>
+                <td>n8n-nodes-base.code (v2)</td>
+                <td>JavaScript: switch on lead_type/call_status to build subject, body, recipients, priority for 8 variants</td>
+            </tr>
+            <tr>
+                <td>Send Summary Email</td>
+                <td>n8n-nodes-base.emailSend (v2.1)</td>
+                <td>SMTP credentials, dynamic to/subject/body from previous node, HTML format</td>
+            </tr>
+            <tr>
+                <td>Log Analytics Row</td>
+                <td>n8n-nodes-base.googleSheets (v4.5)</td>
+                <td>Append operation, Analytics sheet, fields: call_id, duration, cost, call_status, policy_type, lead_quality</td>
+            </tr>
+            <tr>
+                <td>Save Transcript</td>
+                <td>n8n-nodes-base.googleSheets (v4.5)</td>
+                <td>Update operation, Leads sheet, matches by call_id, writes transcript column</td>
+            </tr>
+            <tr>
+                <td>Error Trigger</td>
+                <td>n8n-nodes-base.errorTrigger (v1)</td>
+                <td>Catches all unhandled workflow errors, outputs error object</td>
+            </tr>
+            <tr>
+                <td>Log Error to Sheet</td>
+                <td>n8n-nodes-base.googleSheets (v4.5)</td>
+                <td>Append operation, Errors sheet, fields: workflow_name, node_name, error_message, timestamp</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        Equity Insurance AI Receptionist &mdash; WF-06 Documentation &mdash; Generated 2026-02-14
+    </footer>
+
+</body>
+</html>

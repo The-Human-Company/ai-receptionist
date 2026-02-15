@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-01 Inbound Call Router — Equity Insurance AI Receptionist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+        h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+        p { margin-bottom: 12px; font-size: 14px; }
+        .subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+        .diagram { margin: 24px 0; text-align: center; }
+        svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+        th { font-weight: 600; background: #f8f8f8; }
+        .step-list { list-style: none; padding: 0; margin: 16px 0; }
+        .step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+        .step-list li strong { display: inline-block; min-width: 120px; }
+        footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+
+    <h1>WF-01 Inbound Call Router</h1>
+    <p class="subtitle">Webhook: POST /vapi-call-started &mdash; 6 Nodes &mdash; n8n ID: mghU5hDPImnGTMKe</p>
+
+    <h2>Flow Diagram</h2>
+    <div class="diagram">
+        <svg width="1020" height="310" viewBox="0 0 1020 310" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- Node 1: Webhook Trigger -->
+            <rect x="10" y="80" width="160" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="90" y="102" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Webhook Trigger</text>
+            <text x="90" y="118" text-anchor="middle" font-size="10" fill="#666">POST /vapi-call-started</text>
+
+            <!-- Arrow 1→2 -->
+            <line x1="170" y1="105" x2="200" y2="105" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 2: Extract Call Data -->
+            <rect x="200" y="80" width="160" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="280" y="102" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Extract Call Data</text>
+            <text x="280" y="118" text-anchor="middle" font-size="10" fill="#666">call_id, caller_phone,</text>
+            <text x="280" y="130" text-anchor="middle" font-size="10" fill="#666">timestamp, assistant_id</text>
+
+            <!-- Arrow 2→3 -->
+            <line x1="360" y1="105" x2="390" y2="105" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 3: Check Business Hours -->
+            <rect x="390" y="80" width="160" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="470" y="102" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Check Business Hours</text>
+            <text x="470" y="118" text-anchor="middle" font-size="10" fill="#666">JS: UTC-10, Mon-Fri 9-17</text>
+
+            <!-- Arrow 3→4 -->
+            <line x1="550" y1="105" x2="580" y2="105" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 4: IF Business Hours -->
+            <rect x="580" y="80" width="140" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="650" y="102" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">IF Business Hours</text>
+            <text x="650" y="118" text-anchor="middle" font-size="10" fill="#666">Boolean branch</text>
+
+            <!-- Arrow TRUE (upper branch) -->
+            <line x1="720" y1="92" x2="770" y2="50" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+            <text x="738" y="62" font-size="10" font-weight="600" fill="#1a8a1a">TRUE</text>
+
+            <!-- Arrow FALSE (lower branch) -->
+            <line x1="720" y1="118" x2="770" y2="220" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+            <text x="738" y="182" font-size="10" font-weight="600" fill="#c0392b">FALSE</text>
+
+            <!-- Node 5: Business Hours Config (upper) -->
+            <rect x="770" y="15" width="240" height="70" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="890" y="37" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Return Business Hours</text>
+            <text x="890" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Config</text>
+            <text x="890" y="68" text-anchor="middle" font-size="10" fill="#666">VAPI assistant, system prompt,</text>
+            <text x="890" y="80" text-anchor="middle" font-size="10" fill="#666">5 tools, ElevenLabs voice</text>
+
+            <!-- Node 6: After-Hours Config (lower) -->
+            <rect x="770" y="200" width="240" height="70" rx="8" ry="8" fill="#fff8f0" stroke="#c0392b" stroke-width="1.5" />
+            <text x="890" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Return After-Hours</text>
+            <text x="890" y="237" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Config</text>
+            <text x="890" y="253" text-anchor="middle" font-size="10" fill="#666">Brief message collection,</text>
+            <text x="890" y="265" text-anchor="middle" font-size="10" fill="#666">restricted tools</text>
+        </svg>
+    </div>
+
+    <h2>Step-by-Step Process</h2>
+    <ol class="step-list">
+        <li>
+            <strong>Webhook Trigger</strong>
+            VAPI sends POST to /vapi-call-started when a new call is received.
+        </li>
+        <li>
+            <strong>Extract Call Data</strong>
+            Extracts call_id, caller_phone, call_timestamp, and assistant_id from the VAPI payload.
+        </li>
+        <li>
+            <strong>Check Business Hours</strong>
+            JavaScript calculates current time in HST (UTC-10, no DST). Checks if weekday (Mon-Fri) and within 9am-5pm.
+        </li>
+        <li>
+            <strong>IF Business Hours</strong>
+            Routes to one of two response configurations.
+        </li>
+        <li>
+            <strong>Business Hours Config</strong>
+            Returns full VAPI assistant configuration with: system prompt (12 rules, call flow, 12 data fields, policy questions, qualification checks, cross-sell, closing), 5 VAPI function tools (save_field, check_disqualifier, check_hot_lead, route_existing_customer, route_claim), ElevenLabs voice (Female, Warm), greeting message with Tulsa disclaimer.
+        </li>
+        <li>
+            <strong>After-Hours Config</strong>
+            Returns limited configuration: brief message collection (name, phone, reason only), restricted tool set, next-business-day callback promise.
+        </li>
+    </ol>
+
+    <h2>VAPI Tools Configured</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tool Name</th>
+                <th>Webhook Endpoint</th>
+                <th>Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>save_field</td>
+                <td>/vapi-save-field</td>
+                <td>Save each collected data field to Google Sheets</td>
+            </tr>
+            <tr>
+                <td>check_disqualifier</td>
+                <td>/vapi-check-disqualifier</td>
+                <td>Check claims/urgency disqualifiers</td>
+            </tr>
+            <tr>
+                <td>check_hot_lead</td>
+                <td>/vapi-check-hotlead</td>
+                <td>Detect high-value leads for transfer</td>
+            </tr>
+            <tr>
+                <td>route_existing_customer</td>
+                <td>/vapi-existing-customer</td>
+                <td>Route existing customer requests</td>
+            </tr>
+            <tr>
+                <td>route_claim</td>
+                <td>/vapi-claim</td>
+                <td>Route claim calls</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Transfer Triggers</h2>
+    <p>The following 5 scenarios trigger an immediate transfer to a live agent:</p>
+    <ol class="step-list">
+        <li>
+            <strong>Person Request</strong>
+            Caller asks for a specific person by name.
+        </li>
+        <li>
+            <strong>Complex Policy</strong>
+            Caller has a big or complex policy requiring agent expertise.
+        </li>
+        <li>
+            <strong>Upset Caller</strong>
+            Caller is upset or making a complaint.
+        </li>
+        <li>
+            <strong>Ready to Buy</strong>
+            Caller says they are ready to buy or bind coverage now.
+        </li>
+        <li>
+            <strong>Claim Call</strong>
+            Existing customer calling about a claim.
+        </li>
+    </ol>
+
+    <h2>Node Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Node Name</th>
+                <th>Type</th>
+                <th>Key Parameters</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Webhook Trigger</td>
+                <td>n8n-nodes-base.webhook (v2)</td>
+                <td>POST /vapi-call-started, headerAuth, responseMode: responseNode</td>
+            </tr>
+            <tr>
+                <td>Extract Call Data</td>
+                <td>n8n-nodes-base.set (v3.4)</td>
+                <td>Manual mode, extracts call_id, caller_phone, call_timestamp, assistant_id from VAPI payload</td>
+            </tr>
+            <tr>
+                <td>Check Business Hours</td>
+                <td>n8n-nodes-base.code (v2)</td>
+                <td>JavaScript: calculates HST (UTC-10), checks weekday (Mon-Fri) and hours (9-17), outputs isBusinessHours boolean</td>
+            </tr>
+            <tr>
+                <td>IF Business Hours</td>
+                <td>n8n-nodes-base.if (v2)</td>
+                <td>Boolean condition: isBusinessHours equals true, strict type validation</td>
+            </tr>
+            <tr>
+                <td>Return Business Hours Config</td>
+                <td>n8n-nodes-base.respondToWebhook (v1.1)</td>
+                <td>JSON response: full VAPI assistant with GPT-4o (temp 0.3), ElevenLabs voice, system prompt, 5 function tools</td>
+            </tr>
+            <tr>
+                <td>Return After-Hours Config</td>
+                <td>n8n-nodes-base.respondToWebhook (v1.1)</td>
+                <td>JSON response: limited VAPI assistant with GPT-4o (temp 0.3), ElevenLabs voice, after-hours prompt, 1 function tool (save_field only)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        Equity Insurance AI Receptionist &mdash; WF-01 Documentation &mdash; Generated 2026-02-14
+    </footer>
+
+</body>
+</html>

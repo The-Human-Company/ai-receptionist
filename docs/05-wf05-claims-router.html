@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-05 Claims Router — Equity Insurance AI Receptionist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+        h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+        p { margin-bottom: 12px; font-size: 14px; }
+        .subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+        .diagram { margin: 24px 0; text-align: center; }
+        svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+        th { font-weight: 600; background: #f8f8f8; }
+        .step-list { list-style: none; padding: 0; margin: 16px 0; }
+        .step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+        .step-list li strong { display: inline-block; min-width: 120px; }
+        footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+
+    <h1>WF-05 Claims Router</h1>
+    <p class="subtitle">Webhook: POST /vapi-claim &mdash; 7 Nodes &mdash; n8n ID: ZAoSyxR2U2lH2a7b</p>
+
+    <h2>Flow Diagram</h2>
+    <div class="diagram">
+        <svg width="1020" height="310" viewBox="0 0 1020 310" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- Node 1: Webhook Trigger -->
+            <rect x="10" y="115" width="160" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="90" y="137" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Webhook Trigger</text>
+            <text x="90" y="153" text-anchor="middle" font-size="10" fill="#666">POST /vapi-claim</text>
+
+            <!-- Arrow 1-2 -->
+            <line x1="170" y1="140" x2="200" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 2: Extract Claim Data -->
+            <rect x="200" y="115" width="160" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="280" y="134" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Extract Claim Data</text>
+            <text x="280" y="150" text-anchor="middle" font-size="10" fill="#666">call_id, name, phone,</text>
+            <text x="280" y="161" text-anchor="middle" font-size="9" fill="#666">claim_type, description</text>
+
+            <!-- Arrow 2-3 -->
+            <line x1="360" y1="140" x2="390" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 3: Check Business Hours -->
+            <rect x="390" y="115" width="160" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="470" y="137" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Check Business Hours</text>
+            <text x="470" y="153" text-anchor="middle" font-size="10" fill="#666">JS: UTC-10, Mon-Fri 9-17</text>
+
+            <!-- Arrow 3-4 -->
+            <line x1="550" y1="140" x2="580" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 4: IF Business Hours -->
+            <rect x="580" y="115" width="140" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="650" y="137" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">IF Business Hours</text>
+            <text x="650" y="153" text-anchor="middle" font-size="10" fill="#666">Boolean branch</text>
+
+            <!-- TRUE branch (upper) -->
+            <line x1="720" y1="127" x2="770" y2="55" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+            <text x="738" y="80" font-size="10" font-weight="600" fill="#1a8a1a">TRUE</text>
+
+            <!-- FALSE branch (lower) -->
+            <line x1="720" y1="153" x2="770" y2="230" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+            <text x="738" y="205" font-size="10" font-weight="600" fill="#c0392b">FALSE</text>
+
+            <!-- Node 5a: Send VAPI Transfer Command (upper-left) -->
+            <rect x="770" y="15" width="230" height="55" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="885" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Send VAPI Transfer</text>
+            <text x="885" y="48" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Command</text>
+            <text x="885" y="63" text-anchor="middle" font-size="10" fill="#666">+18087800473, warm mode</text>
+
+            <!-- Node 5b: Send Priority Notification - During Hours (upper-right, below 5a) -->
+            <rect x="770" y="80" width="230" height="50" rx="8" ry="8" fill="#f0f8f0" stroke="#2d7a2d" stroke-width="1.5" />
+            <text x="885" y="100" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Send Priority Notification</text>
+            <text x="885" y="116" text-anchor="middle" font-size="10" fill="#666">Val + Davin, priority=HIGH</text>
+
+            <!-- Connection between 5a and 5b -->
+            <line x1="885" y1="70" x2="885" y2="80" stroke="#2d7a2d" stroke-width="1" stroke-dasharray="3,2" />
+
+            <!-- Node 6: Send Priority Notification - After Hours (lower) -->
+            <rect x="770" y="210" width="230" height="65" rx="8" ry="8" fill="#fff8f0" stroke="#c0392b" stroke-width="1.5" />
+            <text x="885" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Send Priority Notification</text>
+            <text x="885" y="248" text-anchor="middle" font-size="10" fill="#666">Val + Davin, priority=HIGH</text>
+            <text x="885" y="263" text-anchor="middle" font-size="10" fill="#c0392b">AFTER HOURS &mdash; no transfer</text>
+
+            <!-- Converge arrows to Respond to VAPI -->
+            <!-- From During Hours notification -->
+            <line x1="885" y1="130" x2="885" y2="145" stroke="#333" stroke-width="1" />
+            <line x1="885" y1="145" x2="920" y2="145" stroke="#333" stroke-width="1" />
+            <line x1="920" y1="145" x2="920" y2="180" stroke="#333" stroke-width="1" />
+
+            <!-- From After Hours notification -->
+            <line x1="885" y1="275" x2="885" y2="290" stroke="#333" stroke-width="1" />
+            <line x1="885" y1="290" x2="920" y2="290" stroke="#333" stroke-width="1" />
+            <line x1="920" y1="290" x2="920" y2="205" stroke="#333" stroke-width="1" />
+
+            <!-- Merge point -->
+            <line x1="920" y1="180" x2="920" y2="205" stroke="#333" stroke-width="1.5" />
+            <circle cx="920" cy="192" r="3" fill="#333" />
+
+            <!-- Arrow to Respond node (not drawn separately, implied by converge) -->
+
+        </svg>
+    </div>
+    <p style="text-align: center; font-size: 12px; color: #666; margin-top: -12px;">
+        During business hours: transfer call + send notification. After hours: send notification only. Both paths respond to VAPI.
+    </p>
+
+    <h2>Step-by-Step Process</h2>
+    <ol class="step-list">
+        <li>
+            <strong>Webhook Trigger</strong>
+            VAPI calls the route_claim function, sending a POST request to /vapi-claim.
+        </li>
+        <li>
+            <strong>Extract Claim Data</strong>
+            Extracts call_id, caller_name, caller_phone, policy_number (optional), claim_type, and claim_description from the VAPI function call parameters.
+        </li>
+        <li>
+            <strong>Check Business Hours</strong>
+            JavaScript calculates current time in HST (UTC-10, no DST). Checks if weekday (Mon-Fri) and within 9am-5pm. Same logic as WF-01.
+        </li>
+        <li>
+            <strong>IF Business Hours</strong>
+            Routes to the appropriate handling path based on whether the call is during or after business hours.
+        </li>
+        <li>
+            <strong>During Hours Path</strong>
+            Sends a VAPI transfer command via POST to /call/{id}/transfer with warm mode to the primary phone (+1 808-780-0473). Simultaneously sends a priority notification email to both Val and Davin with full claim details.
+        </li>
+        <li>
+            <strong>After Hours Path</strong>
+            Sends a priority notification email only (no transfer attempt). The email subject includes an "AFTER HOURS" tag so recipients know no live transfer was made.
+        </li>
+        <li>
+            <strong>Respond to VAPI</strong>
+            Returns JSON with claim_received=true and transfer_attempted=true (during hours) or transfer_attempted=false (after hours) so the AI can communicate the outcome to the caller.
+        </li>
+    </ol>
+
+    <h2>Priority Notification Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Recipients</td>
+                <td>Val (val@equityinsurance.services) + Davin (davin@equityinsurance.services)</td>
+            </tr>
+            <tr>
+                <td>Subject (During Hours)</td>
+                <td>CLAIM &mdash; {claim_type} &mdash; {caller_name} &mdash; TRANSFER ATTEMPTED</td>
+            </tr>
+            <tr>
+                <td>Subject (After Hours)</td>
+                <td>CLAIM &mdash; {claim_type} &mdash; {caller_name} &mdash; AFTER HOURS</td>
+            </tr>
+            <tr>
+                <td>Priority</td>
+                <td>HIGH</td>
+            </tr>
+            <tr>
+                <td>Body Contents</td>
+                <td>caller_name, caller_phone, policy_number (if provided), claim_type, claim_description, call timestamp, transfer status</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Node Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Node Name</th>
+                <th>Type</th>
+                <th>Key Parameters</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Webhook Trigger</td>
+                <td>n8n-nodes-base.webhook (v2)</td>
+                <td>POST /vapi-claim, headerAuth, responseMode: responseNode</td>
+            </tr>
+            <tr>
+                <td>Extract Claim Data</td>
+                <td>n8n-nodes-base.set (v3.4)</td>
+                <td>Manual mode, extracts call_id, caller_name, caller_phone, policy_number (optional), claim_type, claim_description from VAPI function call parameters</td>
+            </tr>
+            <tr>
+                <td>Check Business Hours</td>
+                <td>n8n-nodes-base.code (v2)</td>
+                <td>JavaScript: calculates HST (UTC-10), checks weekday (Mon-Fri) and hours (9-17), outputs isBusinessHours boolean</td>
+            </tr>
+            <tr>
+                <td>IF Business Hours</td>
+                <td>n8n-nodes-base.if (v2)</td>
+                <td>Boolean condition: isBusinessHours equals true, strict type validation</td>
+            </tr>
+            <tr>
+                <td>Send VAPI Transfer Command</td>
+                <td>n8n-nodes-base.httpRequest (v4.2)</td>
+                <td>POST to VAPI /call/{call_id}/transfer, destination: +18087800473, mode: warm, timeout: 30s</td>
+            </tr>
+            <tr>
+                <td>Send Priority Notification</td>
+                <td>n8n-nodes-base.emailSend (v2.1)</td>
+                <td>To: val@equityinsurance.services, davin@equityinsurance.services, Priority: HIGH, Subject: "CLAIM &mdash; {claim_type} &mdash; {caller_name} &mdash; TRANSFER ATTEMPTED / AFTER HOURS"</td>
+            </tr>
+            <tr>
+                <td>Respond to VAPI</td>
+                <td>n8n-nodes-base.respondToWebhook (v1.1)</td>
+                <td>JSON response: { claim_received: true, transfer_attempted: true/false, message: "Claim logged and team notified" }</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        Equity Insurance AI Receptionist &mdash; WF-05 Documentation &mdash; Generated 2026-02-14
+    </footer>
+
+</body>
+</html>
