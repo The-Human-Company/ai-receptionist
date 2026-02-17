@@ -93,31 +93,57 @@
     },
     {
       "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "Leads",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "autoMapInputData",
-          "value": {}
-        },
-        "options": {
-          "cellFormat": "USER_ENTERED"
-        }
+        "method": "GET",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0/values:batchGet?ranges=Leads!1:1&ranges=Leads!A:B",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "options": {}
       },
-      "id": "wf02-save-to-sheet",
-      "name": "Save to Google Sheet",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
+      "id": "wf02-read-sheet",
+      "name": "Read Sheet Headers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         1300,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get sheet data from Read Sheet Headers\nconst sheetResponse = $('Read Sheet Headers').first().json;\nconst headers = sheetResponse.valueRanges[0].values ? sheetResponse.valueRanges[0].values[0] : [];\nconst dataRows = sheetResponse.valueRanges[1].values || [];\n\n// Find which column index has 'call_id' in headers\nconst callIdColIndex = headers.indexOf('call_id');\n\n// Get accumulated row data from Prepare Sheet Data\nconst rowData = $('Prepare Sheet Data').first().json;\nconst callId = rowData.call_id;\n\n// Find existing row by searching for call_id in the correct column\n// dataRows includes columns A:B, so index within each row matches header offset\n// dataRows[0] = header row, dataRows[1+] = data rows\nlet existingRowNumber = -1;\nif (callIdColIndex >= 0) {\n  for (let i = 1; i < dataRows.length; i++) {\n    const cellValue = dataRows[i] ? dataRows[i][callIdColIndex] : undefined;\n    if (cellValue === callId) {\n      existingRowNumber = i + 1; // 1-based sheet row number\n      break;\n    }\n  }\n}\n\n// Build row values in header order\nconst values = headers.map(header => {\n  const val = rowData[header];\n  return val !== undefined && val !== null ? String(val) : '';\n});\n\n// Column letter helper (handles AA, AB, etc.)\nfunction colLetter(n) {\n  let s = '';\n  while (n > 0) {\n    n--;\n    s = String.fromCharCode(65 + (n % 26)) + s;\n    n = Math.floor(n / 26);\n  }\n  return s;\n}\nconst lastCol = colLetter(headers.length);\n\nconst sheetId = '14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0';\nlet url, method;\nif (existingRowNumber > 0) {\n  url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Leads!A${existingRowNumber}:${lastCol}${existingRowNumber}?valueInputOption=USER_ENTERED`;\n  method = 'PUT';\n} else {\n  url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Leads:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;\n  method = 'POST';\n}\n\nreturn [{\n  json: {\n    url,\n    method,\n    body: {\n      range: existingRowNumber > 0 ? `Leads!A${existingRowNumber}:${lastCol}${existingRowNumber}` : 'Leads',\n      majorDimension: 'ROWS',\n      values: [values]\n    }\n  }\n}];"
+      },
+      "id": "wf02-build-upsert",
+      "name": "Build Upsert Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "={{ $json.method }}",
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "id": "wf02-write-sheet",
+      "name": "Write to Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1700,
         0
       ],
       "credentials": {
@@ -138,7 +164,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1530,
+        1900,
         0
       ]
     },
@@ -190,31 +216,57 @@
     },
     {
       "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "Leads",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "autoMapInputData",
-          "value": {}
-        },
-        "options": {
-          "cellFormat": "USER_ENTERED"
-        }
+        "method": "GET",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0/values:batchGet?ranges=Leads!1:1&ranges=Leads!A:B",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "options": {}
       },
-      "id": "wf02-update-lead-disqualifier",
-      "name": "Update Lead - Disqualifier",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
+      "id": "wf02-read-sheet-disqualifier",
+      "name": "Read Sheet for Disqualifier",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         810,
+        450
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get sheet data from Read Sheet for Disqualifier\nconst sheetResponse = $('Read Sheet for Disqualifier').first().json;\nconst headers = sheetResponse.valueRanges[0].values ? sheetResponse.valueRanges[0].values[0] : [];\nconst dataRows = sheetResponse.valueRanges[1].values || [];\n\n// Find which column index has 'call_id' in headers\nconst callIdColIndex = headers.indexOf('call_id');\n\n// Get disqualifier data\nconst rowData = $('Evaluate Disqualifier Rules').first().json;\nconst callId = rowData.call_id;\n\n// Find existing row by call_id\nlet existingRowNumber = -1;\nif (callIdColIndex >= 0) {\n  for (let i = 1; i < dataRows.length; i++) {\n    const cellValue = dataRows[i] ? dataRows[i][callIdColIndex] : undefined;\n    if (cellValue === callId) {\n      existingRowNumber = i + 1;\n      break;\n    }\n  }\n}\n\nfunction colLetter(n) {\n  let s = '';\n  while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }\n  return s;\n}\n\nconst sheetId = '14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0';\n\nif (existingRowNumber > 0) {\n  // Row exists — update ONLY the disqualifier cells (preserves other data)\n  const fieldsToUpdate = {\n    disqualified: String(rowData.disqualified),\n    reason: rowData.reason || '',\n    result_message: rowData.result_message || '',\n    updated_at: new Date().toISOString()\n  };\n\n  const valueRanges = [];\n  for (const [fieldName, fieldValue] of Object.entries(fieldsToUpdate)) {\n    const colIdx = headers.indexOf(fieldName);\n    if (colIdx >= 0) {\n      valueRanges.push({\n        range: `Leads!${colLetter(colIdx + 1)}${existingRowNumber}`,\n        majorDimension: 'ROWS',\n        values: [[fieldValue]]\n      });\n    }\n  }\n\n  return [{\n    json: {\n      url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`,\n      method: 'POST',\n      body: {\n        valueInputOption: 'USER_ENTERED',\n        data: valueRanges\n      }\n    }\n  }];\n} else {\n  // No existing row — append a new row with disqualifier data\n  const lastCol = colLetter(headers.length);\n  const values = headers.map(header => {\n    if (header === 'call_id') return callId;\n    if (header === 'disqualified') return String(rowData.disqualified);\n    if (header === 'reason') return rowData.reason || '';\n    if (header === 'result_message') return rowData.result_message || '';\n    if (header === 'migration_flag') return 'VAPI_AI_COLLECTED';\n    if (header === 'updated_at') return new Date().toISOString();\n    return '';\n  });\n\n  return [{\n    json: {\n      url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Leads:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,\n      method: 'POST',\n      body: {\n        range: 'Leads',\n        majorDimension: 'ROWS',\n        values: [values]\n      }\n    }\n  }];\n}"
+      },
+      "id": "wf02-build-disqualifier-upsert",
+      "name": "Build Disqualifier Upsert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1010,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "method": "={{ $json.method }}",
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "id": "wf02-write-disqualifier-sheet",
+      "name": "Write Disqualifier to Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1210,
         450
       ],
       "credentials": {
@@ -235,7 +287,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1090,
+        1410,
         450
       ]
     },
@@ -414,14 +466,36 @@
       "main": [
         [
           {
-            "node": "Save to Google Sheet",
+            "node": "Read Sheet Headers",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Save to Google Sheet": {
+    "Read Sheet Headers": {
+      "main": [
+        [
+          {
+            "node": "Build Upsert Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Upsert Request": {
+      "main": [
+        [
+          {
+            "node": "Write to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write to Sheet": {
       "main": [
         [
           {
@@ -447,14 +521,36 @@
       "main": [
         [
           {
-            "node": "Update Lead - Disqualifier",
+            "node": "Read Sheet for Disqualifier",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Update Lead - Disqualifier": {
+    "Read Sheet for Disqualifier": {
+      "main": [
+        [
+          {
+            "node": "Build Disqualifier Upsert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Disqualifier Upsert": {
+      "main": [
+        [
+          {
+            "node": "Write Disqualifier to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Disqualifier to Sheet": {
       "main": [
         [
           {
