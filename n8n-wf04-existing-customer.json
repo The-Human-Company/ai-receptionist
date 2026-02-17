@@ -5,7 +5,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "vapi-existing-customer",
-        "authentication": "headerAuth",
+        "authentication": "none",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -13,110 +13,143 @@
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [250, 300],
+      "position": [
+        250,
+        300
+      ],
       "webhookId": "vapi-existing-customer"
     },
     {
       "parameters": {
-        "mode": "manual",
-        "duplicateItem": false,
-        "assignments": {
-          "assignments": [
-            { "id": "e-call_id", "name": "call_id", "value": "={{ $json.message.functionCall.parameters.call_id }}", "type": "string" },
-            { "id": "e-name", "name": "caller_name", "value": "={{ $json.message.functionCall.parameters.caller_name }}", "type": "string" },
-            { "id": "e-phone", "name": "caller_phone", "value": "={{ $json.message.functionCall.parameters.caller_phone }}", "type": "string" },
-            { "id": "e-policy", "name": "policy_type", "value": "={{ $json.message.functionCall.parameters.policy_type }}", "type": "string" },
-            { "id": "e-desc", "name": "request_description", "value": "={{ $json.message.functionCall.parameters.request_description }}", "type": "string" }
-          ]
-        },
-        "options": {}
+        "jsCode": "// Parse VAPI tool-calls payload (body wrapper for n8n cloud)\nconst data = items[0].json.body || items[0].json;\nconst toolCall = data.message.toolCallList[0];\nconst toolCallId = toolCall.id;\nlet args = toolCall.function.arguments;\nif (typeof args === 'string') {\n  args = JSON.parse(args);\n}\n\nreturn [{\n  json: {\n    toolCallId,\n    ticket_id: (args.call_id || '') + '_existing',\n    call_id: args.call_id,\n    caller_name: args.caller_name,\n    caller_phone: args.caller_phone,\n    policy_type: args.policy_type || '',\n    request_description: args.request_description,\n    created_at: new Date().toISOString(),\n    status: 'pending',\n    escalated: 'false',\n    assigned_to: 'Val',\n    acknowledged_at: '',\n    completed_at: ''\n  }\n}];"
       },
       "id": "wf04-extract-data",
       "name": "Extract Customer Data",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [480, 300]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "append",
-        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_TICKETS_ID }}", "mode": "id" },
-        "sheetName": { "__rl": true, "value": "Tickets", "mode": "name" },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "ticket_id": "={{ $json.call_id }}_existing",
-            "call_id": "={{ $json.call_id }}",
-            "caller_name": "={{ $json.caller_name }}",
-            "caller_phone": "={{ $json.caller_phone }}",
-            "policy_type": "={{ $json.policy_type }}",
-            "request_description": "={{ $json.request_description }}",
-            "created_at": "={{ $now }}",
-            "status": "pending",
-            "escalated": "false",
-            "assigned_to": "Val",
-            "acknowledged_at": "",
-            "completed_at": ""
-          }
+        "documentId": {
+          "__rl": true,
+          "value": "1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8",
+          "mode": "id"
         },
-        "options": { "cellFormat": "USER_ENTERED" }
+        "sheetName": {
+          "__rl": true,
+          "value": "Tickets",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
       },
       "id": "wf04-create-ticket",
       "name": "Create Ticket Row",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [710, 300],
+      "position": [
+        710,
+        300
+      ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "google-sheets-cred",
-          "name": "Google Sheets OAuth2"
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
         }
       }
     },
     {
       "parameters": {
-        "sendTo": "={{ $env.NOTIFY_EMAIL_VAL }}",
-        "subject": "=[Existing Customer] {{ $json.caller_name }} — {{ $json.policy_type }} — Callback Requested",
-        "emailType": "text",
-        "message": "=Name: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy Type: {{ $json.policy_type }}\nRequest: {{ $json.request_description }}\nTime: {{ $now }}\n\nPlease follow up and update the ticket status in the tracking sheet."
+        "sendTo": "val@equityinsurance.services",
+        "subject": "=[Existing Customer] {{ $('Extract Customer Data').item.json.caller_name }} — {{ $('Extract Customer Data').item.json.policy_type }} — Callback Requested",
+        "message": "=Name: {{ $('Extract Customer Data').item.json.caller_name }}\nPhone: {{ $('Extract Customer Data').item.json.caller_phone }}\nPolicy Type: {{ $('Extract Customer Data').item.json.policy_type }}\nRequest: {{ $('Extract Customer Data').item.json.request_description }}\nTime: {{ $now }}\n\nPlease follow up and update the ticket status in the tracking sheet.",
+        "options": {}
       },
       "id": "wf04-email-val",
       "name": "Send Notification to Val",
-      "type": "n8n-nodes-base.emailSend",
+      "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [940, 300],
+      "position": [
+        940,
+        300
+      ],
       "credentials": {
-        "smtp": {
-          "id": "smtp-cred",
-          "name": "SMTP Credentials"
+        "gmailOAuth2": {
+          "id": "Q1QMixyCKrZpc2Vl",
+          "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={ \"result\": \"success\", \"message\": \"Ticket created, notification sent to Val\" }",
+        "responseBody": "={{ JSON.stringify({ results: [{ toolCallId: $('Extract Customer Data').item.json.toolCallId, result: 'Ticket created and notification sent to Val. The team will follow up shortly.' }] }) }}",
         "options": {}
       },
       "id": "wf04-respond",
       "name": "Respond to VAPI",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1170, 300]
+      "position": [
+        1170,
+        300
+      ]
     }
   ],
   "connections": {
     "Webhook Trigger": {
-      "main": [[{ "node": "Extract Customer Data", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Extract Customer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Extract Customer Data": {
-      "main": [[{ "node": "Create Ticket Row", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Create Ticket Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Create Ticket Row": {
-      "main": [[{ "node": "Send Notification to Val", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Send Notification to Val",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Send Notification to Val": {
-      "main": [[{ "node": "Respond to VAPI", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Respond to VAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

@@ -7,7 +7,7 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "*/30 9-16 * * 1-5"
+              "expression": "*/30 9-17 * * 1-5"
             }
           ]
         }
@@ -21,7 +21,7 @@
     {
       "parameters": {
         "operation": "read",
-        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_TICKETS_ID }}", "mode": "id" },
+        "documentId": { "__rl": true, "value": "=1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8", "mode": "id" },
         "sheetName": { "__rl": true, "value": "Tickets", "mode": "name" },
         "filtersUI": {
           "values": [
@@ -37,8 +37,8 @@
       "position": [480, 300],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "google-sheets-cred",
-          "name": "Google Sheets OAuth2"
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
         }
       }
     },
@@ -54,27 +54,27 @@
     },
     {
       "parameters": {
-        "sendTo": "={{ $env.NOTIFY_EMAIL_DAVIN }}",
+        "sendTo": "davin@equityinsurance.services",
         "subject": "=ESCALATION: {{ $json.caller_name }} waiting {{ Math.round((Date.now() - new Date($json.created_at).getTime()) / 3600000) }} hours for callback",
-        "emailType": "text",
-        "message": "=Ticket ID: {{ $json.ticket_id }}\nCaller: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy: {{ $json.policy_type }}\nRequest: {{ $json.request_description }}\nCreated: {{ $json.created_at }}\nTime Waiting: {{ Math.round((Date.now() - new Date($json.created_at).getTime()) / 3600000) }} hours\n\nPlease follow up immediately or update the ticket status."
+        "message": "=Ticket ID: {{ $json.ticket_id }}\nCaller: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy: {{ $json.policy_type }}\nRequest: {{ $json.request_description }}\nCreated: {{ $json.created_at }}\nTime Waiting: {{ Math.round((Date.now() - new Date($json.created_at).getTime()) / 3600000) }} hours\n\nPlease follow up immediately or update the ticket status.",
+        "options": {}
       },
       "id": "wf07-escalation-email",
       "name": "Send Escalation to Davin",
-      "type": "n8n-nodes-base.emailSend",
+      "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [940, 300],
       "credentials": {
-        "smtp": {
-          "id": "smtp-cred",
-          "name": "SMTP Credentials"
+        "gmailOAuth2": {
+          "id": "Q1QMixyCKrZpc2Vl",
+          "name": "Gmail account"
         }
       }
     },
     {
       "parameters": {
         "operation": "update",
-        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_TICKETS_ID }}", "mode": "id" },
+        "documentId": { "__rl": true, "value": "=1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8", "mode": "id" },
         "sheetName": { "__rl": true, "value": "Tickets", "mode": "name" },
         "columns": {
           "mappingMode": "defineBelow",
@@ -94,8 +94,8 @@
       "position": [1170, 300],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "google-sheets-cred",
-          "name": "Google Sheets OAuth2"
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
         }
       }
     }

@@ -32,21 +32,21 @@
     "wf02-new-customer-intake": {
       "workflowId": "BEOQVaIituRIqug9",
       "sourceFile": "n8n-wf02-new-customer-intake.json",
-      "lastDeployed": "2026-02-13T23:15:00.000Z",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
       "name": "WF-02 New Customer P&C Intake",
       "nodeCount": 17,
       "active": false,
       "webhookPaths": ["/vapi-save-field", "/vapi-check-disqualifier", "/vapi-check-hotlead"],
-      "note": "Migration flag updated to VAPI_AI_COLLECTED"
+      "note": "Added field_name whitelist validation (37 fields). Migration flag VAPI_AI_COLLECTED."
     },
     "wf03-hot-lead-transfer": {
       "workflowId": "AxGXJxHIDQJILOtQ",
       "sourceFile": "n8n-wf03-hot-lead-transfer.json",
-      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
       "name": "WF-03 Hot Lead Transfer Handler",
-      "nodeCount": 7,
+      "nodeCount": 14,
       "active": false,
-      "note": "Sub-workflow triggered by WF-02 hot lead detection"
+      "note": "Sub-workflow triggered by WF-02 hot lead detection. Added secondary transfer fallback chain with guard for placeholder phone. SMTP replaced with Gmail."
     },
     "wf04-existing-customer": {
       "workflowId": "BNsx9bdXMBKfJjCe",
@@ -60,30 +60,31 @@
     "wf05-claims-router": {
       "workflowId": "ZAoSyxR2U2lH2a7b",
       "sourceFile": "n8n-wf05-claims-router.json",
-      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
       "name": "WF-05 Claims Router",
       "nodeCount": 7,
       "active": false,
-      "webhookPath": "/vapi-claim"
+      "webhookPath": "/vapi-claim",
+      "note": "Added VAPI Transfer Command node for business-hours warm transfer to Val (+18087800473)"
     },
     "wf06-post-call-processor": {
       "workflowId": "nKwYydxwd8n58ExN",
       "sourceFile": "n8n-wf06-post-call-processor.json",
-      "lastDeployed": "2026-02-13T23:15:00.000Z",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
       "name": "WF-06 Post-Call Processor",
-      "nodeCount": 15,
+      "nodeCount": 17,
       "active": false,
       "webhookPath": "/vapi-call-ended",
-      "note": "Migration flag updated to VAPI_AI_COLLECTED"
+      "note": "Migration flag VAPI_AI_COLLECTED. Fixed business_hours analytics default (was always true)."
     },
     "wf07-escalation-monitor": {
       "workflowId": "aTOUUPC13xwUH6PI",
       "sourceFile": "n8n-wf07-escalation-monitor.json",
-      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
       "name": "WF-07 Escalation Monitor",
       "nodeCount": 5,
       "active": false,
-      "note": "Cron: */30 9-16 * * 1-5 Pacific/Honolulu"
+      "note": "Cron: */30 9-17 * * 1-5 Pacific/Honolulu (covers through 5:30pm)"
     }
   }
 }

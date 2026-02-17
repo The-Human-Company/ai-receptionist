@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equity Insurance | AI Command Center</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        background: '#09090b',
+                        surface: '#18181b',
+                        surfaceHighlight: '#27272a',
+                        primary: '#3b82f6',
+                        primaryDark: '#1d4ed8',
+                        accent: '#f59e0b',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        border: '#27272a',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #09090b;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 40%),
+                radial-gradient(circle at 0% 100%, rgba(245, 158, 11, 0.05), transparent 40%);
+            color: #e4e4e7;
+        }
+
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+        /* Visualizer Bars */
+        .viz-bar {
+            transition: height 0.05s ease;
+            min-height: 4px;
+            border-radius: 2px;
+        }
+
+        /* Status Dot Pulse */
+        .status-dot-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+            opacity: 0.75;
+        }
+        @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* Stage Pips */
+        .stage-pip {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Typing Indicator */
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- Top Navigation -->
+    <header class="h-16 border-b border-border flex items-center justify-between px-6 shrink-0 glass z-50">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primaryDark flex items-center justify-center shadow-lg shadow-primary/20">
+                <i data-lucide="shield" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h1 class="font-display font-bold text-lg leading-tight tracking-tight text-white">Equity Insurance</h1>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono uppercase tracking-wider text-zinc-500">AI RECEPTIONIST</span>
+                    <span class="w-1 h-1 rounded-full bg-zinc-600"></span>
+                    <span class="text-[10px] font-mono text-zinc-500">VAPI.AI + N8N</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <!-- Environment Badge -->
+            <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surfaceHighlight border border-white/5">
+                <i data-lucide="server" class="w-3 h-3 text-zinc-400"></i>
+                <span class="text-xs font-medium text-zinc-300">Production</span>
+            </div>
+
+            <!-- Connection Status -->
+            <div class="flex items-center gap-3 pl-6 border-l border-white/10">
+                <div class="relative w-2.5 h-2.5">
+                    <div id="status-ping" class="status-dot-pulse bg-zinc-500 hidden"></div>
+                    <div id="status-dot" class="relative w-2.5 h-2.5 rounded-full bg-zinc-500 transition-colors duration-300"></div>
+                </div>
+                <span id="connection-status" class="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Disconnected</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 min-h-0 relative">
+        
+        <!-- LEFT: Active Call Stage (5 cols) -->
+        <div class="lg:col-span-5 relative flex flex-col border-r border-border bg-surface/30">
+            
+            <!-- Mode Toggle -->
+            <div class="absolute top-6 left-6 z-20">
+                <div class="glass rounded-lg p-1 flex gap-1 shadow-xl">
+                    <button onclick="setMode('business')" id="mode-biz" class="px-4 py-2 rounded-md text-xs font-semibold transition-all duration-200 bg-primary text-white shadow-lg shadow-primary/25">
+                        Business Hours
+                    </button>
+                    <button onclick="setMode('afterhours')" id="mode-ah" class="px-4 py-2 rounded-md text-xs font-semibold transition-all duration-200 text-zinc-400 hover:text-white hover:bg-white/5">
+                        After Hours
+                    </button>
+                </div>
+            </div>
+
+            <!-- Center Stage -->
+            <div class="flex-1 flex flex-col items-center justify-center relative p-8">
+                
+                <!-- Ambient Glow -->
+                <div id="ambient-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[100px] transition-all duration-700 opacity-0"></div>
+
+                <!-- Call Status Visuals -->
+                <div class="relative z-10 flex flex-col items-center gap-8">
+                    
+                    <!-- Avatar / Visualizer Circle -->
+                    <div class="relative">
+                        <!-- Ring 1 -->
+                        <div id="ring-1" class="absolute inset-0 rounded-full border border-primary/30 scale-110 opacity-0 transition-all duration-500"></div>
+                        <!-- Ring 2 -->
+                        <div id="ring-2" class="absolute inset-0 rounded-full border border-primary/20 scale-125 opacity-0 transition-all duration-500 delay-75"></div>
+                        
+                        <div class="w-40 h-40 rounded-full glass flex items-center justify-center shadow-2xl relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-50"></div>
+                            <i data-lucide="mic" class="w-12 h-12 text-zinc-500 transition-colors duration-300" id="main-mic-icon"></i>
+                            
+                            <!-- Active Visualizer Overlay -->
+                            <div id="circle-visualizer" class="absolute inset-0 flex items-center justify-center gap-1 opacity-0 transition-opacity duration-300">
+                                <div class="w-1.5 h-8 bg-primary rounded-full animate-pulse"></div>
+                                <div class="w-1.5 h-12 bg-primary rounded-full animate-pulse delay-75"></div>
+                                <div class="w-1.5 h-6 bg-primary rounded-full animate-pulse delay-150"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timer & State -->
+                    <div class="text-center space-y-2">
+                        <div id="timer" class="font-mono text-5xl font-light tracking-tighter text-white tabular-nums">00:00</div>
+                        <div id="call-state-text" class="text-sm font-medium text-zinc-500 uppercase tracking-widest">Ready to Connect</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Controls -->
+            <div class="p-8 pb-10 flex justify-center gap-6 relative z-20">
+                <button id="callBtn" onclick="toggleCall()" class="group relative flex items-center justify-center w-16 h-16 rounded-2xl bg-white text-black hover:scale-105 transition-all duration-300 shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]">
+                    <i data-lucide="phone" class="w-6 h-6 transition-transform group-hover:rotate-12"></i>
+                </button>
+                
+                <button id="muteBtn" onclick="toggleMute()" disabled class="group flex items-center justify-center w-16 h-16 rounded-2xl glass text-zinc-400 hover:text-white hover:bg-white/10 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed">
+                    <i data-lucide="mic" class="w-6 h-6"></i>
+                </button>
+                
+                <button onclick="window.location.reload()" class="group flex items-center justify-center w-16 h-16 rounded-2xl glass text-zinc-400 hover:text-white hover:bg-white/10 transition-all duration-300">
+                    <i data-lucide="rotate-ccw" class="w-6 h-6 transition-transform group-hover:-rotate-180"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- CENTER: Transcript (4 cols) -->
+        <div class="lg:col-span-4 border-r border-border bg-background flex flex-col min-h-0">
+            <div class="h-16 px-6 border-b border-border flex items-center justify-between bg-surface/50 backdrop-blur-sm">
+                <h2 class="font-display font-semibold text-sm tracking-wide text-zinc-200 flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-4 h-4 text-primary"></i>
+                    Live Transcript
+                </h2>
+                <button onclick="clearTranscript()" class="text-xs text-zinc-500 hover:text-white transition-colors">Clear</button>
+            </div>
+
+            <div id="transcript" class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
+                <!-- Empty State -->
+                <div class="h-full flex flex-col items-center justify-center text-zinc-600 gap-4 opacity-50">
+                    <i data-lucide="bot" class="w-12 h-12 stroke-1"></i>
+                    <p class="text-sm font-medium">Waiting for call to start...</p>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div id="typing-indicator" class="hidden px-6 py-4 border-t border-border bg-surface/30">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-medium text-primary">AI is speaking</span>
+                    <div class="flex gap-1">
+                        <div class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></div>
+                        <div class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></div>
+                        <div class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Data & Logs (3 cols) -->
+        <div class="lg:col-span-3 flex flex-col min-h-0 bg-surface/20">
+            
+            <!-- Call Stage Indicator -->
+            <div class="px-4 py-3 border-b border-border bg-surface/50 backdrop-blur-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="activity" class="w-3.5 h-3.5 text-zinc-500"></i>
+                    <span class="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">Call Flow</span>
+                </div>
+                <div id="call-stages" class="flex items-center gap-1">
+                    <div class="stage-pip" data-stage="idle">
+                        <div class="w-full h-1.5 rounded-full bg-zinc-700 transition-all duration-500" id="stage-idle"></div>
+                        <span class="text-[9px] text-zinc-600 mt-1">Idle</span>
+                    </div>
+                    <div class="stage-pip" data-stage="collecting">
+                        <div class="w-full h-1.5 rounded-full bg-zinc-700 transition-all duration-500" id="stage-collecting"></div>
+                        <span class="text-[9px] text-zinc-600 mt-1">Collecting</span>
+                    </div>
+                    <div class="stage-pip" data-stage="evaluating">
+                        <div class="w-full h-1.5 rounded-full bg-zinc-700 transition-all duration-500" id="stage-evaluating"></div>
+                        <span class="text-[9px] text-zinc-600 mt-1">Evaluating</span>
+                    </div>
+                    <div class="stage-pip" data-stage="routing">
+                        <div class="w-full h-1.5 rounded-full bg-zinc-700 transition-all duration-500" id="stage-routing"></div>
+                        <span class="text-[9px] text-zinc-600 mt-1">Routing</span>
+                    </div>
+                    <div class="stage-pip" data-stage="complete">
+                        <div class="w-full h-1.5 rounded-full bg-zinc-700 transition-all duration-500" id="stage-complete"></div>
+                        <span class="text-[9px] text-zinc-600 mt-1">Done</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Badges -->
+            <div id="status-badges" class="px-4 py-3 border-b border-border space-y-2 hidden">
+                <div id="badge-calltype" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-white/5">
+                    <i data-lucide="phone-forwarded" class="w-3.5 h-3.5"></i>
+                    <span class="text-xs font-medium" id="badge-calltype-text"></span>
+                </div>
+                <div id="badge-disqualifier" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-white/5">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span class="text-xs font-medium" id="badge-disqualifier-text"></span>
+                </div>
+                <div id="badge-hotlead" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-white/5">
+                    <i data-lucide="flame" class="w-3.5 h-3.5"></i>
+                    <span class="text-xs font-medium" id="badge-hotlead-text"></span>
+                </div>
+            </div>
+
+            <!-- Data Extraction Panel -->
+            <div class="flex-1 flex flex-col min-h-0 border-b border-border">
+                <div class="h-12 px-6 border-b border-border flex items-center justify-between bg-surface/50 backdrop-blur-sm">
+                    <h2 class="font-display font-semibold text-sm tracking-wide text-zinc-200 flex items-center gap-2">
+                        <i data-lucide="database" class="w-4 h-4 text-accent"></i>
+                        Extracted Data
+                    </h2>
+                    <span id="field-count" class="text-[10px] font-mono text-zinc-600">0 / 8</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-0">
+                    <table class="w-full text-left border-collapse">
+                        <tbody id="data-table-body" class="divide-y divide-white/5">
+                            <tr class="text-zinc-600">
+                                <td class="px-6 py-8 text-center text-xs italic" colspan="2">
+                                    Data fields collected during the call will appear here in real-time.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- System Logs Panel -->
+            <div class="h-1/3 flex flex-col bg-[#0c0c0e]">
+                <div class="px-4 py-2 border-b border-white/5 flex justify-between items-center bg-white/5">
+                    <span class="text-[10px] font-mono font-bold text-zinc-500 uppercase">System Logs</span>
+                    <div class="flex gap-1.5">
+                        <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                        <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                    </div>
+                </div>
+                <div id="system-logs" class="flex-1 overflow-y-auto p-4 font-mono text-[10px] leading-relaxed space-y-1.5 text-zinc-400">
+                    <div class="text-zinc-500">> System initialized. Ready.</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // ============================
+        // CONFIGURATION
+        // ============================
+        const VAPI_PUBLIC_KEY = '7fa4969d-367a-43c3-a835-121e9a2d6c9b';
+
+        // VAPI Assistant IDs (created via API with full tool + n8n webhook config)
+        const ASSISTANT_ID_BUSINESS = 'bbf67fe2-99dc-427a-a546-37892f58a796';
+        const ASSISTANT_ID_AFTERHOURS = '8ae61948-d6c5-4586-9f55-b7c1416db25b';
+
+        // ============================
+        // STATE & LOGIC
+        // ============================
+        let vapi = null;
+        let callActive = false;
+        let isMuted = false;
+        let currentMode = 'business';
+        let durationInterval = null;
+        let callStartTime = null;
+
+        function activateCall() {
+            if (callActive) return; // already activated
+            callActive = true;
+            callStartTime = Date.now();
+            startDurationTimer();
+            updateUI('active');
+            updateCallStage('idle');
+            logSystem('Call connection established.');
+
+            // Visuals
+            document.getElementById('ambient-glow').classList.remove('opacity-0');
+            document.getElementById('ring-1').classList.remove('opacity-0');
+            document.getElementById('ring-2').classList.remove('opacity-0');
+            document.getElementById('circle-visualizer').classList.remove('opacity-0');
+            const micIcon = document.getElementById('main-mic-icon');
+            if (micIcon) {
+                micIcon.classList.add('text-primary');
+                micIcon.classList.remove('text-zinc-500');
+            }
+        }
+
+        function deactivateCall() {
+            callActive = false;
+            stopDurationTimer();
+            updateUI('ended');
+            logSystem('Call terminated.');
+            document.getElementById('typing-indicator').classList.add('hidden');
+            updateCallStage('complete');
+
+            // Visuals
+            document.getElementById('ambient-glow').classList.add('opacity-0');
+            document.getElementById('ring-1').classList.add('opacity-0');
+            document.getElementById('ring-2').classList.add('opacity-0');
+            document.getElementById('circle-visualizer').classList.add('opacity-0');
+            const micIcon = document.getElementById('main-mic-icon');
+            if (micIcon) {
+                micIcon.classList.remove('text-primary');
+                micIcon.classList.add('text-zinc-500');
+            }
+        }
+
+        function initVapi() {
+            vapi = new Vapi(VAPI_PUBLIC_KEY);
+
+            // Listen for both old and new event names
+            vapi.on('call-start', activateCall);
+            vapi.on('call-started', activateCall);
+
+            vapi.on('call-end', deactivateCall);
+            vapi.on('call-ended', deactivateCall);
+
+            vapi.on('speech-start', () => {
+                activateCall(); // fallback: if call-start never fired, activate on first speech
+                document.getElementById('typing-indicator').classList.remove('hidden');
+                updateConnectionStatus('Speaking', 'text-primary', 'bg-primary');
+            });
+
+            vapi.on('speech-end', () => {
+                document.getElementById('typing-indicator').classList.add('hidden');
+                updateConnectionStatus('Connected', 'text-success', 'bg-success');
+            });
+
+            vapi.on('message', (message) => {
+                activateCall(); // fallback: activate on first message of any kind
+                if (message.type === 'transcript' && message.transcriptType === 'final') {
+                    addTranscriptMessage(message.role, message.transcript);
+                }
+                if (message.type === 'function-call') {
+                    handleFunctionCall(message.functionCall);
+                }
+                if (message.type === 'tool-calls' && message.toolCalls) {
+                    message.toolCalls.forEach(tc => {
+                        if(tc.function) handleFunctionCall(tc.function);
+                    });
+                }
+                // Handle tool-call results from n8n webhooks
+                if (message.type === 'tool-calls-result' && message.toolCallResult) {
+                    handleToolCallResult(message.toolCallResult.id, message.toolCallResult.result);
+                }
+                if (message.type === 'function-call-result' || message.type === 'tool-call-result') {
+                    const result = message.result || message.functionCallResult?.result || '';
+                    handleToolCallResult(message.toolCallId || '', result);
+                }
+            });
+
+            vapi.on('error', (error) => {
+                console.error('VAPI Error (full):', JSON.stringify(error, null, 2));
+                let errMsg;
+                try {
+                    const inner = error?.error?.error || error?.error || error;
+                    errMsg = typeof inner?.message === 'string' ? inner.message
+                           : typeof inner?.message === 'object' ? JSON.stringify(inner.message)
+                           : JSON.stringify(inner);
+                } catch(e) {
+                    errMsg = String(error);
+                }
+                const errStatus = error?.error?.statusCode || error?.statusCode || '';
+
+                // Krisp/audio processor errors are non-fatal — suppress and continue
+                const isKrisp = errMsg?.includes('Krisp') || errMsg?.includes('krisp')
+                    || errMsg?.includes('SAMPLE_RATE') || errMsg?.includes('mic processor');
+                if (isKrisp) {
+                    console.warn('Non-fatal Krisp/audio warning (suppressed):', errMsg);
+                    logSystem(`<span class="text-amber-400">AUDIO</span> Noise filter unavailable (non-fatal) — call continues`);
+                    return;
+                }
+
+                // Daily.co ejection — log details but don't double-reset if call already ended
+                const isEjection = errMsg?.includes('ejected') || errMsg?.includes('Meeting has ended');
+                if (isEjection) {
+                    logSystem(`<span class="text-red-400">EJECTED</span> Daily.co session ended — type: ${error?.type}, action: ${error?.error?.action}`);
+                    if (callActive) deactivateCall();
+                    else updateUI('error');
+                    return;
+                }
+
+                // Only reset UI for fatal errors (API 400, start failures)
+                const isFatal = error?.type === 'start-method-error'
+                    || errStatus >= 400
+                    || errMsg?.includes('start')
+                    || errMsg?.includes('unauthorized');
+                if (isFatal && !callActive) {
+                    updateUI('error');
+                }
+                logSystem(`${isFatal ? 'FATAL' : 'Warning'}: ${errMsg}`);
+            });
+        }
+
+        function handleFunctionCall(fn) {
+            const args = (() => {
+                try { return typeof fn.arguments === 'string' ? JSON.parse(fn.arguments) : (fn.arguments || {}); }
+                catch(e) { console.error('Error parsing args for', fn.name, e); return {}; }
+            })();
+
+            switch (fn.name) {
+                case 'save_field':
+                    logSystem(`<span class="text-blue-400">SAVE</span> ${args.field_name} = "${args.field_value}"`);
+                    updateDataTable(args.field_name, args.field_value);
+                    updateCallStage('collecting');
+                    break;
+
+                case 'check_disqualifier':
+                    logSystem(`<span class="text-amber-400">RULE CHECK</span> Disqualifier evaluation triggered`);
+                    updateStatusBadge('disqualifier', 'checking', 'Evaluating...');
+                    updateCallStage('evaluating');
+                    break;
+
+                case 'check_hot_lead':
+                    logSystem(`<span class="text-amber-400">RULE CHECK</span> Hot lead evaluation triggered`);
+                    updateStatusBadge('hotlead', 'checking', 'Evaluating...');
+                    updateCallStage('evaluating');
+                    break;
+
+                case 'route_existing_customer':
+                    logSystem(`<span class="text-purple-400">ROUTE</span> Existing customer → Ticket + Val notification`);
+                    updateStatusBadge('calltype', 'info', 'Existing Customer');
+                    updateCallStage('routing');
+                    break;
+
+                case 'route_claim':
+                    logSystem(`<span class="text-red-400">ROUTE</span> Claim filed → Priority notification sent`);
+                    updateStatusBadge('calltype', 'urgent', 'Claim Filed');
+                    updateCallStage('routing');
+                    break;
+
+                default:
+                    logSystem(`Function: ${fn.name}`);
+            }
+        }
+
+        function updateDataTable(key, value) {
+            const tbody = document.getElementById('data-table-body');
+            // Remove empty state
+            if (tbody.querySelector('td[colspan="2"]')) {
+                tbody.innerHTML = '';
+            }
+
+            let row = document.getElementById(`row-${key}`);
+            if (!row) {
+                row = document.createElement('tr');
+                row.id = `row-${key}`;
+                row.className = 'border-b border-white/5 hover:bg-white/5 transition-colors animate-slide-up';
+                row.innerHTML = `
+                    <td class="px-6 py-3 font-mono text-xs text-zinc-500">${key}</td>
+                    <td class="px-6 py-3 text-sm text-zinc-200 font-medium" id="val-${key}"></td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            const valCell = row.querySelector(`#val-${key}`);
+            valCell.textContent = value;
+            valCell.classList.add('text-accent');
+            setTimeout(() => valCell.classList.remove('text-accent'), 1500);
+
+            // Update field counter
+            const rows = tbody.querySelectorAll('tr');
+            document.getElementById('field-count').textContent = `${rows.length} / 8`;
+        }
+
+        let fieldCount = 0;
+        const stageOrder = ['idle', 'collecting', 'evaluating', 'routing', 'complete'];
+
+        function updateCallStage(stage) {
+            const idx = stageOrder.indexOf(stage);
+            stageOrder.forEach((s, i) => {
+                const el = document.getElementById(`stage-${s}`);
+                if (!el) return;
+                if (i < idx) {
+                    el.className = 'w-full h-1.5 rounded-full bg-success transition-all duration-500';
+                } else if (i === idx) {
+                    el.className = 'w-full h-1.5 rounded-full bg-primary animate-pulse transition-all duration-500';
+                } else {
+                    el.className = 'w-full h-1.5 rounded-full bg-zinc-700 transition-all duration-500';
+                }
+            });
+        }
+
+        function updateStatusBadge(type, status, text) {
+            const container = document.getElementById('status-badges');
+            const badge = document.getElementById(`badge-${type}`);
+            const label = document.getElementById(`badge-${type}-text`);
+            if (!badge || !label) return;
+
+            container.classList.remove('hidden');
+            badge.classList.remove('hidden');
+            label.textContent = text;
+
+            // Reset classes
+            badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg border';
+            const icon = badge.querySelector('svg, i');
+
+            switch (status) {
+                case 'checking':
+                    badge.classList.add('bg-amber-500/10', 'border-amber-500/20');
+                    label.classList.add('text-amber-400');
+                    if (icon) icon.classList.add('text-amber-400');
+                    break;
+                case 'pass':
+                    badge.classList.add('bg-emerald-500/10', 'border-emerald-500/20');
+                    label.classList.add('text-emerald-400');
+                    if (icon) icon.classList.add('text-emerald-400');
+                    break;
+                case 'fail':
+                    badge.classList.add('bg-red-500/10', 'border-red-500/20');
+                    label.classList.add('text-red-400');
+                    if (icon) icon.classList.add('text-red-400');
+                    break;
+                case 'hot':
+                    badge.classList.add('bg-orange-500/10', 'border-orange-500/20');
+                    label.classList.add('text-orange-400');
+                    if (icon) icon.classList.add('text-orange-400');
+                    break;
+                case 'info':
+                    badge.classList.add('bg-purple-500/10', 'border-purple-500/20');
+                    label.classList.add('text-purple-400');
+                    if (icon) icon.classList.add('text-purple-400');
+                    break;
+                case 'urgent':
+                    badge.classList.add('bg-red-500/10', 'border-red-500/20');
+                    label.classList.add('text-red-400');
+                    if (icon) icon.classList.add('text-red-400');
+                    break;
+                default:
+                    badge.classList.add('bg-surface', 'border-white/5');
+            }
+            lucide.createIcons();
+        }
+
+        function handleToolCallResult(toolCallId, result) {
+            // Parse result text to update status badges
+            const r = (result || '').toLowerCase();
+            if (r.includes('not disqualified') || r.includes('qualifies')) {
+                updateStatusBadge('disqualifier', 'pass', 'Qualified');
+                logSystem('<span class="text-emerald-400">PASS</span> Caller qualifies — no disqualifiers');
+            } else if (r.includes('disqualified')) {
+                updateStatusBadge('disqualifier', 'fail', 'Disqualified');
+                logSystem('<span class="text-red-400">FAIL</span> Caller disqualified');
+            }
+            if (r.includes('hot lead') || r.includes('high value') || r.includes('transfer')) {
+                updateStatusBadge('hotlead', 'hot', 'HOT LEAD — Transfer');
+                logSystem('<span class="text-orange-400">HOT LEAD</span> High-value — transferring to agent');
+                updateCallStage('routing');
+            } else if (r.includes('not a hot lead') || r.includes('standard') || r.includes('not hot')) {
+                updateStatusBadge('hotlead', 'pass', 'Standard Lead');
+                logSystem('<span class="text-emerald-400">PASS</span> Standard lead — continue intake');
+            }
+            if (r.includes('ticket created') || r.includes('notification sent')) {
+                updateCallStage('complete');
+                logSystem('<span class="text-emerald-400">DONE</span> Workflow actions completed');
+            }
+        }
+
+        async function toggleCall() {
+            if (callActive) {
+                logSystem('Ending call...');
+                try {
+                    vapi.stop();
+                } catch (err) {
+                    console.error('Error stopping call:', err);
+                }
+                // Force UI reset in case call-end event doesn't fire
+                setTimeout(() => {
+                    if (callActive) {
+                        logSystem('Force-ending call (event timeout).');
+                        deactivateCall();
+                    }
+                }, 3000);
+            } else {
+                updateUI('connecting');
+                try {
+                    const assistantId = currentMode === 'business' ? ASSISTANT_ID_BUSINESS : ASSISTANT_ID_AFTERHOURS;
+                    logSystem(`Initializing call (${currentMode} mode, assistant: ${assistantId.slice(0,8)}...)...`);
+                    await vapi.start(assistantId);
+                } catch (err) {
+                    updateUI('error');
+                    console.error('Start call error (full):', JSON.stringify(err, null, 2));
+                    let detail;
+                    try {
+                        const inner = err?.error?.error || err?.error || err;
+                        detail = typeof inner?.message === 'string' ? inner.message
+                               : typeof inner?.message === 'object' ? JSON.stringify(inner.message)
+                               : err?.message || JSON.stringify(err);
+                    } catch(e) {
+                        detail = String(err);
+                    }
+                    logSystem('Failed to start: ' + detail);
+                }
+            }
+        }
+
+        function toggleMute() {
+            if (!callActive) return;
+            isMuted = !isMuted;
+            vapi.setMuted(isMuted);
+            const btn = document.getElementById('muteBtn');
+            const icon = btn.querySelector('i') || btn.querySelector('svg');
+
+            if (isMuted) {
+                btn.classList.add('bg-danger', 'text-white', 'border-transparent');
+                btn.classList.remove('glass', 'text-zinc-400');
+                if (icon) icon.setAttribute('data-lucide', 'mic-off');
+            } else {
+                btn.classList.remove('bg-danger', 'text-white', 'border-transparent');
+                btn.classList.add('glass', 'text-zinc-400');
+                if (icon) icon.setAttribute('data-lucide', 'mic');
+            }
+            lucide.createIcons();
+        }
+
+        function setMode(mode) {
+            if (callActive) return;
+            currentMode = mode;
+            const bizBtn = document.getElementById('mode-biz');
+            const ahBtn = document.getElementById('mode-ah');
+            
+            if (mode === 'business') {
+                bizBtn.className = 'px-4 py-2 rounded-md text-xs font-semibold transition-all duration-200 bg-primary text-white shadow-lg shadow-primary/25';
+                ahBtn.className = 'px-4 py-2 rounded-md text-xs font-semibold transition-all duration-200 text-zinc-400 hover:text-white hover:bg-white/5';
+            } else {
+                ahBtn.className = 'px-4 py-2 rounded-md text-xs font-semibold transition-all duration-200 bg-primary text-white shadow-lg shadow-primary/25';
+                bizBtn.className = 'px-4 py-2 rounded-md text-xs font-semibold transition-all duration-200 text-zinc-400 hover:text-white hover:bg-white/5';
+            }
+        }
+
+        function updateUI(state) {
+            const btn = document.getElementById('callBtn');
+            const muteBtn = document.getElementById('muteBtn');
+            const statusText = document.getElementById('call-state-text');
+            // Lucide replaces <i> with <svg>, so check both
+            const btnIcon = btn.querySelector('i') || btn.querySelector('svg');
+
+            switch (state) {
+                case 'connecting':
+                    btn.disabled = true;
+                    btn.classList.add('opacity-75');
+                    statusText.textContent = 'Connecting...';
+                    updateConnectionStatus('Connecting', 'text-accent', 'bg-accent');
+                    break;
+                case 'active':
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'bg-white', 'text-black');
+                    btn.classList.add('bg-danger', 'text-white', 'shadow-danger/40');
+                    if (btnIcon) btnIcon.setAttribute('data-lucide', 'phone-off');
+                    statusText.textContent = 'Live Call';
+                    muteBtn.disabled = false;
+                    updateConnectionStatus('Connected', 'text-success', 'bg-success');
+                    break;
+                case 'ended':
+                case 'error':
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'bg-danger', 'text-white', 'shadow-danger/40');
+                    btn.classList.add('bg-white', 'text-black');
+                    if (btnIcon) btnIcon.setAttribute('data-lucide', 'phone');
+                    statusText.textContent = state === 'error' ? 'Connection Failed' : 'Call Ended';
+                    muteBtn.disabled = true;
+                    updateConnectionStatus('Disconnected', 'text-zinc-400', 'bg-zinc-500');
+                    break;
+            }
+            lucide.createIcons();
+        }
+
+        function updateConnectionStatus(text, textColor, dotColor) {
+            const statusEl = document.getElementById('connection-status');
+            const dotEl = document.getElementById('status-dot');
+            const pingEl = document.getElementById('status-ping');
+            
+            statusEl.textContent = text;
+            statusEl.className = `text-xs font-semibold uppercase tracking-wide ${textColor}`;
+            
+            dotEl.className = `relative w-2.5 h-2.5 rounded-full ${dotColor} transition-colors duration-300`;
+            pingEl.className = `status-dot-pulse ${dotColor} ${text === 'Disconnected' ? 'hidden' : 'block'}`;
+        }
+
+        function addTranscriptMessage(role, text) {
+            const container = document.getElementById('transcript');
+            // Remove empty state
+            if (container.querySelector('.text-zinc-600')) {
+                container.innerHTML = '';
+            }
+
+            const isAi = role === 'assistant';
+            const div = document.createElement('div');
+            div.className = `flex ${isAi ? 'justify-start' : 'justify-end'} animate-slide-up`;
+            
+            div.innerHTML = `
+                <div class="max-w-[85%] ${isAi ? 'bg-surfaceHighlight border border-white/5 text-zinc-200' : 'bg-primary text-white shadow-lg shadow-primary/20'} rounded-2xl px-5 py-3.5 text-sm leading-relaxed">
+                    ${text}
+                </div>
+            `;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearTranscript() {
+            document.getElementById('transcript').innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-zinc-600 gap-4 opacity-50">
+                    <i data-lucide="bot" class="w-12 h-12 stroke-1"></i>
+                    <p class="text-sm font-medium">Waiting for call to start...</p>
+                </div>
+            `;
+        }
+
+        function logSystem(text) {
+            const container = document.getElementById('system-logs');
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            div.className = 'text-zinc-500 hover:text-zinc-300 transition-colors';
+            div.innerHTML = `<span class="text-zinc-700 mr-2">[${time}]</span>${text}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function startDurationTimer() {
+            stopDurationTimer();
+            durationInterval = setInterval(() => {
+                if (!callStartTime) return;
+                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+                const min = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const sec = String(elapsed % 60).padStart(2, '0');
+                document.getElementById('timer').textContent = min + ':' + sec;
+            }, 1000);
+        }
+
+        function stopDurationTimer() {
+            if (durationInterval) {
+                clearInterval(durationInterval);
+                durationInterval = null;
+            }
+        }
+
+        // ============================
+        // FIX: Force mic to 48kHz max to prevent Krisp crash on high-sample-rate mics (192kHz)
+        // Krisp only supports up to 48kHz. Daily.co's WebRTC layer initializes Krisp
+        // before VAPI assistant config is applied, so we intercept getUserMedia globally.
+        // ============================
+        (function patchGetUserMedia() {
+            const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+            navigator.mediaDevices.getUserMedia = async function(constraints) {
+                if (constraints && constraints.audio) {
+                    if (typeof constraints.audio === 'boolean') {
+                        constraints.audio = { sampleRate: { ideal: 48000, max: 48000 } };
+                    } else if (typeof constraints.audio === 'object') {
+                        constraints.audio.sampleRate = { ideal: 48000, max: 48000 };
+                    }
+                }
+                return original(constraints);
+            };
+        })();
+
+        // Suppress uncaught Krisp promise rejections as a safety net
+        window.addEventListener('unhandledrejection', (event) => {
+            const msg = String(event.reason?.message || event.reason || '');
+            if (msg.includes('Krisp') || msg.includes('krisp') || msg.includes('SAMPLE_RATE')) {
+                event.preventDefault();
+                console.warn('Suppressed Krisp error:', msg);
+            }
+        });
+
+        // Boot — dynamically import VAPI Web SDK (ES module)
+        async function boot() {
+            try {
+                const module = await import('https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/+esm');
+                // The SDK may export as default, default.default, or named Vapi
+                const VapiClass = module.default?.default || module.default || module.Vapi;
+                if (!VapiClass || typeof VapiClass !== 'function') {
+                    console.log('Module exports:', Object.keys(module), 'default type:', typeof module.default);
+                    throw new Error('Could not find Vapi constructor in module');
+                }
+                window.Vapi = VapiClass;
+                logSystem('VAPI SDK loaded successfully.');
+                initVapi();
+            } catch (err) {
+                console.error('Failed to load VAPI SDK:', err);
+                logSystem('ERROR: Failed to load VAPI SDK — ' + err.message);
+            }
+        }
+        boot();
+    </script>
+</body>
+</html>

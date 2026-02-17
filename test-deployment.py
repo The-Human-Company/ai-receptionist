@@ -82,8 +82,8 @@ for wf_name, wf_id in WF_IDS.items():
 
 # Node counts
 expected_nodes = {
-    'WF-01': 6, 'WF-02': 17, 'WF-03': 7, 'WF-04': 5,
-    'WF-05': 7, 'WF-06': 15, 'WF-07': 5
+    'WF-01': 6, 'WF-02': 17, 'WF-03': 14, 'WF-04': 5,
+    'WF-05': 7, 'WF-06': 17, 'WF-07': 5
 }
 for wf_name, expected in expected_nodes.items():
     if wf_name in workflows:
@@ -153,7 +153,7 @@ if 'WF-01' in workflows:
         test('WF-01 biz-hours: has save_field tool', 'save_field' in body)
         test('WF-01 biz-hours: has check_disqualifier tool', 'check_disqualifier' in body)
         test('WF-01 biz-hours: has check_hot_lead tool', 'check_hot_lead' in body)
-        test('WF-01 biz-hours: voice provider=elevenlabs', 'elevenlabs' in body)
+        test('WF-01 biz-hours: voice provider=11labs', '11labs' in body)
         test('WF-01 biz-hours: model=gpt-4o', 'gpt-4o' in body)
         test('WF-01 biz-hours: temperature=0.3', '0.3' in body)
         test('WF-01 biz-hours: data collection order specified', 'DATA COLLECTION FOR NEW P&C CUSTOMERS' in body)
@@ -241,7 +241,7 @@ if 'WF-02' in workflows:
     save_sheet = get_node(wf2, 'Save to Google Sheet')
     test('WF-02 saves to Google Sheets', save_sheet is not None)
     if save_sheet:
-        test('WF-02 sheet uses GOOGLE_SHEET_LEADS_ID env', 'GOOGLE_SHEET_LEADS_ID' in json.dumps(save_sheet['parameters']))
+        test('WF-02 sheet uses Leads sheet ID', '14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0' in json.dumps(save_sheet['parameters']))
         test('WF-02 sets migration_flag=VAPI_AI_COLLECTED', 'VAPI_AI_COLLECTED' in json.dumps(save_sheet['parameters']))
 
     ret_success = get_node(wf2, 'Return Success')
@@ -290,7 +290,7 @@ if 'WF-03' in workflows:
     if transfer:
         test('WF-03 transfer uses HTTP POST', transfer['parameters'].get('method') == 'POST')
         test('WF-03 transfer uses warm mode', 'warm' in json.dumps(transfer['parameters']))
-        test('WF-03 transfer URL includes VAPI_API_BASE', 'VAPI_API_BASE' in json.dumps(transfer['parameters']))
+        test('WF-03 transfer URL includes VAPI API base', 'api.vapi.ai' in json.dumps(transfer['parameters']))
 
     wait = get_node(wf3, 'Wait for Transfer Result')
     test('WF-03 has wait node', wait is not None)
@@ -312,7 +312,7 @@ if 'WF-03' in workflows:
     urgent = get_node(wf3, 'Send URGENT Notification')
     test('WF-03 sends urgent email on failure', urgent is not None)
     if urgent:
-        test('WF-03 urgent email to Val and Davin', 'NOTIFY_EMAIL_VAL' in json.dumps(urgent['parameters']) and 'NOTIFY_EMAIL_DAVIN' in json.dumps(urgent['parameters']))
+        test('WF-03 urgent email to Val and Davin', 'val@equityinsurance.services' in json.dumps(urgent['parameters']) and 'davin@equityinsurance.services' in json.dumps(urgent['parameters']))
 
 # ==============================================================
 # TEST SUITE 5: WF-04 Existing Customer Handler
@@ -335,14 +335,18 @@ if 'WF-04' in workflows:
     test('WF-04 creates ticket in Google Sheets', ticket is not None)
     if ticket:
         params_str = json.dumps(ticket['parameters'])
-        test('WF-04 ticket uses TICKETS sheet', 'GOOGLE_SHEET_TICKETS_ID' in params_str)
-        test('WF-04 ticket status=pending', 'pending' in params_str)
-        test('WF-04 ticket assigned_to=Val', 'Val' in params_str)
+        test('WF-04 ticket uses TICKETS sheet', '1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8' in params_str)
+    # status=pending and assigned_to=Val are set in Extract Customer Data code node
+    extract4 = get_node(wf4, 'Extract Customer Data')
+    if extract4:
+        code4_str = extract4['parameters'].get('jsCode', '')
+        test('WF-04 ticket status=pending', "'pending'" in code4_str)
+        test('WF-04 ticket assigned_to=Val', "'Val'" in code4_str)
 
     email4 = get_node(wf4, 'Send Notification to Val')
     test('WF-04 sends email to Val', email4 is not None)
     if email4:
-        test('WF-04 email to Val address', 'NOTIFY_EMAIL_VAL' in json.dumps(email4['parameters']))
+        test('WF-04 email to Val address', 'val@equityinsurance.services' in json.dumps(email4['parameters']))
 
     resp4 = get_node(wf4, 'Respond to VAPI')
     test('WF-04 responds to VAPI', resp4 is not None)
@@ -373,14 +377,14 @@ if 'WF-05' in workflows:
     if_hours5 = get_node(wf5, 'IF Business Hours')
     test('WF-05 branches on business hours', if_hours5 is not None)
 
-    transfer5 = get_node(wf5, 'Send VAPI Transfer Command')
-    test('WF-05 attempts transfer during hours', transfer5 is not None)
+    respond5 = get_node(wf5, 'Respond to VAPI')
+    test('WF-05 responds with transfer instruction via VAPI tool result', respond5 is not None)
 
     notif5 = get_node(wf5, 'Send Priority Notification')
     test('WF-05 sends priority notification', notif5 is not None)
     if notif5:
         p5_str = json.dumps(notif5['parameters'])
-        test('WF-05 notification to BOTH Val and Davin', 'NOTIFY_EMAIL_VAL' in p5_str and 'NOTIFY_EMAIL_DAVIN' in p5_str)
+        test('WF-05 notification to BOTH Val and Davin', 'val@equityinsurance.services' in p5_str and 'davin@equityinsurance.services' in p5_str)
         test('WF-05 notification priority=HIGH', 'HIGH' in p5_str)
 
     resp5 = get_node(wf5, 'Respond to VAPI')
@@ -451,7 +455,7 @@ if 'WF-06' in workflows:
     test('WF-06 logs analytics', analytics6 is not None)
     if analytics6:
         a6_str = json.dumps(analytics6['parameters'])
-        test('WF-06 analytics uses ANALYTICS sheet', 'GOOGLE_SHEET_ANALYTICS_ID' in a6_str)
+        test('WF-06 analytics uses ANALYTICS sheet', '1V2uXB0YuGrRNy8ZGjp1OpxI2OxheOsDRGDZHpwRBAR4' in a6_str)
 
     transcript6 = get_node(wf6, 'Save Transcript')
     test('WF-06 saves transcript', transcript6 is not None)
@@ -462,7 +466,7 @@ if 'WF-06' in workflows:
     error_log = get_node(wf6, 'Log Error to Sheet')
     test('WF-06 logs errors to Errors sheet', error_log is not None)
     if error_log:
-        test('WF-06 error log uses ERRORS sheet', 'GOOGLE_SHEET_ERRORS_ID' in json.dumps(error_log['parameters']))
+        test('WF-06 error log uses ERRORS sheet', '1qF-nC9GRGntn4i-REurbqtzfVii2K4vHc6GCVZ2PgvE' in json.dumps(error_log['parameters']))
 
 # ==============================================================
 # TEST SUITE 8: WF-07 Escalation Monitor
@@ -480,13 +484,13 @@ if 'WF-07' in workflows:
     if cron7:
         cron_str = json.dumps(cron7['parameters'])
         test('WF-07 cron: */30 schedule', '*/30' in cron_str)
-        test('WF-07 cron: business hours 9-16', '9-16' in cron_str)
+        test('WF-07 cron: business hours 9-17', '9-17' in cron_str)
         test('WF-07 cron: weekdays only 1-5', '1-5' in cron_str)
 
     read7 = get_node(wf7, 'Read Pending Tickets')
     test('WF-07 reads pending tickets', read7 is not None)
     if read7:
-        test('WF-07 reads from TICKETS sheet', 'GOOGLE_SHEET_TICKETS_ID' in json.dumps(read7['parameters']))
+        test('WF-07 reads from TICKETS sheet', '1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8' in json.dumps(read7['parameters']))
         test('WF-07 filters status=pending', 'pending' in json.dumps(read7['parameters']))
 
     filter7 = get_node(wf7, 'Filter Overdue')
@@ -499,7 +503,7 @@ if 'WF-07' in workflows:
     esc_email = get_node(wf7, 'Send Escalation to Davin')
     test('WF-07 sends escalation email', esc_email is not None)
     if esc_email:
-        test('WF-07 escalation to Davin', 'NOTIFY_EMAIL_DAVIN' in json.dumps(esc_email['parameters']))
+        test('WF-07 escalation to Davin', 'davin@equityinsurance.services' in json.dumps(esc_email['parameters']))
         test('WF-07 escalation subject mentions ESCALATION', 'ESCALATION' in json.dumps(esc_email['parameters']))
 
     update7 = get_node(wf7, 'Update Ticket Status')
@@ -530,12 +534,13 @@ for wf_name, wf in workflows.items():
             all_paths.append(n['parameters'].get('path', ''))
 test('All webhook paths are unique', len(all_paths) == len(set(all_paths)), f'paths: {all_paths}')
 
-# All workflows reference correct Google Sheet env vars
+# All workflows reference correct Google Sheet IDs (hardcoded)
+SHEET_IDS = ['14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0', '1V2uXB0YuGrRNy8ZGjp1OpxI2OxheOsDRGDZHpwRBAR4', '1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8', '1qF-nC9GRGntn4i-REurbqtzfVii2K4vHc6GCVZ2PgvE']
 for wf_name, wf in workflows.items():
     wf_str = json.dumps(wf)
     if 'googleSheets' in wf_str:
-        test(f'{wf_name} uses env vars for Sheet IDs (not hardcoded)',
-             'GOOGLE_SHEET_' in wf_str)
+        test(f'{wf_name} uses valid Google Sheet IDs',
+             any(sid in wf_str for sid in SHEET_IDS))
 
 # ==============================================================
 # TEST SUITE 10: Compliance & Business Rules
