@@ -208,10 +208,17 @@
                         </div>
                     </div>
 
+                    <!-- Mic Level Indicator -->
+                    <div id="mic-level-bar" class="w-40 h-2 rounded-full bg-zinc-800 overflow-hidden opacity-0 transition-opacity duration-300">
+                        <div id="mic-level-fill" class="h-full rounded-full bg-zinc-600 transition-all duration-100" style="width: 0%"></div>
+                    </div>
+
                     <!-- Timer & State -->
                     <div class="text-center space-y-2">
                         <div id="timer" class="font-mono text-5xl font-light tracking-tighter text-white tabular-nums">00:00</div>
                         <div id="call-state-text" class="text-sm font-medium text-zinc-500 uppercase tracking-widest">Ready to Connect</div>
+                        <!-- Partial transcript — shows user's speech in real-time -->
+                        <div id="partial-transcript" class="hidden text-xs text-zinc-500 italic max-w-xs truncate mt-1"></div>
                     </div>
                 </div>
             </div>
@@ -394,6 +401,9 @@
                 micIcon.classList.add('text-primary');
                 micIcon.classList.remove('text-zinc-500');
             }
+            // Show mic level bar
+            const micBar = document.getElementById('mic-level-bar');
+            if (micBar) micBar.classList.remove('opacity-0');
         }
 
         function deactivateCall() {
@@ -414,6 +424,11 @@
                 micIcon.classList.remove('text-primary');
                 micIcon.classList.add('text-zinc-500');
             }
+            // Hide mic level bar and partial transcript
+            const micBar = document.getElementById('mic-level-bar');
+            if (micBar) { micBar.classList.add('opacity-0'); }
+            const partialEl = document.getElementById('partial-transcript');
+            if (partialEl) { partialEl.textContent = ''; partialEl.classList.add('hidden'); }
         }
 
         function initVapi() {
@@ -429,17 +444,56 @@
             vapi.on('speech-start', () => {
                 activateCall(); // fallback: if call-start never fired, activate on first speech
                 document.getElementById('typing-indicator').classList.remove('hidden');
-                updateConnectionStatus('Speaking', 'text-primary', 'bg-primary');
+                updateConnectionStatus('AI Speaking', 'text-primary', 'bg-primary');
+                // Dim mic level when AI is speaking
+                const micBar = document.getElementById('mic-level-bar');
+                if (micBar) micBar.style.opacity = '0.3';
             });
 
             vapi.on('speech-end', () => {
                 document.getElementById('typing-indicator').classList.add('hidden');
-                updateConnectionStatus('Connected', 'text-success', 'bg-success');
+                updateConnectionStatus('Listening', 'text-success', 'bg-success');
+                // Restore mic level visibility when AI stops
+                const micBar = document.getElementById('mic-level-bar');
+                if (micBar) micBar.style.opacity = '1';
+            });
+
+            // Mic volume level — animate the circle visualizer bars to show mic is active
+            vapi.on('volume-level', (level) => {
+                const bars = document.querySelectorAll('#circle-visualizer > div');
+                const micBar = document.getElementById('mic-level-fill');
+                if (micBar) {
+                    micBar.style.width = Math.min(level * 200, 100) + '%';
+                    micBar.style.backgroundColor = level > 0.05 ? '#22c55e' : '#71717a';
+                }
+                if (bars.length && callActive) {
+                    const h = [8, 12, 6]; // base heights in tailwind units
+                    bars.forEach((bar, i) => {
+                        const boost = level * 40;
+                        bar.style.height = (h[i] + boost * (0.8 + Math.random() * 0.4)) + 'px';
+                    });
+                }
             });
 
             vapi.on('message', (message) => {
                 activateCall(); // fallback: activate on first message of any kind
+
+                // Show partial transcripts (real-time) so user can see their voice is being heard
+                if (message.type === 'transcript' && message.transcriptType === 'partial') {
+                    const partialEl = document.getElementById('partial-transcript');
+                    if (partialEl && message.role === 'user') {
+                        partialEl.textContent = message.transcript;
+                        partialEl.classList.remove('hidden');
+                    }
+                }
+
                 if (message.type === 'transcript' && message.transcriptType === 'final') {
+                    // Clear partial transcript
+                    const partialEl = document.getElementById('partial-transcript');
+                    if (partialEl) {
+                        partialEl.textContent = '';
+                        partialEl.classList.add('hidden');
+                    }
                     addTranscriptMessage(message.role, message.transcript);
                 }
                 if (message.type === 'function-call') {
@@ -850,16 +904,26 @@
         // FIX: Force mic to 48kHz max to prevent Krisp crash on high-sample-rate mics (192kHz)
         // Krisp only supports up to 48kHz. Daily.co's WebRTC layer initializes Krisp
         // before VAPI assistant config is applied, so we intercept getUserMedia globally.
+        // IMPORTANT: Preserve all default audio processing (echo cancel, noise suppression, gain)
         // ============================
         (function patchGetUserMedia() {
             const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
             navigator.mediaDevices.getUserMedia = async function(constraints) {
                 if (constraints && constraints.audio) {
                     if (typeof constraints.audio === 'boolean') {
-                        constraints.audio = { sampleRate: { ideal: 48000, max: 48000 } };
+                        constraints.audio = {
+                            sampleRate: { ideal: 48000, max: 48000 },
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        };
                     } else if (typeof constraints.audio === 'object') {
                         constraints.audio.sampleRate = { ideal: 48000, max: 48000 };
+                        if (constraints.audio.echoCancellation === undefined) constraints.audio.echoCancellation = true;
+                        if (constraints.audio.noiseSuppression === undefined) constraints.audio.noiseSuppression = true;
+                        if (constraints.audio.autoGainControl === undefined) constraints.audio.autoGainControl = true;
                     }
+                    console.log('[MIC] getUserMedia audio constraints:', JSON.stringify(constraints.audio));
                 }
                 return original(constraints);
             };

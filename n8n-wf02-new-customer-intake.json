@@ -80,7 +80,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Build dynamic column object for Google Sheets\nconst { call_id, field_name, field_value } = items[0].json;\nconst row = {\n  call_id: call_id,\n  migration_flag: 'VAPI_AI_COLLECTED',\n  updated_at: new Date().toISOString()\n};\nrow[field_name] = field_value;\nreturn [{ json: row }];"
+        "jsCode": "// Accumulate all fields for this call using workflow static data\nconst staticData = $getWorkflowStaticData('global');\nconst { call_id, field_name, field_value } = items[0].json;\n\n// Initialize call data accumulator if first field\nif (!staticData[call_id]) {\n  staticData[call_id] = {};\n}\n\n// Store the new field\nstaticData[call_id][field_name] = field_value;\n\n// Build a COMPLETE row with ALL fields collected so far\nconst row = {\n  call_id: call_id,\n  migration_flag: 'VAPI_AI_COLLECTED',\n  updated_at: new Date().toISOString()\n};\n\n// Merge all accumulated fields into the row\nfor (const [key, value] of Object.entries(staticData[call_id])) {\n  row[key] = value;\n}\n\nreturn [{ json: row }];"
       },
       "id": "wf02-prepare-sheet-data",
       "name": "Prepare Sheet Data",
