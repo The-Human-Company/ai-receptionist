@@ -391,6 +391,19 @@
             updateCallStage('idle');
             logSystem('Call connection established.');
 
+            // Ensure mic is unmuted when call starts
+            isMuted = false;
+            if (vapi) {
+                try { vapi.setMuted(false); } catch (e) {}
+            }
+            const muteBtn2 = document.getElementById('muteBtn');
+            if (muteBtn2) {
+                muteBtn2.classList.remove('bg-danger', 'text-white', 'border-transparent');
+                muteBtn2.classList.add('glass', 'text-zinc-400');
+                const muteIcon2 = muteBtn2.querySelector('i') || muteBtn2.querySelector('svg');
+                if (muteIcon2) muteIcon2.setAttribute('data-lucide', 'mic');
+            }
+
             // Visuals
             document.getElementById('ambient-glow').classList.remove('opacity-0');
             document.getElementById('ring-1').classList.remove('opacity-0');
