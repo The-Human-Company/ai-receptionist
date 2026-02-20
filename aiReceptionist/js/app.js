@@ -10,10 +10,146 @@ lucide.createIcons();
 // CONFIGURATION
 // ============================
 const VAPI_PUBLIC_KEY = '7fa4969d-367a-43c3-a835-121e9a2d6c9b';
+const N8N_BASE = 'https://solarexpresss.app.n8n.cloud/webhook';
 
-// VAPI Assistant IDs (created via API with full tool + n8n webhook config)
-const ASSISTANT_ID_BUSINESS = 'bbf67fe2-99dc-427a-a546-37892f58a796';
-const ASSISTANT_ID_AFTERHOURS = '8ae61948-d6c5-4586-9f55-b7c1416db25b';
+// Shared voice, transcriber, and behavior settings
+const SHARED_VOICE_BIZ = {
+    provider: '11labs', voiceId: 'EXAVITQu4vr4xnSDxMaL', stability: 0.55,
+    similarityBoost: 0.8, style: 0.45, speed: 0.92, useSpeakerBoost: true,
+    model: 'eleven_turbo_v2_5', chunkPlan: { enabled: true, minCharacters: 80 }
+};
+const SHARED_VOICE_AH = {
+    provider: '11labs', voiceId: 'sarah', stability: 0.55,
+    similarityBoost: 0.8, style: 0.45, speed: 0.92, useSpeakerBoost: true,
+    model: 'eleven_turbo_v2_5', chunkPlan: { enabled: true, minCharacters: 80 }
+};
+const SHARED_TRANSCRIBER = { provider: '11labs', model: 'scribe_v2_realtime', language: 'en', silenceThresholdSeconds: 0.3 };
+const SHARED_BEHAVIOR = {
+    backgroundDenoisingEnabled: false,
+    backgroundSpeechDenoisingPlan: { smartDenoisingPlan: { enabled: false }, fourierDenoisingPlan: { enabled: false } },
+    endCallFunctionEnabled: true, dialKeypadFunctionEnabled: true,
+    serverUrl: `${N8N_BASE}/vapi-call-ended`,
+    stopSpeakingPlan: {
+        numWords: 3, voiceSeconds: 0.3, backoffSeconds: 1.0,
+        acknowledgementPhrases: ['okay','got it','mm-hmm','uh-huh','right','sure','yep'],
+        interruptionPhrases: ['wait','hold on','stop','actually','excuse me']
+    },
+    startSpeakingPlan: {
+        waitSeconds: 1.2, smartEndpointingPlan: { provider: 'livekit' },
+        transcriptionEndpointingPlan: { onPunctuationSeconds: 0.6, onNoPunctuationSeconds: 2.2, onNumberSeconds: 1.5 }
+    },
+    backchannelingEnabled: false, silenceTimeoutSeconds: 30
+};
+
+// Tool definitions
+const TOOL_SAVE_FIELD_BIZ = {
+    type: 'function', function: {
+        name: 'save_field', description: 'Save a collected data field from the caller to the system. Call this after collecting each piece of information.',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string', description: 'The unique call identifier' },
+            field_name: { type: 'string', enum: [
+                'caller_name','caller_phone','caller_email','caller_address','caller_dob','caller_occupation',
+                'policy_type','referral_source','claims_count','claims_details','urgency_timeline','current_coverage','shopping_reason',
+                'auto_vehicle_info','auto_vin','auto_lien_type','auto_lienholder','auto_violations','auto_household_drivers','auto_title_names',
+                'renter_address','renter_possessions_value','renter_mgmt_company','renter_addl_insured',
+                'property_address','property_first_buyer','property_value','property_coverage_needs','property_policy_age',
+                'biz_name','biz_ein','biz_start_date','biz_revenue','biz_industry','biz_contact','cross_sell_interest','cross_sell_types'
+            ]},
+            field_value: { type: 'string', description: 'The value collected from the caller' }
+        }, required: ['call_id','field_name','field_value'] }
+    }, server: { url: `${N8N_BASE}/vapi-save-field` }
+};
+const TOOL_SAVE_FIELD_AH = {
+    type: 'function', function: {
+        name: 'save_field', description: 'Save a collected data field to the system',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string' },
+            field_name: { type: 'string', enum: ['caller_name','caller_phone','reason_for_calling'] },
+            field_value: { type: 'string' }
+        }, required: ['call_id','field_name','field_value'] }
+    }, server: { url: `${N8N_BASE}/vapi-save-field` }
+};
+const TOOL_CHECK_DISQUALIFIER = {
+    type: 'function', function: {
+        name: 'check_disqualifier', description: 'Check if the caller is disqualified based on claims history or coverage urgency.',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string', description: 'The unique call identifier' },
+            claims_count_worst_year: { type: 'integer', description: 'The highest number of claims in any single year' },
+            urgency_hours: { type: 'integer', description: 'How many hours until coverage is needed' }
+        }, required: ['call_id','claims_count_worst_year','urgency_hours'] }
+    }, server: { url: `${N8N_BASE}/vapi-check-disqualifier` }
+};
+const TOOL_CHECK_HOT_LEAD = {
+    type: 'function', function: {
+        name: 'check_hot_lead', description: 'Check if the caller qualifies as a high-value hot lead for immediate agent transfer.',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string', description: 'The unique call identifier' },
+            policy_type: { type: 'string', description: 'The type of insurance policy' },
+            estimated_value: { type: 'number', description: 'The estimated property or auto value in dollars' }
+        }, required: ['call_id','policy_type','estimated_value'] }
+    }, server: { url: `${N8N_BASE}/vapi-check-hotlead` }
+};
+const TOOL_ROUTE_EXISTING = {
+    type: 'function', function: {
+        name: 'route_existing_customer', description: 'Route an existing customer request. Creates a support ticket and notifies the team.',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string', description: 'The unique call identifier' },
+            caller_name: { type: 'string', description: 'The existing customer name' },
+            caller_phone: { type: 'string', description: 'The customer phone number' },
+            policy_type: { type: 'string', description: 'The type of policy they have or are asking about' },
+            request_description: { type: 'string', description: 'What the customer is asking for specifically' }
+        }, required: ['call_id','caller_name','caller_phone','request_description'] }
+    }, server: { url: `${N8N_BASE}/vapi-existing-customer` }
+};
+const TOOL_ROUTE_CLAIM = {
+    type: 'function', function: {
+        name: 'route_claim', description: 'Route a claim call. Attempts to transfer to claims agent and sends priority notification.',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string', description: 'The unique call identifier' },
+            caller_name: { type: 'string', description: 'The caller name' },
+            caller_phone: { type: 'string', description: 'The caller phone number' },
+            policy_number: { type: 'string', description: 'The policy number if available' },
+            claim_type: { type: 'string', description: 'The type of claim (auto, property, etc.)' },
+            claim_description: { type: 'string', description: 'Description of the claim' }
+        }, required: ['call_id','caller_name','caller_phone','claim_type','claim_description'] }
+    }, server: { url: `${N8N_BASE}/vapi-claim` }
+};
+const TOOL_ROUTE_CLAIM_AH = {
+    type: 'function', function: {
+        name: 'route_claim', description: 'Route an urgent claim to the claims team for priority handling',
+        parameters: { type: 'object', properties: {
+            call_id: { type: 'string' }, caller_name: { type: 'string' }, caller_phone: { type: 'string' },
+            claim_type: { type: 'string', enum: ['Auto','Property','Business','Other'] },
+            claim_description: { type: 'string' }
+        }, required: ['call_id','caller_name','caller_phone','claim_type','claim_description'] }
+    }, server: { url: `${N8N_BASE}/vapi-claim` }
+};
+
+// System prompts (from WF-01)
+const SYSTEM_PROMPT_BUSINESS = "You are the receptionist at Equity Insurance Inc., a 3rd-generation family-owned independent insurance agency in Honolulu, Hawaii. Your name is not important -- you are just the friendly voice that answers the phone. You genuinely care about helping people, and it comes through in how you speak.\n\nWHO YOU ARE:\nYou sound like a real person who has worked at this office for years. You know the team, you know the business, and you like talking to people. You are warm but not over-the-top. You are helpful but you know your limits -- you are not a licensed agent. You collect information and schedule follow-ups with our human agents. Our core philosophy: We are always of service.\n\nHOW YOU TALK -- THIS IS CRITICAL:\n- Talk like a real person on the phone, not like you are reading from a screen. Vary your sentence length. Sometimes a short \"Got it\" is all you need. Other times you can say a full sentence.\n- React to what people tell you BEFORE asking the next question. If someone says they just bought a house, say something like \"Oh congratulations, that is exciting!\" If they mention an accident, say \"Oh no, I am sorry to hear that.\" If they have an unusual occupation, show brief interest. Be a human being first, data collector second.\n- Do NOT use the same acknowledgment twice in a row. Mix it up: \"Perfect.\" / \"Great, thank you.\" / \"Okay.\" / \"Got it.\" / \"Sounds good.\" / \"Alright.\" / \"Wonderful.\" Never say \"Thank you for providing that\" -- nobody talks like that.\n- Keep responses to 1 to 3 sentences. A real receptionist does not give speeches. Ask ONE question at a time, then wait.\n- Use contractions always. Say \"I'll\" not \"I will\", \"we'd\" not \"we would\", \"you're\" not \"you are\", \"that's\" not \"that is\", \"don't\" not \"do not\", \"it's\" not \"it is\", \"what's\" not \"what is\", \"we've\" not \"we have\".\n- Use casual transitions, not formal ones. Say \"And what's your email?\" not \"May I also have your email address please?\" Say \"Okay and the mailing address?\" not \"Could you please provide your mailing address?\"\n- Sometimes use sentence fragments. \"Perfect, got that down.\" is better than \"I have successfully recorded that information.\"\n- If there is a pause or silence, do NOT immediately fill it. Wait a beat, then gently prompt: \"Still there?\" or \"Take your time.\"\n- If you mishear or the caller corrects you, be natural: \"Oh sorry about that, let me fix that\" or \"My bad, let me update that.\"\n- Match the caller's energy. If they are chatty, be a little more conversational. If they are in a hurry, be efficient and get through the questions faster.\n- NEVER repeat the caller's answer back in a formal way like \"So your name is John Smith, is that correct?\" Instead say it casually: \"John Smith -- did I get that right?\" or just move on if it was clear.\n- Do NOT say Aloha or Mahalo during the conversation. Those words are only for the greeting and closing. During the call, speak plain conversational English.\n\nIMPORTANT RULES:\n1. NEVER give coverage guarantees, bind policies, underwrite, or offer specific coverage advice.\n2. NEVER discuss Private Mortgage Insurance, Federal loans, or Freddie Mac. Mortgage Protection is fine.\n3. Mention early in the call: we are not affiliated with Equity Insurance in Tulsa, Oklahoma.\n4. If unsure about anything: \"That's a great question -- I'll make sure our agent covers that when they follow up with you.\"\n5. We do NOT offer Pet Insurance or Travel Insurance.\n6. We work with multiple carriers. A simple auto policy can sometimes be bound within an hour. More complex property coverage may take up to 3 business days.\n7. Minimum premium is about $150 a year for basic renters.\n8. If someone asks for Davin about a P&C matter: \"Davin's tied up with another client right now, but I can get your info together so we can speed up the quoting process for you.\"\n9. If someone mentions Life Insurance, Health Insurance, or Medicare, collect their name and phone, then say: \"Davin Char handles those personally -- he'll give you a call back shortly.\" Save with policy_type set to life_insurance, health_insurance, or medicare.\n10. The caller can press the pound key anytime to reach a live person.\n11. Existing customers: ask what they need, get their name, phone, policy type, and a description, then call route_existing_customer.\n12. Claim callers: get name, phone, policy number if they have it, claim type, and a description, then call route_claim.\n\nWHEN TO TRANSFER IMMEDIATELY:\n- Caller asks for someone specific by name.\n- Caller has something complex that needs an agent.\n- Caller is upset or complaining.\n- Caller says they are ready to buy or bind coverage right now.\n- Existing customer calling about a claim (use route_claim).\n\nCALL FLOW:\nFigure out what the caller needs:\nA) New customer shopping for insurance -- go through data collection below.\nB) Existing customer -- find out what they need, collect their info, call route_existing_customer.\nC) Calling about a claim -- collect claim details, call route_claim.\n\nIf it is not clear, just ask naturally: \"Are you looking for a new quote, or are you already a customer with us?\"\n\nDATA COLLECTION FOR NEW P&C CUSTOMERS:\nCollect these in order, but make it feel like a conversation, not a checklist. Weave in natural transitions.\n\n1. Full Name -- \"Can I get your full name? And would you mind spelling the last name for me?\"\n2. Phone Number -- repeat it back casually to confirm.\n3. Email -- \"And what's a good email? We'll need that to send the quote over.\"\n4. Mailing Address -- \"Okay, and your mailing address?\" Double-check spelling on street names.\n5. Date of Birth.\n6. Occupation -- \"What do you do for work? Just asking because some occupations actually qualify for discounts.\"\n7. Insurance Type -- Auto, Renters, Property, or Business. If they already mentioned it, confirm instead of asking again.\n8. Referral Source -- \"By the way, how'd you hear about us? We like to thank whoever sent you our way.\"\n9. Shopping Reason -- \"What made you start looking for new coverage?\" Understand the story.\n10. Current Coverage -- \"Do you have insurance on this right now? If so, who are you with and roughly what are you paying?\"\n11. Claims History -- \"Any claims in the past 5 years?\" For EACH claim, ask what happened, what type, and the outcome.\n12. Coverage Urgency -- \"When do you need coverage to start?\"\n\nAfter collecting each piece, call the save_field function.\n\nPOLICY-SPECIFIC QUESTIONS:\nFor Auto: vehicle info, VIN if they have it, lease or loan, lienholder name, tickets or accidents past 5 years, all household drivers, multiple names on title, current auto policy and rate. Mention: \"Progressive is one of our carriers and with a VIN we can sometimes get coverage going pretty quick.\"\nFor Renters: estimated value of possessions, property management company (additional insured), rental address.\nFor Property: first-time buyer, property value, address, claims past 5 years with details on each, urgency, current homeowners policy and how long they have had it.\nFor Business: business name, EIN, start date, annual gross revenue, industry and specific activity, best contact.\n\nQUALIFICATION CHECKS:\nAfter claims and urgency, call check_disqualifier. If disqualified (3+ claims in worst year or coverage needed within 72 hours), be kind about it.\n\nAfter property or auto value, call check_hot_lead. If hot lead (property over $2M or auto over $180K), connect them with an agent right away.\n\nCROSS-SELL:\nAfter everything is collected and the lead qualifies, naturally offer ONE related coverage.\n\nENDING THE CALL:\nYou can end the call after the caller says goodbye. Always wait for the caller to say goodbye first.\n\nCLOSING:\nBriefly recap what you collected and confirm. Then close warmly: \"Mahalo for calling Equity Insurance! Val's going to look over everything and get back to you with your quote. We're always happy to help. Have a great day!\"";
+
+const SYSTEM_PROMPT_AFTERHOURS = "You are the after-hours receptionist at Equity Insurance Inc., a 3rd-generation family-owned insurance agency in Honolulu, Hawaii. The office is closed right now -- business hours are 9 AM to 5 PM Hawaii time, Monday through Friday.\n\nBe warm and brief. You are just here to take a quick message so someone can call them back.\n\nHOW YOU TALK:\n- Sound like a real person, not a robot. Use contractions. Keep it short.\n- Vary your acknowledgments. Don't say the same thing twice.\n- React naturally to what people say.\n- 1 to 2 sentences max per response.\n\nCollect only:\n1. Full Name -- ask them to spell it.\n2. Phone Number -- repeat it back to confirm.\n3. Reason for calling -- brief description of what they need.\n\nIf they have an urgent claim or emergency, collect the details (name, phone, claim type, description) and call route_claim to trigger a priority alert to our team.\n\nRULES:\n- Never give coverage advice or make promises.\n- We are not affiliated with Equity Insurance in Tulsa, Oklahoma.\n- We don't offer Pet Insurance or Travel Insurance.\n- If unsure: \"Great question -- our team will cover that when they follow up with you.\"\n\nAfter collecting info, call save_field for each piece. Then close: \"Mahalo for calling Equity Insurance! Someone from our team will get back to you on the next business day. Have a good evening!\" Then wait for them to say goodbye, and end the call.\n\nENDING THE CALL:\nYou can end the call. Do it after the caller says goodbye or any farewell. Always let them say bye first -- don't hang up abruptly.";
+
+// Inline assistant config builder (matches WF-01 exactly)
+function getAssistantConfig(mode) {
+    const isBiz = mode === 'business';
+    const tools = isBiz
+        ? [TOOL_SAVE_FIELD_BIZ, TOOL_CHECK_DISQUALIFIER, TOOL_CHECK_HOT_LEAD, TOOL_ROUTE_EXISTING, TOOL_ROUTE_CLAIM]
+        : [TOOL_SAVE_FIELD_AH, TOOL_ROUTE_CLAIM_AH];
+    return {
+        firstMessage: isBiz
+            ? "Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii -- not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?"
+            : "Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We are currently closed -- our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I can take a message and have someone call you back. May I have your name?",
+        model: {
+            provider: 'openai', model: 'gpt-4o', temperature: 0.5, maxTokens: 300,
+            messages: [{ role: 'system', content: isBiz ? SYSTEM_PROMPT_BUSINESS : SYSTEM_PROMPT_AFTERHOURS }],
+            tools: tools
+        },
+        voice: isBiz ? SHARED_VOICE_BIZ : SHARED_VOICE_AH,
+        transcriber: SHARED_TRANSCRIBER,
+        ...SHARED_BEHAVIOR
+    };
+}
 
 // ============================
 // STATE
@@ -288,9 +424,9 @@ async function toggleCall() {
     } else {
         updateUI('connecting');
         try {
-            const assistantId = currentMode === 'business' ? ASSISTANT_ID_BUSINESS : ASSISTANT_ID_AFTERHOURS;
-            logSystem(`Initializing call (${currentMode} mode, assistant: ${assistantId.slice(0, 8)}...)...`);
-            await vapi.start(assistantId);
+            const config = getAssistantConfig(currentMode);
+            logSystem(`Initializing call (${currentMode} mode, inline config, voice: ${config.voice.voiceId})...`);
+            await vapi.start(config);
         } catch (err) {
             updateUI('error');
             console.error('Start call error (full):', JSON.stringify(err, null, 2));
@@ -416,7 +552,8 @@ function updateDataTable(key, value) {
     setTimeout(() => valCell.classList.remove('text-accent'), 1500);
 
     const rows = tbody.querySelectorAll('tr');
-    document.getElementById('field-count').textContent = `${rows.length} / 8`;
+    const total = currentMode === 'business' ? 12 : 3;
+    document.getElementById('field-count').textContent = `${rows.length} / ${total}+`;
 }
 
 const stageOrder = ['idle', 'collecting', 'evaluating', 'routing', 'complete'];

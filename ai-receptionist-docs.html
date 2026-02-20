@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Receptionist | Complete System Documentation</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f4f4f5;
+    --surface-3: #e4e4e7;
+    --border: #18181b;
+    --border-light: #d4d4d8;
+    --text: #09090b;
+    --text-dim: #3f3f46;
+    --text-muted: #71717a;
+    
+    /* Technical Colors for Guidance */
+    --primary: #2563eb;
+    --primary-bg: #eff6ff;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --info: #0284c7;
+    --info-bg: #f0f9ff;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, .flow-node, .wf-flow, .sheet-col .col-name, .hero-badge, .toc a, .section-label, .flow-label, .branch-label, .timeline-dot, .wf-icon, .wf-subtitle, .wf-tag, .data-table th, .badge, .convo-info .name, .convo-info .status, .msg .sender, .convo-action, .sheet-card .tab-name, .email-subject, .rule-threshold, footer {
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 100px 40px 80px;
+    text-align: center;
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(var(--surface-3) 1px, transparent 1px), linear-gradient(90deg, var(--surface-3) 1px, transparent 1px);
+    background-size: 32px 32px;
+    z-index: 0;
+    opacity: 0.6;
+  }
+  .hero > * {
+    position: relative;
+    z-index: 1;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border: 2px solid var(--border);
+    font-size: 13px; font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    box-shadow: 4px 4px 0px var(--border);
+  }
+  .hero h1 {
+    font-size: 64px; font-weight: 800; letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .hero p { font-size: 20px; color: var(--text-dim); max-width: 680px; margin: 0 auto 40px; font-weight: 500; }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+    padding-top: 16px;
+  }
+  .hero-stat {
+    text-align: center;
+    border: 2px solid var(--border);
+    padding: 24px 40px;
+    background: var(--bg);
+    box-shadow: 6px 6px 0px var(--border);
+    min-width: 160px;
+  }
+  .hero-stat .num { font-size: 40px; font-weight: 800; font-family: monospace; color: var(--primary); }
+  .hero-stat .label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+
+  /* ── Nav ── */
+  .toc {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 2px solid var(--border);
+    padding: 0 24px;
+    overflow-x: auto;
+  }
+  .toc-inner {
+    display: flex; gap: 16px; max-width: 1200px; margin: 0 auto;
+    padding: 16px 0;
+  }
+  .toc a {
+    color: var(--text); text-decoration: none; font-size: 14px; font-weight: 700;
+    padding: 8px 16px; border: 2px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .toc a:hover { border-color: var(--border); background: var(--primary-bg); color: var(--primary); box-shadow: 4px 4px 0px var(--border); }
+
+  /* ── Container ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Sections ── */
+  section { padding: 100px 0; }
+  section + section { border-top: 4px solid var(--border); }
+
+  .section-label {
+    font-size: 14px; text-transform: uppercase; letter-spacing: 2px;
+    font-weight: 800; margin-bottom: 20px;
+    display: inline-block; padding: 8px 16px; background: var(--primary); color: white;
+  }
+  .section-title {
+    font-size: 40px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 20px; text-transform: uppercase;
+  }
+  .section-desc {
+    font-size: 20px; color: var(--text-dim); max-width: 720px; margin-bottom: 56px; font-weight: 500;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 40px;
+    margin-bottom: 32px;
+    box-shadow: 8px 8px 0px var(--border);
+  }
+  .card h3 {
+    font-size: 22px; font-weight: 800; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 16px;
+  }
+  .card p { color: var(--text-dim); font-size: 16px; font-weight: 500; }
+
+  /* ── Flow Diagram ── */
+  .flow-diagram {
+    position: relative;
+    padding: 60px 40px;
+    overflow-x: auto;
+    background: var(--surface-2);
+    border: 2px solid var(--border);
+    margin-top: 32px;
+    background-image: radial-gradient(var(--border-light) 2px, transparent 2px);
+    background-size: 24px 24px;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .flow-node {
+    position: relative;
+    padding: 20px 32px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+    min-width: 180px;
+    max-width: 260px;
+    line-height: 1.5;
+    flex-shrink: 0;
+    box-shadow: 6px 6px 0px var(--border);
+    text-transform: uppercase;
+  }
+  .flow-node small {
+    display: block; font-weight: 600; color: var(--text-dim); margin-top: 12px; font-family: 'Inter', sans-serif; font-size: 13px; text-transform: none; border-top: 2px dashed var(--border-light); padding-top: 12px;
+  }
+  .flow-node.decision {
+    background: var(--text);
+    color: var(--bg);
+  }
+  .flow-node.decision small { color: var(--surface-3); border-top-color: var(--text-dim); }
+  
+  /* Adding colored borders/shadows to flow nodes for guidance */
+  .flow-node.phone { border-color: var(--purple); box-shadow: 6px 6px 0px var(--purple); }
+  .flow-node.talkroute { border-color: var(--warning); box-shadow: 6px 6px 0px var(--warning); }
+  .flow-node.vapi { border-color: var(--primary); box-shadow: 6px 6px 0px var(--primary); }
+  .flow-node.n8n { border-color: var(--success); box-shadow: 6px 6px 0px var(--success); }
+  .flow-node.sheets { border-color: var(--info); box-shadow: 6px 6px 0px var(--info); }
+  .flow-node.email { border-color: var(--danger); box-shadow: 6px 6px 0px var(--danger); }
+  .flow-node.crm { border-color: var(--warning); box-shadow: 6px 6px 0px var(--warning); }
+
+  /* Arrows styling to point correctly */
+  .flow-arrow {
+    color: var(--text);
+    font-size: 28px;
+    font-weight: 900;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .flow-arrow-down {
+    text-align: center;
+    color: var(--text);
+    font-size: 28px;
+    font-weight: 900;
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+  }
+  .flow-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--bg);
+    text-align: center;
+    padding: 8px 20px;
+    background: var(--text);
+    display: inline-block;
+    border: 2px solid var(--border);
+    margin: 0 auto;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0px var(--border-light);
+  }
+  .flow-branch {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 40px 0;
+    align-items: flex-start;
+  }
+  .flow-branch-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 32px;
+    border: 2px dashed var(--border);
+    background: var(--bg);
+    min-width: 320px;
+    box-shadow: 8px 8px 0px var(--border-light);
+  }
+  .flow-branch-item.new-customer { border-color: var(--info); box-shadow: 8px 8px 0px var(--info-bg); }
+  .flow-branch-item.existing-customer { border-color: var(--success); box-shadow: 8px 8px 0px var(--success-bg); }
+  .flow-branch-item.insurance-claim { border-color: var(--danger); box-shadow: 8px 8px 0px var(--danger-bg); }
+  
+  .branch-label {
+    font-size: 14px;
+    font-weight: 800;
+    padding: 10px 24px;
+    border: 2px solid var(--border);
+    background: var(--text);
+    color: var(--bg);
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0px var(--border-light);
+  }
+  .branch-label.info { background: var(--info); border-color: var(--info); box-shadow: 4px 4px 0px var(--info-bg); color: white;}
+  .branch-label.success { background: var(--success); border-color: var(--success); box-shadow: 4px 4px 0px var(--success-bg); color: white;}
+  .branch-label.danger { background: var(--danger); border-color: var(--danger); box-shadow: 4px 4px 0px var(--danger-bg); color: white;}
+
+  /* ── Big Flow (Master Diagram) ── */
+  .master-flow {
+    background: var(--bg);
+    border: 4px solid var(--border);
+    padding: 60px 40px;
+    overflow-x: auto;
+    box-shadow: 12px 12px 0px var(--border);
+    background-image: radial-gradient(var(--surface-3) 2px, transparent 2px);
+    background-size: 24px 24px;
+  }
+  .master-flow h3 {
+    text-align: center; font-size: 28px; font-weight: 800; margin-bottom: 60px; text-transform: uppercase; letter-spacing: 2px;
+    background: var(--text); color: var(--bg); display: inline-block; padding: 12px 32px; border: 2px solid var(--border);
+  }
+
+  /* ── Step Timeline ── */
+  .timeline {
+    position: relative;
+    padding-left: 80px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--surface-3);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 64px;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -80px; top: 0;
+    width: 60px; height: 60px;
+    background: var(--bg);
+    border: 4px solid var(--text);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800;
+    box-shadow: 6px 6px 0px var(--border);
+  }
+  .timeline-dot.step1 { border-color: var(--purple); color: var(--purple); box-shadow: 6px 6px 0px var(--purple-bg); }
+  .timeline-dot.step2 { border-color: var(--info); color: var(--info); box-shadow: 6px 6px 0px var(--info-bg); }
+  .timeline-dot.step3 { border-color: var(--success); color: var(--success); box-shadow: 6px 6px 0px var(--success-bg); }
+  .timeline-dot.step4 { border-color: var(--warning); color: var(--warning); box-shadow: 6px 6px 0px var(--warning-bg); }
+  .timeline-dot.step5 { border-color: var(--danger); color: var(--danger); box-shadow: 6px 6px 0px var(--danger-bg); }
+  .timeline-dot.step6 { border-color: var(--primary); color: var(--primary); box-shadow: 6px 6px 0px var(--primary-bg); }
+  
+  .timeline-content h4 { font-size: 24px; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; }
+  .timeline-content p { color: var(--text-dim); font-size: 18px; font-weight: 500; }
+  .timeline-detail {
+    margin-top: 24px;
+    background: var(--surface-2);
+    border: 2px solid var(--border);
+    padding: 24px 32px;
+    box-shadow: 6px 6px 0px var(--border);
+  }
+  .timeline-detail ul { list-style: none; }
+  .timeline-detail li {
+    padding: 10px 0; font-size: 16px; color: var(--text-dim);
+    display: flex; align-items: flex-start; gap: 16px;
+    font-weight: 600;
+  }
+  .timeline-detail li::before { content: '>'; font-family: monospace; font-weight: 900; font-size: 18px; }
+  .timeline-detail.primary li::before { color: var(--purple); }
+  .timeline-detail.info li::before { color: var(--info); }
+  .timeline-detail.success li::before { color: var(--success); }
+  .timeline-detail.accent li::before { color: var(--warning); }
+  .timeline-detail.danger li::before { color: var(--danger); }
+  .timeline-detail.cyan li::before { color: var(--primary); }
+
+  /* ── Workflow Cards ── */
+  .wf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 40px;
+  }
+  .wf-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 40px;
+    box-shadow: 8px 8px 0px var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .wf-card:hover { transform: translate(-4px, -4px); box-shadow: 12px 12px 0px var(--border); }
+  .wf-header {
+    display: flex; align-items: center; gap: 20px; margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 20px;
+  }
+  .wf-icon {
+    width: 64px; height: 64px;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800;
+    background: var(--text); color: var(--bg);
+    flex-shrink: 0;
+  }
+  .wf-icon.wf1 { background: var(--primary-bg); color: var(--primary); border-color: var(--primary); }
+  .wf-icon.wf2 { background: var(--info-bg); color: var(--info); border-color: var(--info); }
+  .wf-icon.wf3 { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+  .wf-icon.wf4 { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+  .wf-icon.wf5 { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+  .wf-icon.wf6 { background: var(--purple-bg); color: var(--purple); border-color: var(--purple); }
+  .wf-icon.wf7 { background: var(--info-bg); color: var(--info); border-color: var(--info); }
+
+  .wf-title { font-size: 22px; font-weight: 800; text-transform: uppercase; }
+  .wf-subtitle { font-size: 14px; color: var(--text-dim); margin-top: 6px; font-weight: 700; }
+  .wf-body { font-size: 16px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; font-weight: 500; }
+  .wf-flow {
+    background: var(--surface-2);
+    border: 2px solid var(--border);
+    padding: 24px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+    font-weight: 700;
+  }
+  .wf-tags {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;
+  }
+  .wf-tag {
+    padding: 8px 16px; border: 2px solid var(--border); font-size: 12px; font-weight: 800;
+    background: var(--bg); text-transform: uppercase; box-shadow: 2px 2px 0px var(--border);
+  }
+  .wf-tag.webhook { border-color: var(--primary); color: var(--primary); }
+  .wf-tag.sheets { border-color: var(--info); color: var(--info); }
+  .wf-tag.gmail { border-color: var(--danger); color: var(--danger); }
+  .wf-tag.subwf { border-color: var(--warning); color: var(--warning); }
+  .wf-tag.cron { border-color: var(--success); color: var(--success); }
+  .wf-tag.vapi-api { border-color: var(--purple); color: var(--purple); }
+
+  /* ── Data Tables ── */
+  .data-table {
+    width: 100%; border-collapse: collapse; margin: 24px 0;
+    font-size: 16px; border: 2px solid var(--border);
+    background: var(--bg);
+  }
+  .data-table th {
+    text-align: left; padding: 20px 24px;
+    background: var(--text); color: var(--bg);
+    font-weight: 800; font-size: 14px;
+    border-bottom: 2px solid var(--border);
+    border-right: 2px solid var(--border);
+  }
+  .data-table td {
+    padding: 20px 24px; border-bottom: 2px solid var(--border);
+    border-right: 2px solid var(--border);
+    color: var(--text-dim); font-weight: 600;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table code {
+    background: var(--surface-2); padding: 6px 12px; border: 2px solid var(--border);
+    font-size: 14px; color: var(--text); font-weight: 800;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex; padding: 6px 16px; border: 2px solid var(--border);
+    font-size: 12px; font-weight: 800; text-transform: uppercase;
+    background: var(--text); color: var(--bg);
+  }
+  .badge.active { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+  .badge.pending { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+  .badge.disabled { background: var(--surface-3); color: var(--text-muted); border-color: var(--border-light); }
+
+  /* ── Output Cards ── */
+  .output-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+  }
+  .output-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 40px;
+    box-shadow: 8px 8px 0px var(--border);
+  }
+  .output-card h4 {
+    font-size: 20px; font-weight: 800; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 16px; border-bottom: 2px solid var(--border); padding-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .output-card .icon {
+    width: 48px; height: 48px; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; background: var(--text); color: var(--bg);
+  }
+  .output-card:nth-child(1) .icon { background: var(--info-bg); color: var(--info); border-color: var(--info); }
+  .output-card:nth-child(2) .icon { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+  .output-card:nth-child(3) .icon { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+  .output-card:nth-child(4) .icon { background: var(--primary-bg); color: var(--primary); border-color: var(--primary); }
+  .output-card:nth-child(5) .icon { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+  .output-card:nth-child(6) .icon { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+  
+  .output-card ul {
+    list-style: none;
+  }
+  .output-card li {
+    padding: 10px 0; font-size: 16px; color: var(--text-dim); display: flex; align-items: flex-start; gap: 16px; font-weight: 600;
+  }
+  .output-card li::before { content: '■'; font-size: 12px; color: var(--text); margin-top: 4px; }
+
+  /* ── Conversation Demo ── */
+  .convo-demo {
+    max-width: 680px; margin: 0 auto;
+    background: var(--bg);
+    border: 4px solid var(--border);
+    box-shadow: 12px 12px 0px var(--border);
+  }
+  .convo-header {
+    background: var(--text);
+    padding: 24px 32px;
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 4px solid var(--border);
+  }
+  .convo-avatar {
+    width: 56px; height: 56px; border: 2px solid var(--bg);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--text);
+  }
+  .convo-info .name { font-size: 16px; font-weight: 800; color: var(--bg); text-transform: uppercase;}
+  .convo-info .status { font-size: 13px; color: var(--success); font-weight: 700;}
+  .convo-body { padding: 40px; display: flex; flex-direction: column; gap: 24px; background: var(--surface-2); }
+  .msg {
+    max-width: 85%; padding: 20px 24px;
+    font-size: 16px; line-height: 1.6; font-weight: 600;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    box-shadow: 4px 4px 0px var(--border-light);
+  }
+  .msg.ai {
+    align-self: flex-start;
+    border-left: 8px solid var(--primary);
+  }
+  .msg.user {
+    align-self: flex-end;
+    border-right: 8px solid var(--text);
+  }
+  .msg .sender {
+    font-size: 13px; font-weight: 800; margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+    border-bottom: 2px solid var(--border-light); padding-bottom: 6px; display: inline-block;
+  }
+  .msg.ai .sender { color: var(--primary); border-bottom-color: var(--primary); }
+  .convo-action {
+    margin: 16px 0;
+    padding: 20px;
+    background: var(--surface-3);
+    border: 2px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    text-align: center;
+    font-weight: 800;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0px var(--border-light);
+  }
+  .convo-action strong { color: var(--primary); }
+  .convo-action.warning { background: var(--warning-bg); border-color: var(--warning); color: var(--warning); }
+  .convo-action.danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+  .convo-action.success { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+
+  /* ── Sheet Diagram ── */
+  .sheet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+  }
+  .sheet-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 40px;
+    box-shadow: 8px 8px 0px var(--border);
+  }
+  .sheet-card h4 {
+    font-size: 20px; font-weight: 800; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px; text-transform: uppercase;
+  }
+  .sheet-card .tab-name {
+    font-size: 14px; font-weight: 800; border-bottom: 2px solid var(--border); padding-bottom: 16px; margin-bottom: 24px;
+    display: inline-block; background: var(--info-bg); color: var(--info); border-color: var(--info); padding: 8px 16px;
+  }
+  .sheet-cols {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .sheet-col {
+    display: flex; align-items: center; gap: 20px;
+    font-size: 15px; color: var(--text-dim); font-weight: 600;
+  }
+  .sheet-col .col-name {
+    font-size: 13px; font-weight: 800; color: var(--info);
+    background: var(--info-bg); border: 2px solid var(--info);
+    padding: 6px 12px; flex-shrink: 0; min-width: 160px; text-align: right;
+  }
+
+  /* ── Email Samples ── */
+  .email-preview {
+    background: var(--bg);
+    border: 4px solid var(--border);
+    margin-bottom: 40px;
+    box-shadow: 12px 12px 0px var(--border);
+  }
+  .email-header {
+    padding: 24px 32px;
+    background: var(--surface-2);
+    border-bottom: 4px solid var(--border);
+  }
+  .email-subject {
+    font-size: 20px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase;
+  }
+  .email-meta { font-size: 15px; color: var(--text-dim); font-weight: 700; }
+  .email-body {
+    padding: 40px 32px; font-size: 16px; color: var(--text); line-height: 1.8; font-weight: 500;
+  }
+
+  /* ── Rules ── */
+  .rule-card {
+    display: flex; align-items: flex-start; gap: 32px;
+    padding: 40px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    margin-bottom: 32px;
+    box-shadow: 8px 8px 0px var(--border);
+  }
+  .rule-icon {
+    width: 80px; height: 80px; border: 4px solid var(--border); background: var(--text); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; flex-shrink: 0;
+  }
+  .rule-icon.danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+  .rule-icon.warning { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
+  
+  .rule-content h4 { font-size: 22px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; }
+  .rule-content p { font-size: 16px; color: var(--text-dim); line-height: 1.6; font-weight: 600; }
+  .rule-threshold {
+    display: inline-flex; padding: 8px 20px; border: 2px solid var(--border);
+    font-size: 14px; font-weight: 800; margin-top: 20px;
+    background: var(--surface-2); color: var(--text); text-transform: uppercase;
+    box-shadow: 4px 4px 0px var(--border);
+  }
+  .rule-threshold.danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); box-shadow: 4px 4px 0px var(--danger); }
+  .rule-threshold.warning { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); box-shadow: 4px 4px 0px var(--warning); }
+
+  /* ── Footer ── */
+  footer {
+    padding: 100px 24px;
+    text-align: center;
+    border-top: 4px solid var(--border);
+    background: var(--text);
+    color: var(--bg);
+    font-weight: 800;
+    font-size: 15px;
+  }
+  footer p { margin-bottom: 16px; text-transform: uppercase; }
+
+  /* ── OVERRIDES for technical colored theme ── */
+  [style*="color: var(--text) !important"] { color: inherit !important; }
+  [style*="background: var(--bg) !important"] { background: inherit !important; border-color: inherit !important; }
+  .convo-action[style] { background: inherit !important; color: inherit !important; border-color: inherit !important; }
+  .branch-label[style] { background: inherit !important; color: inherit !important; }
+  .flow-node[style] { background: inherit !important; color: inherit !important; border-color: inherit !important; }
+  
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 40px; }
+    .hero { padding: 80px 20px 60px; }
+    section { padding: 60px 0; }
+    .section-title { font-size: 32px; }
+    .flow-row { flex-direction: column; align-items: stretch; }
+    .flow-node { max-width: 100%; }
+    .flow-arrow { transform: rotate(90deg); text-align: center; padding: 16px 0; }
+    .wf-grid { grid-template-columns: 1fr; }
+    .timeline-dot { width: 48px; height: 48px; left: -56px; font-size: 18px; }
+    .timeline { padding-left: 32px; }
+    .timeline::before { left: 15px; }
+    .sheet-col { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .sheet-col .col-name { text-align: left; }
+    .rule-card { flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════ HERO ════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">
+    <span>&#9889;</span> AI-Powered Voice Automation
+  </div>
+  <h1>AI Receptionist</h1>
+  <p>Complete system documentation for Equity Insurance Inc.'s automated voice receptionist &mdash; powered by VAPI, n8n, and Google Workspace.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">7</div>
+      <div class="label">Workflows</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">75</div>
+      <div class="label">Nodes</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">7</div>
+      <div class="label">Webhooks</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">4</div>
+      <div class="label">Spreadsheets</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ NAV ════════════════════════════════════════════ -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#overview">Overview</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#master-flow">Master Flow</a>
+    <a href="#conversation">AI Conversation</a>
+    <a href="#workflows">Workflows</a>
+    <a href="#data-outputs">Data Outputs</a>
+    <a href="#sheets">Google Sheets</a>
+    <a href="#emails">Email Alerts</a>
+    <a href="#crm">QQ Catalyst</a>
+    <a href="#rules">Business Rules</a>
+    <a href="#talkroute">Talkroute</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════ OVERVIEW ════════════════════════════════════════════ -->
+<section id="overview">
+  <div class="container">
+    <div class="section-label">System Overview</div>
+    <div class="section-title">What is the AI Receptionist?</div>
+    <div class="section-desc">An automated voice-based call handling system that answers inbound calls, collects insurance lead data, and routes calls to the right team member &mdash; 24/7.</div>
+
+    <div class="wf-grid">
+      <div class="card">
+        <h3>&#128222; Voice AI</h3>
+        <p><strong>VAPI.ai</strong> powers the voice conversation. Uses <strong>ElevenLabs</strong> voices (Bella for business hours, Sarah for after hours) and <strong>GPT-4o</strong> for natural language understanding. Callers speak naturally and the AI responds like a real receptionist.</p>
+      </div>
+      <div class="card">
+        <h3>&#9881; Orchestration</h3>
+        <p><strong>n8n Cloud</strong> runs 7 automated workflows that handle all business logic: routing calls, saving data, checking rules, transferring calls, sending emails, and monitoring for escalations.</p>
+      </div>
+      <div class="card">
+        <h3>&#128202; Data Storage</h3>
+        <p><strong>Google Sheets</strong> stores all lead data, tickets, call analytics, transcripts, and error logs across 4 spreadsheets. All data is flagged with <code>VAPI_AI_COLLECTED</code> for future CRM migration.</p>
+      </div>
+      <div class="card">
+        <h3>&#128231; Notifications</h3>
+        <p><strong>Gmail</strong> sends automated email alerts for every call type: hot leads, claims, existing customer requests, post-call summaries, and ticket escalations.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Service</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Phone System</strong></td><td>Talkroute</td><td>Main line +1 808-593-7746, forwards to VAPI</td></tr>
+          <tr><td><strong>Voice AI</strong></td><td>VAPI.ai + ElevenLabs</td><td>Conversational AI with natural voice</td></tr>
+          <tr><td><strong>Brain</strong></td><td>GPT-4o</td><td>Intent detection, data extraction, conversation flow</td></tr>
+          <tr><td><strong>Orchestration</strong></td><td>n8n Cloud</td><td>7 workflows, 75 nodes total</td></tr>
+          <tr><td><strong>CRM</strong></td><td>QQ Catalyst</td><td>Primary CRM (integration pending)</td></tr>
+          <tr><td><strong>Data Storage</strong></td><td>Google Sheets</td><td>Leads, Tickets, Analytics, Transcripts, Errors</td></tr>
+          <tr><td><strong>Notifications</strong></td><td>Gmail</td><td>Team alerts for all call outcomes</td></tr>
+          <tr><td><strong>Transcription</strong></td><td>ElevenLabs Scribe (scribe_v2_realtime)</td><td>Real-time speech-to-text</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ HOW IT WORKS ════════════════════════════════════════════ -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-label">Step by Step</div>
+    <div class="section-title">How the AI Receptionist Works</div>
+    <div class="section-desc">From the moment a call arrives to the final summary email, here's every step of the process.</div>
+
+    <div class="timeline">
+      <!-- Step 1 -->
+      <div class="timeline-item">
+        <div class="timeline-dot step1">1</div>
+        <div class="timeline-content">
+          <h4>&#128222; Call Arrives via Talkroute</h4>
+          <p>A caller dials <strong>+1 808-593-7746</strong> (Equity Insurance main line). Talkroute forwards the call to VAPI.ai.</p>
+          <div class="timeline-detail primary">
+            <ul>
+              <li>Talkroute is the phone system that owns the business number</li>
+              <li>Call is forwarded to VAPI's SIP endpoint</li>
+              <li>VAPI receives the call and triggers a <code>call-started</code> event</li>
+              <li>The event is sent as a webhook to n8n: <code>POST /vapi-call-started</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="timeline-item">
+        <div class="timeline-dot step2">2</div>
+        <div class="timeline-content">
+          <h4>&#128336; Business Hours Check (WF-01)</h4>
+          <p>n8n's <strong>WF-01 Call Router</strong> checks if the call is during business hours (Mon-Fri 9am-5pm Hawaii Time).</p>
+          <div class="timeline-detail info">
+            <ul>
+              <li>Converts UTC to HST (UTC-10, no daylight saving in Hawaii)</li>
+              <li><strong>Business Hours:</strong> Returns full assistant config with all 5 tools (save_field, check_disqualifier, check_hot_lead, route_existing_customer, route_claim) and Bella voice</li>
+              <li><strong>After Hours:</strong> Returns limited config with 2 tools (save_field, route_claim) and Sarah voice for voicemail-style handling</li>
+              <li>Config includes: voice settings, system prompt, available function tools</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="timeline-item">
+        <div class="timeline-dot step3">3</div>
+        <div class="timeline-content">
+          <h4>&#129302; AI Greets & Classifies Intent</h4>
+          <p>VAPI's AI speaks to the caller with a warm "Aloha!" greeting and determines what they need through natural conversation.</p>
+          <div class="timeline-detail success">
+            <ul>
+              <li><strong>New Customer</strong> &mdash; Wants an insurance quote &rarr; Routes to WF-02 (Data Collection)</li>
+              <li><strong>Existing Customer</strong> &mdash; Has a service request &rarr; Routes to WF-04 (Ticket Creation)</li>
+              <li><strong>Insurance Claim</strong> &mdash; Needs to report a claim &rarr; Routes to WF-05 (Claims Router)</li>
+              <li>Caller can press <strong>#</strong> at ANY time to reach a human agent</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="timeline-item">
+        <div class="timeline-dot step4">4</div>
+        <div class="timeline-content">
+          <h4>&#128203; Data Collection & Processing</h4>
+          <p>Based on intent, the AI collects the right data and triggers the appropriate n8n workflow via VAPI function calls (tool calls).</p>
+          <div class="timeline-detail accent">
+            <ul>
+              <li><strong>New Customer:</strong> Collects name, phone, email, address, DOB, occupation, policy type, referral source. Each field saved in real-time to Google Sheets</li>
+              <li><strong>Existing Customer:</strong> Collects request summary, creates a ticket, emails Val</li>
+              <li><strong>Claim:</strong> Collects policy number, claim type, description. During business hours: transfers to Val. After hours: sends priority email</li>
+              <li>Each function call triggers a specific webhook in n8n</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="timeline-item">
+        <div class="timeline-dot step5">5</div>
+        <div class="timeline-content">
+          <h4>&#9989; Qualification & Routing</h4>
+          <p>For new customers, the AI runs two checks before completing the call.</p>
+          <div class="timeline-detail danger">
+            <ul>
+              <li><strong>Disqualifier Check:</strong> 3+ claims/year or coverage needed within 72 hours &rarr; Politely redirect ("We recommend contacting an agent directly")</li>
+              <li><strong>Hot Lead Check:</strong> Property $2M+ or Auto $180K+ &rarr; Immediate warm transfer to Val (+1 808-780-0473)</li>
+              <li>If hot lead transfer fails: tries secondary number, then sends URGENT email</li>
+              <li>If qualified &amp; not hot: Data saved, team notified, caller thanked</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="timeline-item">
+        <div class="timeline-dot step6">6</div>
+        <div class="timeline-content">
+          <h4>&#128232; Post-Call Processing (WF-06)</h4>
+          <p>After every single call, VAPI sends an end-of-call report. WF-06 processes everything.</p>
+          <div class="timeline-detail cyan">
+            <ul>
+              <li>Merges call data with lead record from Google Sheets</li>
+              <li>Flags all data with <code>VAPI_AI_COLLECTED</code> for CRM migration</li>
+              <li>Attempts sync to QQ Catalyst (currently disabled &mdash; placeholder)</li>
+              <li>Builds smart summary email based on call outcome (7 categories)</li>
+              <li>Logs analytics: duration, call type, qualification status, cost</li>
+              <li>Saves full transcript for review</li>
+              <li><strong>WF-07</strong> runs every 30 min to check for tickets pending 2+ hours &rarr; escalates to Davin</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ MASTER FLOW ════════════════════════════════════════════ -->
+<section id="master-flow">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <div class="section-title">Complete System Flow Diagram</div>
+    <div class="section-desc">Visual map of how every component connects, from the phone call to the final outputs.</div>
+
+    <div class="master-flow">
+      <h3>&#128268; End-to-End Call Processing</h3>
+
+      <!-- Row 1: Phone -->
+      <div class="flow-row">
+        <div class="flow-node phone">&#128222; Caller Dials<br><strong>808-593-7746</strong></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node talkroute">&#128225; Talkroute<br><small>Phone System</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node vapi">&#129302; VAPI.ai<br><small>Voice AI + GPT-4o</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node n8n">&#9881; WF-01<br><small>Call Router</small></div>
+      </div>
+
+      <div class="flow-arrow-down">&darr;</div>
+      <div class="flow-label">Returns assistant config (business or after hours)</div>
+      <div class="flow-arrow-down">&darr;</div>
+
+      <!-- Row 2: AI Conversation -->
+      <div class="flow-row">
+        <div class="flow-node vapi" style="min-width: 300px;">&#127908; AI Conversation Begins<br><small>"Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii..."</small></div>
+      </div>
+
+      <div class="flow-arrow-down">&darr;</div>
+      <div class="flow-label">AI classifies intent through natural conversation</div>
+      <div class="flow-arrow-down">&darr;</div>
+
+      <!-- Row 3: Branches -->
+      <div class="flow-branch">
+        <div class="flow-branch-item new-customer">
+          <div class="branch-label info">New Customer</div>
+          <div class="flow-node n8n">&#128196; WF-02<br><small>Data Collector</small><br><small style="font-size:10px;">(22 nodes, 3 webhooks)</small></div>
+          <div class="flow-arrow-down">&darr;</div>
+          <div style="display:flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+            <div class="flow-node sheets" style="min-width:90px; font-size:12px;">&#128203; Save Field<br><small>Google Sheets</small></div>
+            <div class="flow-node n8n" style="min-width:90px; font-size:12px;">&#9989; Check<br><small>Disqualifier</small></div>
+            <div class="flow-node n8n" style="min-width:90px; font-size:12px;">&#128293; Check<br><small>Hot Lead</small></div>
+          </div>
+          <div class="flow-arrow-down">&darr;</div>
+          <div class="flow-node crm" style="font-size:12px;">&#128293; WF-03 Transfer<br><small>Hot Lead &rarr; Val</small></div>
+        </div>
+
+        <div class="flow-branch-item existing-customer">
+          <div class="branch-label success">Existing Customer</div>
+          <div class="flow-node n8n">&#127915; WF-04<br><small>Existing Customer</small><br><small style="font-size:10px;">(5 nodes)</small></div>
+          <div class="flow-arrow-down">&darr;</div>
+          <div style="display:flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+            <div class="flow-node sheets" style="min-width:80px; font-size:12px;">&#127915; Create<br><small>Ticket</small></div>
+            <div class="flow-node email" style="min-width:80px; font-size:12px;">&#128231; Email<br><small>Val</small></div>
+          </div>
+        </div>
+
+        <div class="flow-branch-item insurance-claim">
+          <div class="branch-label danger">Insurance Claim</div>
+          <div class="flow-node n8n">&#128680; WF-05<br><small>Claims Router</small><br><small style="font-size:10px;">(7 nodes)</small></div>
+          <div class="flow-arrow-down">&darr;</div>
+          <div style="display:flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+            <div class="flow-node vapi" style="min-width:80px; font-size:12px;">&#128222; Transfer<br><small>to Val</small></div>
+            <div class="flow-node email" style="min-width:80px; font-size:12px;">&#128680; Priority<br><small>Email</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-arrow-down" style="margin-top: 16px;">&#11015;</div>
+      <div class="flow-label">After EVERY call ends (regardless of type)</div>
+      <div class="flow-arrow-down">&darr;</div>
+
+      <!-- Row 4: Post-Call -->
+      <div class="flow-row">
+        <div class="flow-node vapi">&#128214; VAPI Sends<br><small>End-of-Call Report</small></div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-node n8n" style="min-width: 180px;">&#128230; WF-06<br><small>Post-Call Processor</small><br><small style="font-size:10px;">(16 nodes)</small></div>
+      </div>
+
+      <div class="flow-arrow-down">&darr;</div>
+
+      <!-- Row 5: Outputs -->
+      <div class="flow-row" style="gap: 12px;">
+        <div class="flow-node crm" style="font-size:12px;">&#127970; QQ Catalyst<br><small>CRM Sync</small><br><small style="font-size:10px; opacity:0.7;">(pending)</small></div>
+        <div class="flow-node sheets" style="font-size:12px;">&#128203; Leads Sheet<br><small>Merged Data</small></div>
+        <div class="flow-node email" style="font-size:12px;">&#128231; Summary<br><small>Email</small></div>
+        <div class="flow-node sheets" style="font-size:12px;">&#128200; Analytics<br><small>Sheet</small></div>
+        <div class="flow-node sheets" style="font-size:12px;">&#128221; Transcript<br><small>Sheet</small></div>
+      </div>
+
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
+        <div class="flow-row">
+          <div class="flow-node sheets" style="font-size:13px;">&#9200; WF-07 Escalation Monitor<br><small>Every 30 min &bull; Checks for 2hr+ pending tickets &bull; Emails Davin</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ CONVERSATION ════════════════════════════════════════════ -->
+<section id="conversation">
+  <div class="container">
+    <div class="section-label">AI Conversation</div>
+    <div class="section-title">How the AI Talks to Callers</div>
+    <div class="section-desc">Three complete example conversations showing exactly how the AI handles each call type, with every system action triggered in real-time. The AI speaks casually like a real receptionist &mdash; warm, uses contractions, varies acknowledgments, and reacts naturally before asking the next question.</div>
+
+    <!-- ─── SCENARIO A: New Customer - Full Qualified Lead ─── -->
+    <h3 style="color: var(--primary); margin-bottom: 12px; font-size: 16px;">SCENARIO A: New Customer &mdash; Qualified Home Insurance Lead</h3>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Full data collection flow showing all 12 steps, disqualifier check, hot lead check, cross-sell, and closing.</p>
+
+    <div class="convo-demo">
+      <div class="convo-header">
+        <div class="convo-avatar">&#129302;</div>
+        <div class="convo-info">
+          <div class="name">AI Receptionist &mdash; Equity Insurance</div>
+          <div class="status">&#9679; Business Hours &bull; Bella Voice &bull; GPT-4o</div>
+        </div>
+      </div>
+      <div class="convo-body">
+
+        <!-- Greeting -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?
+        </div>
+
+        <!-- Intent -->
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Hi, yeah, we just bought a house in Kailua and we need homeowners insurance.
+        </div>
+        <div class="convo-action">&#9881; AI classifies intent: <strong>New Customer &mdash; P&amp;C Quote (Property)</strong></div>
+
+        <!-- 1. Name -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Oh congratulations, that's exciting! I'd love to help get you started. Can I get your full name? And would you mind spelling the last name for me?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Sarah Tanaka. T-A-N-A-K-A.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>caller_name = Sarah Tanaka</strong></div>
+
+        <!-- 2. Phone -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Got it, Sarah. And what's the best number to reach you at?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          808-555-2001.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          808-555-2001 &mdash; did I get that right?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Yep, that's it.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>caller_phone = 808-555-2001</strong></div>
+
+        <!-- 3. Email -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Perfect. And what's a good email? We'll need that to send the quote over.
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          sarah.tanaka@gmail.com
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>caller_email = sarah.tanaka@gmail.com</strong></div>
+
+        <!-- 4. Mailing Address -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Great, thank you. Okay, and your mailing address?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          1234 Ala Moana Boulevard, Honolulu, Hawaii 96815.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Ala Moana Boulevard &mdash; A-L-A M-O-A-N-A, is that right?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Yes, that's correct.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>caller_address = 1234 Ala Moana Blvd, Honolulu HI 96815</strong></div>
+
+        <!-- 5. DOB -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Alright. And what's your date of birth?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          March 15th, 1985.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>caller_dob = 1985-03-15</strong></div>
+
+        <!-- 6. Occupation -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Sounds good. What do you do for work? Just asking because some occupations actually qualify for discounts.
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          I'm a teacher at Kailua Elementary.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Oh nice, that's great! Teachers do sometimes get good rates.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>caller_occupation = Teacher</strong></div>
+
+        <!-- 7. Policy Type (confirmed) -->
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>policy_type = home</strong> (already mentioned at start)</div>
+
+        <!-- 8. Referral Source -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          By the way, how'd you hear about us? We like to thank whoever sent you our way.
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          My coworker recommended you, actually. She said you guys were really helpful.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Oh that's so kind, we appreciate that!
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>referral_source = Coworker referral</strong></div>
+
+        <!-- 9. Shopping Reason -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          So what made you start looking for new coverage? Is this the new place in Kailua?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Yeah, we're closing next month and the lender needs proof of insurance before we can finalize.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>shopping_reason = New home purchase, lender requires insurance</strong></div>
+
+        <!-- 10. Current Coverage -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Got it, makes sense. Do you have homeowners insurance right now, or is this your first time?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          First-time buyer! We've been renting.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>property_first_buyer = yes</strong></div>
+
+        <!-- Property Value -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Congrats again, that's a big step! Roughly how much is the property worth?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          About $800,000.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>property_value = 800000</strong></div>
+
+        <!-- 11. Claims History -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Okay. Have you had any insurance claims in the past five years? Doesn't matter how small &mdash; just want to get the full picture.
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          We had one small water damage claim on our rental about two years ago. The pipe under the kitchen sink burst.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Oh no, that's never fun. Was it covered okay?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Yeah, renter's insurance took care of it. Maybe like $3,000 total.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>claims_count = 1, claims_details = Water damage, pipe burst, $3K, 2 years ago</strong></div>
+
+        <!-- DISQUALIFIER CHECK -->
+        <div class="convo-action success">&#9989; <code>check_disqualifier</code> &rarr; WF-02: claims=1, urgency=720hrs &rarr; <strong>Not disqualified. Continue.</strong></div>
+
+        <!-- 12. Urgency -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Alright, no worries at all. When do you need the coverage to start?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          We close on March 28th, so probably by March 25th to be safe.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>urgency_timeline = Coverage by March 25</strong></div>
+
+        <!-- HOT LEAD CHECK -->
+        <div class="convo-action">&#128269; <code>check_hot_lead</code> &rarr; WF-02: property=$800K &lt; $2M &rarr; <strong>Not a hot lead. Continue standard flow.</strong></div>
+
+        <!-- Cross-sell -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Sounds good, we've got plenty of time for that. By the way, since you're getting homeowners, do you have auto insurance too? A lot of our clients bundle those together and save a bit.
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Oh yeah actually, I've been meaning to shop around for auto too. Could you add that?
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Absolutely! I'll note that down.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>cross_sell_interest = true, cross_sell_types = auto</strong></div>
+
+        <!-- Closing -->
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Alright Sarah, let me make sure I've got everything. Sarah Tanaka, 808-555-2001, email is sarah.tanaka@gmail.com, you're looking at homeowners for the new place in Kailua &mdash; about $800K, closing March 28th. And you'd also like us to look at auto. Does that all sound right?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Yep, that's everything!
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Mahalo for calling Equity Insurance! Val's going to look over everything and get back to you with your quote. We're always happy to help. Have a great day!
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Thank you, bye!
+        </div>
+        <div class="convo-action danger">&#128222; Call ends &rarr; VAPI sends end-of-call report &rarr; <strong>WF-06 Post-Call Processor</strong>: Merges data, sends [QUALIFIED] summary email, logs analytics, saves transcript</div>
+      </div>
+    </div>
+
+    <!-- ─── SCENARIO B: Existing Customer ─── -->
+    <h3 style="color: var(--success); margin: 40px 0 12px; font-size: 16px;">SCENARIO B: Existing Customer &mdash; Service Request</h3>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Existing customer needing to update their address. Creates a ticket and notifies Val.</p>
+
+    <div class="convo-demo">
+      <div class="convo-header">
+        <div class="convo-avatar">&#129302;</div>
+        <div class="convo-info">
+          <div class="name">AI Receptionist &mdash; Equity Insurance</div>
+          <div class="status">&#9679; Business Hours &bull; Bella Voice &bull; GPT-4o</div>
+        </div>
+      </div>
+      <div class="convo-body">
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Hi, I'm already a customer. I need to update my mailing address on my home policy.
+        </div>
+        <div class="convo-action">&#9881; AI classifies intent: <strong>Existing Customer &mdash; Service Request</strong></div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Sure thing! Can I get your name?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Lisa Wong.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Got it, Lisa. And a phone number so Val can call you back?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          808-555-4001.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          808-555-4001, perfect. So you need to update your mailing address on your home policy &mdash; is there anything else you need while I've got you?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Nope, that's it. Just the address change.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Alright, I've got that noted. Val will give you a call back to get the new address updated. Is there a good time for her to reach you?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Anytime this afternoon works.
+        </div>
+        <div class="convo-action warning">&#127915; <code>route_existing_customer</code> &rarr; WF-04: Creates ticket in Tickets Sheet &bull; Emails jephdaligdig98@gmail.com &bull; Status: pending &bull; Assigned to: Val</div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          I've created a ticket and notified Val. She'll call you back this afternoon. Mahalo for calling Equity Insurance, Lisa! Have a great day.
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Thanks, bye!
+        </div>
+        <div class="convo-action danger">&#128222; Call ends &rarr; WF-06: [EXISTING] summary email &bull; WF-07 monitors ticket (escalates to Davin if no response in 2 hours)</div>
+      </div>
+    </div>
+
+    <!-- ─── SCENARIO C: Claims Call ─── -->
+    <h3 style="color: var(--danger); margin: 40px 0 12px; font-size: 16px;">SCENARIO C: Insurance Claim &mdash; Auto Accident</h3>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Caller reporting a car accident. During business hours: transfers to Val + sends priority email.</p>
+
+    <div class="convo-demo">
+      <div class="convo-header">
+        <div class="convo-avatar">&#129302;</div>
+        <div class="convo-info">
+          <div class="name">AI Receptionist &mdash; Equity Insurance</div>
+          <div class="status">&#9679; Business Hours &bull; Bella Voice &bull; GPT-4o</div>
+        </div>
+      </div>
+      <div class="convo-body">
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          I was just in a car accident on the H1. I need to file a claim.
+        </div>
+        <div class="convo-action">&#9881; AI classifies intent: <strong>Insurance Claim &mdash; Auto</strong></div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Oh no, I'm sorry to hear that. Are you okay? Let me get some details so we can get this taken care of for you. What's your name?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          David Kim.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Got it, David. And a phone number in case we get disconnected?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          808-555-5001.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Okay. Do you have your policy number handy?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Yeah, it's POL-HI-2024-001.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Alright. Can you tell me what happened?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          I was heading westbound on H1 near the Aloha Stadium exit and someone rear-ended me. My bumper and trunk are pretty banged up. No injuries though, thankfully.
+        </div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          I'm glad you're okay. Let me get you connected with Val, our claims specialist. She'll be able to walk you through next steps. Just hold for a moment.
+        </div>
+        <div class="convo-action danger">&#128680; <code>route_claim</code> &rarr; WF-05: Sends priority email (HIGH) &bull; Initiates warm transfer to Val (+1 808-780-0473) &bull; AI tells caller: "Transferring you now"</div>
+        <div class="convo-action danger">&#128222; During transfer &rarr; WF-06 will process end-of-call report: [CLAIM] summary email, analytics logged, transcript saved</div>
+      </div>
+    </div>
+
+    <!-- ─── SCENARIO D: After Hours ─── -->
+    <h3 style="color: var(--purple); margin: 40px 0 12px; font-size: 16px;">SCENARIO D: After Hours Call &mdash; Voicemail-Style</h3>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Call arrives at 7:30 PM HST. After-hours config with Sarah voice, limited tools (save_field + route_claim only).</p>
+
+    <div class="convo-demo">
+      <div class="convo-header">
+        <div class="convo-avatar">&#129302;</div>
+        <div class="convo-info">
+          <div class="name">AI Receptionist &mdash; Equity Insurance</div>
+          <div class="status">&#9679; After Hours &bull; Sarah Voice &bull; GPT-4o</div>
+        </div>
+      </div>
+      <div class="convo-body">
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We're currently closed &mdash; our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I can take a message and have someone call you back. May I have your name?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Hi, it's Mark Ito. I wanted to ask about renters insurance.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; <strong>caller_name = Mark Ito</strong></div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Hi Mark. And a phone number so we can call you back?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          808-555-7777.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; <strong>caller_phone = 808-555-7777</strong></div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          808-555-7777, got it. So you're interested in renters insurance &mdash; I'll make sure our team knows. Is there anything specific you'd like them to cover when they call back?
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Just looking for basic renters coverage for my apartment in Kakaako. Nothing too fancy.
+        </div>
+        <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; <strong>policy_type = renters</strong></div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          Mahalo for calling Equity Insurance, Mark! Someone from our team will get back to you on the next business day. Have a good evening!
+        </div>
+        <div class="msg user">
+          <div class="sender">CALLER</div>
+          Thanks, goodnight!
+        </div>
+        <div class="convo-action danger">&#128222; Call ends &rarr; WF-06: [PARTIAL] summary email (after hours, limited data) &bull; Analytics logged &bull; Transcript saved</div>
+      </div>
+    </div>
+
+    <!-- ─── VAPI Tools Table ─── -->
+    <div style="margin-top: 40px;">
+      <h3 style="margin-bottom: 16px;">VAPI Function Tools (What the AI Can Trigger)</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tool Name</th>
+            <th>n8n Webhook</th>
+            <th>What It Does</th>
+            <th>Workflow</th>
+            <th>Available</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>save_field</code></td>
+            <td><code>/vapi-save-field</code></td>
+            <td>Saves one data field to Google Sheets in real-time</td>
+            <td>WF-02</td>
+            <td>Business + After Hours</td>
+          </tr>
+          <tr>
+            <td><code>check_disqualifier</code></td>
+            <td><code>/vapi-check-disqualifier</code></td>
+            <td>Checks if 3+ claims/year or &le;72hr urgency</td>
+            <td>WF-02</td>
+            <td>Business Hours only</td>
+          </tr>
+          <tr>
+            <td><code>check_hot_lead</code></td>
+            <td><code>/vapi-check-hotlead</code></td>
+            <td>Checks if property &ge;$2M or auto &ge;$180K</td>
+            <td>WF-02</td>
+            <td>Business Hours only</td>
+          </tr>
+          <tr>
+            <td><code>route_existing_customer</code></td>
+            <td><code>/vapi-existing-customer</code></td>
+            <td>Creates ticket + emails notification</td>
+            <td>WF-04</td>
+            <td>Business Hours only</td>
+          </tr>
+          <tr>
+            <td><code>route_claim</code></td>
+            <td><code>/vapi-claim</code></td>
+            <td>Priority email + transfer (business hrs) or email only (after hrs)</td>
+            <td>WF-05</td>
+            <td>Business + After Hours</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ WORKFLOWS ════════════════════════════════════════════ -->
+<section id="workflows">
+  <div class="container">
+    <div class="section-label">Automation Engine</div>
+    <div class="section-title">All 7 Workflows</div>
+    <div class="section-desc">Each workflow handles a specific part of the call lifecycle. All run on n8n Cloud.</div>
+
+    <div class="wf-grid">
+      <!-- WF-01 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf1">01</div>
+          <div>
+            <div class="wf-title">Inbound Call Router</div>
+            <div class="wf-subtitle">6 nodes &bull; Entry point for all calls</div>
+          </div>
+        </div>
+        <div class="wf-body">Receives every incoming VAPI call. Checks if it's business hours (Mon-Fri 9-5 HST) and returns the correct assistant config with voice, tools, and prompt.</div>
+        <div class="wf-flow">Webhook &#10132; Extract Data &#10132; Check Hours &#10132; IF Hours?
+  &#9989; YES &#10132; Business Config (5 tools, Bella voice)
+  &#10060; NO  &#10132; After-Hours Config (2 tools, Sarah voice)</div>
+        <div class="wf-tags">
+          <span class="wf-tag webhook">webhook</span>
+        </div>
+      </div>
+
+      <!-- WF-02 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf2">02</div>
+          <div>
+            <div class="wf-title">New Customer P&C Intake</div>
+            <div class="wf-subtitle">22 nodes &bull; 3 webhook endpoints</div>
+          </div>
+        </div>
+        <div class="wf-body">The largest workflow. Handles 3 functions: saving individual fields, checking disqualifiers, and detecting hot leads. Each runs independently via its own webhook.</div>
+        <div class="wf-flow">A) /vapi-save-field
+   &#10132; Validate &#10132; Upsert to Leads Sheet
+
+B) /vapi-check-disqualifier
+   &#10132; 3+ claims? &le;72hr urgency? &#10132; Result
+
+C) /vapi-check-hotlead
+   &#10132; $2M+ property? $180K+ auto?
+   &#10132; IF HOT &#10132; WF-03 Transfer + Email</div>
+        <div class="wf-tags">
+          <span class="wf-tag webhook">3 webhooks</span>
+          <span class="wf-tag sheets">Google Sheets</span>
+          <span class="wf-tag gmail">Gmail</span>
+          <span class="wf-tag subwf">triggers WF-03</span>
+        </div>
+      </div>
+
+      <!-- WF-03 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf3">03</div>
+          <div>
+            <div class="wf-title">Hot Lead Transfer</div>
+            <div class="wf-subtitle">14 nodes &bull; Sub-workflow from WF-02</div>
+          </div>
+        </div>
+        <div class="wf-body">Executes live call transfer for hot leads. Tries Val's direct number first; if that fails, tries the office line. On total failure, sends URGENT email requiring callback within 1 hour.</div>
+        <div class="wf-flow">From WF-02 &#10132; Transfer to Val (808-780-0473)
+  &#9989; OK &#10132; Update Lead (transferred)
+  &#10060; FAIL &#10132; Try Office (808-593-7746)
+     &#9989; OK &#10132; Update Lead (secondary)
+     &#10060; FAIL &#10132; URGENT Email + Log</div>
+        <div class="wf-tags">
+          <span class="wf-tag subwf">sub-workflow</span>
+          <span class="wf-tag vapi-api">VAPI Transfer API</span>
+          <span class="wf-tag sheets">Google Sheets</span>
+          <span class="wf-tag gmail">Gmail</span>
+        </div>
+      </div>
+
+      <!-- WF-04 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf4">04</div>
+          <div>
+            <div class="wf-title">Existing Customer</div>
+            <div class="wf-subtitle">5 nodes &bull; Ticket creation</div>
+          </div>
+        </div>
+        <div class="wf-body">Creates a service ticket for existing customers, emails Val with the request details, and tells the caller someone will follow up.</div>
+        <div class="wf-flow">Webhook &#10132; Extract Data &#10132; Create Ticket
+  &#10132; Email Val &#10132; Respond to VAPI</div>
+        <div class="wf-tags">
+          <span class="wf-tag webhook">webhook</span>
+          <span class="wf-tag sheets">Tickets Sheet</span>
+          <span class="wf-tag gmail">Gmail</span>
+        </div>
+      </div>
+
+      <!-- WF-05 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf5">05</div>
+          <div>
+            <div class="wf-title">Claims Router</div>
+            <div class="wf-subtitle">7 nodes &bull; Priority handling</div>
+          </div>
+        </div>
+        <div class="wf-body">Handles insurance claims. During business hours: warm transfer to Val + priority email. After hours: priority email only + promise of next-day callback.</div>
+        <div class="wf-flow">Webhook &#10132; Extract Claim &#10132; Check Hours
+  &#9989; Business &#10132; Transfer + Priority Email
+  &#10060; After Hrs &#10132; Priority Email Only</div>
+        <div class="wf-tags">
+          <span class="wf-tag webhook">webhook</span>
+          <span class="wf-tag vapi-api">VAPI Transfer API</span>
+          <span class="wf-tag gmail">Gmail (HIGH priority)</span>
+        </div>
+      </div>
+
+      <!-- WF-06 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf6">06</div>
+          <div>
+            <div class="wf-title">Post-Call Processor</div>
+            <div class="wf-subtitle">16 nodes &bull; Most complex workflow</div>
+          </div>
+        </div>
+        <div class="wf-body">Runs after EVERY call. Merges data with lead records, attempts CRM sync, builds a categorized summary email (7 types: [HOT LEAD TRANSFERRED], [DISQUALIFIED], [TRANSFER FAILED], [CLAIM], [EXISTING], [PARTIAL], [QUALIFIED]), logs analytics, and saves the full transcript.</div>
+        <div class="wf-flow">Webhook &#10132; Is End-of-Call? &#10132; Extract Data
+  &#10132; Read Lead &#10132; Merge + Flag (VAPI_AI_COLLECTED)
+  &#10132; CRM Sync (disabled) &#10132; Fallback Sheet
+  &#10132; Smart Email &#10132; Analytics &#10132; Transcript</div>
+        <div class="wf-tags">
+          <span class="wf-tag webhook">webhook</span>
+          <span class="wf-tag sheets">4 Sheet tabs</span>
+          <span class="wf-tag gmail">Gmail</span>
+        </div>
+      </div>
+
+      <!-- WF-07 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf7">07</div>
+          <div>
+            <div class="wf-title">Escalation Monitor</div>
+            <div class="wf-subtitle">5 nodes &bull; Cron every 30 min</div>
+          </div>
+        </div>
+        <div class="wf-body">Runs automatically every 30 minutes during business hours. Checks for tickets that have been pending 2+ hours and sends escalation emails to Davin.</div>
+        <div class="wf-flow">Cron (*/30 9-17 Mon-Fri)
+  &#10132; Read Pending Tickets &#10132; Filter 2hr+
+  &#10132; Email Davin &#10132; Mark Escalated</div>
+        <div class="wf-tags">
+          <span class="wf-tag cron">cron schedule</span>
+          <span class="wf-tag sheets">Tickets Sheet</span>
+          <span class="wf-tag gmail">Gmail</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ DATA OUTPUTS ════════════════════════════════════════════ -->
+<section id="data-outputs">
+  <div class="container">
+    <div class="section-label">System Outputs</div>
+    <div class="section-title">What Gets Created After Each Call</div>
+    <div class="section-desc">Every call generates multiple outputs across different systems.</div>
+
+    <div class="output-grid">
+      <div class="output-card">
+        <h4><span class="icon" style="background: var(--cyan-glow);">&#128203;</span> Lead Record (Google Sheets)</h4>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">Created for new customer calls. Updated in real-time as AI collects data.</p>
+        <ul>
+          <li>&#10003; Full name, phone, email, address</li>
+          <li>&#10003; Date of birth, occupation</li>
+          <li>&#10003; Policy type, referral source</li>
+          <li>&#10003; Disqualification status + reason</li>
+          <li>&#10003; Hot lead flag + estimated value</li>
+          <li>&#10003; Call duration, status, cost</li>
+          <li>&#10003; Migration flag: VAPI_AI_COLLECTED</li>
+        </ul>
+      </div>
+
+      <div class="output-card">
+        <h4><span class="icon" style="background: var(--success-glow);">&#127915;</span> Ticket (Google Sheets)</h4>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">Created for existing customer and claim calls.</p>
+        <ul>
+          <li>&#10003; Ticket ID, call ID</li>
+          <li>&#10003; Caller name and phone</li>
+          <li>&#10003; Policy type</li>
+          <li>&#10003; Request description / claim details</li>
+          <li>&#10003; Status: pending &rarr; escalated &rarr; resolved</li>
+          <li>&#10003; Assigned to: Val</li>
+          <li>&#10003; Escalation timestamp (if overdue)</li>
+        </ul>
+      </div>
+
+      <div class="output-card">
+        <h4><span class="icon" style="background: var(--danger-glow);">&#128231;</span> Email Notification</h4>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">Sent for every call with context-appropriate content.</p>
+        <ul>
+          <li>&#10003; Smart subject with call category</li>
+          <li>&#10003; Caller details and request summary</li>
+          <li>&#10003; Call duration and recording link</li>
+          <li>&#10003; AI-generated conversation summary</li>
+          <li>&#10003; Priority flag for claims/hot leads</li>
+          <li>&#10003; Action items for the team</li>
+        </ul>
+      </div>
+
+      <div class="output-card">
+        <h4><span class="icon" style="background: var(--primary-glow);">&#128200;</span> Analytics Row</h4>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">One row per call in the Analytics sheet for reporting.</p>
+        <ul>
+          <li>&#10003; Date, time, day of week</li>
+          <li>&#10003; Call duration, cost</li>
+          <li>&#10003; Masked phone (last 4 digits)</li>
+          <li>&#10003; Policy type, intent classification</li>
+          <li>&#10003; Qualification + transfer status</li>
+          <li>&#10003; Referral source, business hours flag</li>
+        </ul>
+      </div>
+
+      <div class="output-card">
+        <h4><span class="icon" style="background: var(--accent-glow);">&#128221;</span> Transcript</h4>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">Full conversation saved for review and training.</p>
+        <ul>
+          <li>&#10003; Call ID, date, caller name</li>
+          <li>&#10003; Complete AI + caller transcript</li>
+          <li>&#10003; Recording URL (when available)</li>
+        </ul>
+      </div>
+
+      <div class="output-card">
+        <h4><span class="icon" style="background: var(--accent-glow);">&#127970;</span> CRM Record (QQ Catalyst)</h4>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;"><span class="badge pending">Pending Integration</span></p>
+        <ul>
+          <li>&#9723; Contact creation/update</li>
+          <li>&#9723; Lead record with all collected data</li>
+          <li>&#9723; Migration flag: VAPI_AI_COLLECTED</li>
+          <li>&#10003; Falls back to Google Sheets on error</li>
+          <li style="color: var(--text-muted); font-style: italic;">Placeholder API URL configured. Ready to connect when QQ Catalyst API access is provided.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ SHEETS ════════════════════════════════════════════ -->
+<section id="sheets">
+  <div class="container">
+    <div class="section-label">Data Storage</div>
+    <div class="section-title">Google Sheets Structure</div>
+    <div class="section-desc">4 spreadsheets with 6 tabs store all system data.</div>
+
+    <div class="sheet-grid">
+      <div class="sheet-card">
+        <h4>&#128215; Leads Database</h4>
+        <div class="tab-name">Tab: Leads</div>
+        <div class="sheet-cols">
+          <div class="sheet-col"><span class="col-name">call_id</span> Unique call identifier</div>
+          <div class="sheet-col"><span class="col-name">caller_name</span> Full name</div>
+          <div class="sheet-col"><span class="col-name">caller_phone</span> Phone number</div>
+          <div class="sheet-col"><span class="col-name">caller_email</span> Email address</div>
+          <div class="sheet-col"><span class="col-name">caller_address</span> Mailing address</div>
+          <div class="sheet-col"><span class="col-name">caller_dob</span> Date of birth</div>
+          <div class="sheet-col"><span class="col-name">caller_occupation</span> Occupation</div>
+          <div class="sheet-col"><span class="col-name">policy_type</span> Insurance type</div>
+          <div class="sheet-col"><span class="col-name">disqualified</span> true/false</div>
+          <div class="sheet-col"><span class="col-name">hot_lead</span> true/false</div>
+          <div class="sheet-col"><span class="col-name">estimated_value</span> Dollar value</div>
+          <div class="sheet-col"><span class="col-name">migration_flag</span> VAPI_AI_COLLECTED</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Written by: WF-02, WF-06 &bull; Read by: WF-06</p>
+      </div>
+
+      <div class="sheet-card">
+        <h4>&#128215; Leads Database</h4>
+        <div class="tab-name">Tab: Transcripts</div>
+        <div class="sheet-cols">
+          <div class="sheet-col"><span class="col-name">call_id</span> Unique call identifier</div>
+          <div class="sheet-col"><span class="col-name">date</span> Call date</div>
+          <div class="sheet-col"><span class="col-name">caller_name</span> Caller's name</div>
+          <div class="sheet-col"><span class="col-name">transcript_text</span> Full conversation</div>
+          <div class="sheet-col"><span class="col-name">recording_url</span> Audio recording link</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Written by: WF-06</p>
+      </div>
+
+      <div class="sheet-card">
+        <h4>&#128214; Ticket Tracker</h4>
+        <div class="tab-name">Tab: Tickets</div>
+        <div class="sheet-cols">
+          <div class="sheet-col"><span class="col-name">ticket_id</span> Unique ticket ID</div>
+          <div class="sheet-col"><span class="col-name">caller_name</span> Customer name</div>
+          <div class="sheet-col"><span class="col-name">caller_phone</span> Phone number</div>
+          <div class="sheet-col"><span class="col-name">request_description</span> What they need</div>
+          <div class="sheet-col"><span class="col-name">status</span> pending / escalated</div>
+          <div class="sheet-col"><span class="col-name">assigned_to</span> Val</div>
+          <div class="sheet-col"><span class="col-name">escalated</span> true/false</div>
+          <div class="sheet-col"><span class="col-name">created_at</span> Timestamp</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Written by: WF-04, WF-07 &bull; Read by: WF-07</p>
+      </div>
+
+      <div class="sheet-card">
+        <h4>&#128200; Analytics Dashboard</h4>
+        <div class="tab-name">Tab: Analytics</div>
+        <div class="sheet-cols">
+          <div class="sheet-col"><span class="col-name">date</span> Call date</div>
+          <div class="sheet-col"><span class="col-name">call_duration</span> Seconds</div>
+          <div class="sheet-col"><span class="col-name">policy_type</span> Insurance type</div>
+          <div class="sheet-col"><span class="col-name">intent</span> Classification</div>
+          <div class="sheet-col"><span class="col-name">qualification_status</span> Result</div>
+          <div class="sheet-col"><span class="col-name">transfer_status</span> If transferred</div>
+          <div class="sheet-col"><span class="col-name">referral_source</span> How they found us</div>
+          <div class="sheet-col"><span class="col-name">cost</span> VAPI call cost</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Written by: WF-06</p>
+      </div>
+
+      <div class="sheet-card">
+        <h4>&#128680; Error Log</h4>
+        <div class="tab-name">Tab: Errors</div>
+        <div class="sheet-cols">
+          <div class="sheet-col"><span class="col-name">timestamp</span> When it happened</div>
+          <div class="sheet-col"><span class="col-name">workflow_id</span> Which workflow</div>
+          <div class="sheet-col"><span class="col-name">node_name</span> Which node failed</div>
+          <div class="sheet-col"><span class="col-name">error_message</span> Error details</div>
+          <div class="sheet-col"><span class="col-name">call_id</span> Related call</div>
+          <div class="sheet-col"><span class="col-name">resolution_status</span> open/resolved</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Written by: WF-06 Error Handler</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ EMAILS ════════════════════════════════════════════ -->
+<section id="emails">
+  <div class="container">
+    <div class="section-label">Notifications</div>
+    <div class="section-title">Email Alert Types</div>
+    <div class="section-desc">The system sends 6 types of email notifications across the workflows. Currently all emails route to <code>jephdaligdig98@gmail.com</code> for testing. In production, they can be split to route to Val and Davin respectively.</div>
+
+    <div class="email-preview">
+      <div class="email-header">
+        <div class="email-subject" style="color: var(--accent);">&#128293; [HOT LEAD] Sarah Tanaka -- Property -- $3,500,000</div>
+        <div class="email-meta">From: AI Receptionist &bull; To: jephdaligdig98@gmail.com &bull; Triggered by: WF-02 (hot lead detected)</div>
+      </div>
+      <div class="email-body">
+        <strong>HOT LEAD ALERT</strong><br><br>
+        A high-value lead has been identified and is being transferred to you now.<br><br>
+        <strong>Caller:</strong> Sarah Tanaka<br>
+        <strong>Phone:</strong> 808-555-2001<br>
+        <strong>Policy:</strong> Property Insurance<br>
+        <strong>Est. Value:</strong> $3,500,000<br>
+        <strong>Reason:</strong> Property value exceeds $2M threshold<br><br>
+        <em>Transfer is in progress. Please be ready to receive the call.</em>
+      </div>
+    </div>
+
+    <div class="email-preview">
+      <div class="email-header">
+        <div class="email-subject" style="color: var(--danger);">&#128680; CLAIM -- Auto -- David Kim -- TRANSFER VIA AI / AFTER HOURS</div>
+        <div class="email-meta">From: AI Receptionist &bull; To: jephdaligdig98@gmail.com &bull; Priority: HIGH &bull; Triggered by: WF-05</div>
+      </div>
+      <div class="email-body">
+        <strong>INSURANCE CLAIM REPORTED</strong><br><br>
+        <strong>Caller:</strong> David Kim<br>
+        <strong>Phone:</strong> 808-555-5001<br>
+        <strong>Policy #:</strong> POL-HI-2024-001<br>
+        <strong>Claim Type:</strong> Auto<br>
+        <strong>Description:</strong> Rear-ended on H1 freeway near Aloha Stadium exit<br><br>
+        <em>During business hours: caller is being transferred. After hours: please follow up next business day.</em>
+      </div>
+    </div>
+
+    <div class="email-preview">
+      <div class="email-header">
+        <div class="email-subject" style="color: var(--success);">[Existing Customer] Lisa Wong -- Home -- Callback Requested</div>
+        <div class="email-meta">From: AI Receptionist &bull; To: jephdaligdig98@gmail.com &bull; Triggered by: WF-04</div>
+      </div>
+      <div class="email-body">
+        <strong>EXISTING CUSTOMER REQUEST</strong><br><br>
+        <strong>Caller:</strong> Lisa Wong<br>
+        <strong>Phone:</strong> 808-555-4001<br>
+        <strong>Policy:</strong> Home Insurance<br>
+        <strong>Request:</strong> Needs to update mailing address on home policy<br><br>
+        <em>Ticket created. Please call back within 2 hours or ticket will escalate to Davin.</em>
+      </div>
+    </div>
+
+    <div class="email-preview">
+      <div class="email-header">
+        <div class="email-subject" style="color: var(--cyan);">ESCALATION: Lisa Wong waiting 2.5 hours for callback</div>
+        <div class="email-meta">From: AI Receptionist &bull; To: jephdaligdig98@gmail.com &bull; Triggered by: WF-07 (2hr+ ticket pending)</div>
+      </div>
+      <div class="email-body">
+        <strong>ESCALATION ALERT</strong><br><br>
+        This ticket has been pending for over 2 hours without response.<br><br>
+        <strong>Ticket ID:</strong> scenario-4-existing_existing<br>
+        <strong>Caller:</strong> Lisa Wong<br>
+        <strong>Phone:</strong> 808-555-4001<br>
+        <strong>Waiting:</strong> 2.5 hours<br><br>
+        <em>Please ensure this customer receives a callback today.</em>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Email Type</th>
+            <th>Workflow</th>
+            <th>Recipient</th>
+            <th>Priority</th>
+            <th>When</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Hot Lead Pre-Transfer</td><td>WF-02</td><td>jephdaligdig98@gmail.com</td><td>Normal</td><td>Hot lead threshold met</td></tr>
+          <tr><td>Transfer Failed URGENT</td><td>WF-03</td><td>jephdaligdig98@gmail.com</td><td><strong style="color:var(--danger);">URGENT</strong></td><td>Both transfer attempts fail</td></tr>
+          <tr><td>Existing Customer Request</td><td>WF-04</td><td>jephdaligdig98@gmail.com</td><td>Normal</td><td>Every existing customer call</td></tr>
+          <tr><td>Claim Priority</td><td>WF-05</td><td>jephdaligdig98@gmail.com</td><td><strong style="color:var(--danger);">HIGH</strong></td><td>Every claim call</td></tr>
+          <tr><td>Post-Call Summary</td><td>WF-06</td><td>jephdaligdig98@gmail.com</td><td>Varies</td><td>After every call</td></tr>
+          <tr><td>Ticket Escalation</td><td>WF-07</td><td>jephdaligdig98@gmail.com</td><td><strong style="color:var(--danger);">HIGH</strong></td><td>Ticket pending 2+ hours</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ CRM ════════════════════════════════════════════ -->
+<section id="crm">
+  <div class="container">
+    <div class="section-label">CRM Integration</div>
+    <div class="section-title">QQ Catalyst Sync</div>
+    <div class="section-desc">How AI-collected data flows to the primary CRM system.</div>
+
+    <div class="card">
+      <h3>&#127970; Current Status: <span class="badge pending">Integration Pending</span></h3>
+      <p style="margin-bottom: 20px;">QQ Catalyst API access is pending. The system is fully prepared for integration:</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h4 style="color: #fff; font-size: 15px; margin-bottom: 8px;">What's Ready Now</h4>
+          <ul style="list-style: none; font-size: 13px; color: var(--text-dim);">
+            <li style="padding: 4px 0;">&#9989; WF-06 has a "Write to QQ Catalyst" HTTP Request node</li>
+            <li style="padding: 4px 0;">&#9989; API call structure configured (POST to contacts endpoint)</li>
+            <li style="padding: 4px 0;">&#9989; All data flagged with <code>VAPI_AI_COLLECTED</code></li>
+            <li style="padding: 4px 0;">&#9989; Migration date tracked on every record</li>
+            <li style="padding: 4px 0;">&#9989; Fallback to Google Sheets on CRM error</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: #fff; font-size: 15px; margin-bottom: 8px;">What's Needed</h4>
+          <ul style="list-style: none; font-size: 13px; color: var(--text-dim);">
+            <li style="padding: 4px 0;">&#9723; QQ Catalyst API endpoint URL</li>
+            <li style="padding: 4px 0;">&#9723; API authentication credentials</li>
+            <li style="padding: 4px 0;">&#9723; Field mapping (QQ Catalyst field names)</li>
+            <li style="padding: 4px 0;">&#9723; Contact creation vs. update logic</li>
+            <li style="padding: 4px 0;">&#9723; Testing with real CRM sandbox</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+      <h3>&#128260; Data Flow: AI &rarr; Google Sheets &rarr; QQ Catalyst</h3>
+      <div class="flow-diagram" style="padding: 20px 0;">
+        <div class="flow-row">
+          <div class="flow-node vapi">&#129302; VAPI Call<br><small>AI collects data</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node n8n">&#9881; WF-02<br><small>save_field</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node sheets">&#128203; Google Sheets<br><small>Leads tab (real-time)</small></div>
+        </div>
+        <div class="flow-arrow-down">&darr;</div>
+        <div class="flow-label">Call ends &rarr; VAPI sends end-of-call report</div>
+        <div class="flow-arrow-down">&darr;</div>
+        <div class="flow-row">
+          <div class="flow-node n8n">&#128230; WF-06<br><small>Post-Call Processor</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node sheets">&#128203; Read Lead<br><small>from Sheets</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node n8n">&#128260; Merge + Flag<br><small>VAPI_AI_COLLECTED</small></div>
+        </div>
+        <div class="flow-arrow-down">&darr;</div>
+        <div class="flow-row">
+          <div class="flow-node crm">&#127970; QQ Catalyst<br><small>POST /contacts</small><br><small style="opacity:0.6;">(pending API access)</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node" style="font-size: 13px;">IF Error?<br><small>Fallback &darr;</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node sheets">&#128203; Fallback Write<br><small>to Google Sheets</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ RULES ════════════════════════════════════════════ -->
+<section id="rules">
+  <div class="container">
+    <div class="section-label">Business Logic</div>
+    <div class="section-title">Business Rules & Thresholds</div>
+    <div class="section-desc">Critical rules that govern how the AI handles callers.</div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px;">
+      <div>
+        <h3 style="color: var(--danger); font-size: 16px; margin-bottom: 12px;">&#128683; Disqualification Rules</h3>
+        <div class="rule-card">
+          <div class="rule-icon danger">&#128200;</div>
+          <div class="rule-content">
+            <h4>High Claims Frequency</h4>
+            <p>Caller has filed too many claims in a single year.</p>
+            <div class="rule-threshold danger">Threshold: 3+ claims/year</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon danger">&#9200;</div>
+          <div class="rule-content">
+            <h4>Urgent Coverage Need</h4>
+            <p>Coverage needed within 72 hours &mdash; too time-sensitive for AI intake. Applies to all policy types.</p>
+            <div class="rule-threshold danger">Threshold: &le; 72 hours</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="color: var(--accent); font-size: 16px; margin-bottom: 12px;">&#128293; Hot Lead Thresholds</h3>
+        <div class="rule-card">
+          <div class="rule-icon warning">&#127968;</div>
+          <div class="rule-content">
+            <h4>High-Value Property</h4>
+            <p>Property insurance with estimated value above threshold.</p>
+            <div class="rule-threshold warning">Threshold: $2,000,000+</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon warning">&#128663;</div>
+          <div class="rule-content">
+            <h4>High-Value Auto</h4>
+            <p>Auto insurance with vehicle/coverage value above threshold.</p>
+            <div class="rule-threshold warning">Threshold: $180,000+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>&#128274; AI Safety Guardrails</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px;">
+        <div>
+          <h4 style="color: var(--danger); font-size: 14px; margin-bottom: 8px;">AI Must NEVER:</h4>
+          <ul style="list-style: none; font-size: 13px; color: var(--text-dim);">
+            <li style="padding: 3px 0;">&#10060; Give coverage advice or recommendations</li>
+            <li style="padding: 3px 0;">&#10060; Bind, quote, or price any policy</li>
+            <li style="padding: 3px 0;">&#10060; Sign, underwrite, or guarantee anything</li>
+            <li style="padding: 3px 0;">&#10060; Claim affiliation with Equity Insurance in Tulsa, OK</li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="color: var(--success); font-size: 14px; margin-bottom: 8px;">AI Must ALWAYS:</h4>
+          <ul style="list-style: none; font-size: 13px; color: var(--text-dim);">
+            <li style="padding: 3px 0;">&#9989; State non-affiliation with Tulsa entity</li>
+            <li style="padding: 3px 0;">&#9989; Flag data with VAPI_AI_COLLECTED</li>
+            <li style="padding: 3px 0;">&#9989; Allow # key press for human transfer</li>
+            <li style="padding: 3px 0;">&#9989; Double-check phone numbers and spelling</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ TALKROUTE ════════════════════════════════════════════ -->
+<section id="talkroute">
+  <div class="container">
+    <div class="section-label">Phone System</div>
+    <div class="section-title">Talkroute Configuration</div>
+    <div class="section-desc">How the physical phone system connects to the AI receptionist. Note: Talkroute SIP/API connection to VAPI is pending configuration &mdash; Talkroute access credentials are needed to complete setup.</div>
+
+    <div class="card">
+      <h3>&#128222; Call Routing Architecture</h3>
+      <div class="flow-diagram" style="padding: 20px 0;">
+        <div class="flow-row">
+          <div class="flow-node phone" style="min-width: 160px;">&#128241; Caller<br><small>Dials 808-593-7746</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node talkroute" style="min-width: 200px;">&#128225; Talkroute<br><small>Main business line</small><br><small>Routes to VAPI SIP</small></div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node vapi" style="min-width: 200px;">&#129302; VAPI.ai<br><small>Answers the call</small><br><small>AI conversation begins</small></div>
+        </div>
+        <div style="margin-top: 24px;">
+          <div class="flow-row">
+            <div class="flow-node vapi" style="min-width: 200px;">&#128222; VAPI Transfer<br><small>Hot lead or claim</small></div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node phone" style="min-width: 200px;">&#128241; Val's Phone<br><small>+1 808-780-0473</small><br><small>Warm transfer</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+      <div class="card">
+        <h3>&#128222; Phone Numbers</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Main Line</strong></td><td>+1 808-593-7746</td></tr>
+            <tr><td><strong>Val (P&C Agent)</strong></td><td>+1 808-780-0473</td></tr>
+            <tr><td><strong>Transfer Priority</strong></td><td>Val first, then main line</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>&#128336; Business Hours (HST)</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Monday - Friday</strong></td><td>9:00 AM - 5:00 PM</td></tr>
+            <tr><td><strong>Saturday - Sunday</strong></td><td>After Hours mode</td></tr>
+            <tr><td><strong>Timezone</strong></td><td>HST (UTC-10, no DST)</td></tr>
+            <tr><td><strong>Transfer Available</strong></td><td>Business hours only</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════ FOOTER ════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <p><strong>Equity Insurance Inc.</strong> &bull; AI Receptionist System Documentation</p>
+    <p style="margin-top: 4px;">Powered by VAPI.ai &bull; n8n Cloud &bull; Google Workspace &bull; Built February 2026</p>
+    <p style="margin-top: 4px; opacity: 0.5;">All 7 workflows active &bull; 26/26 tests passing &bull; System operational</p>
+  </div>
+</footer>
+
+</body>
+</html>
