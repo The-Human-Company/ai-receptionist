@@ -1,8 +1,8 @@
 # AI Receptionist System Guide
 ## Equity Insurance Inc. | Powered by VAPI + n8n
 
-**Version:** 1.0
-**Last Updated:** February 20, 2026
+**Version:** 1.1
+**Last Updated:** February 25, 2026
 **Owner:** Equity Insurance Inc. (Davin Char)
 **System URL:** https://solarexpresss.app.n8n.cloud
 
@@ -13,7 +13,7 @@
 1. [System Overview](#1-system-overview)
 2. [Architecture Diagram](#2-architecture-diagram)
 3. [Call Flow Summary](#3-call-flow-summary)
-4. [Workflow Reference (WF-01 through WF-07)](#4-workflow-reference)
+4. [Workflow Reference (WF-01 through WF-08)](#4-workflow-reference)
 5. [Google Sheets Data Model](#5-google-sheets-data-model)
 6. [Email Notifications](#6-email-notifications)
 7. [Business Rules](#7-business-rules)
@@ -33,11 +33,12 @@ The AI Receptionist is an automated voice-based call handling system for Equity 
 |-----------|---------|---------|
 | **Voice AI** | VAPI.ai + ElevenLabs | Voice conversation with callers (Female, Warm tone) |
 | **LLM** | GPT-4o | Natural language understanding and conversation flow |
-| **Orchestration** | n8n Cloud | 7 workflows handling all business logic |
+| **Orchestration** | n8n Cloud | 8 workflows handling all business logic |
 | **Phone System** | Talkroute | Main line routing (+1 808-593-7746) |
 | **CRM** | QQ Catalyst | Primary CRM (integration pending) |
 | **Data Storage** | Google Sheets | Lead records, tickets, analytics, transcripts |
 | **Notifications** | Gmail | Email alerts to team members |
+| **Form Delivery** | Gmail | Sends Google Form link to callers via email (WF-08) |
 
 ### Team Contacts
 
@@ -84,6 +85,12 @@ The AI Receptionist is an automated voice-based call handling system for Equity 
               |    | Hot Lead| |Sheets | | Sheet    |
               |    | Transfer| |(Leads)| +----+-----+
               |    +---------+ +-------+      |
+              |         |
+              |    +---------+
+              |    | WF-08   |
+              |    | Email   |
+              |    | Form    |
+              |    +---------+
               |                               |
               v               v               v
         +---------+    +-----------+    +-----------+
@@ -113,7 +120,7 @@ Every inbound call follows this lifecycle:
 3. VAPI triggers `vapi-call-started` webhook
 4. **WF-01** checks if it's business hours (Mon-Fri 9am-5pm HST)
 5. Returns the appropriate VAPI assistant configuration (Business or After Hours)
-6. AI greets caller: "Aloha! Thank you for calling Equity Insurance..."
+6. AI greets caller: "Aloha! Thank you for calling Equity Insurance... Just so you know, I'm an AI assistant here to help get things started..."
 
 ### Step 2: Intent Classification (VAPI AI)
 The AI determines the caller's intent through conversation:
@@ -123,10 +130,12 @@ The AI determines the caller's intent through conversation:
 
 ### Step 3A: New Customer Quote Flow (WF-02)
 1. AI collects data fields one at a time (name, phone, email, address, DOB, occupation, policy type)
-2. Each field is saved to Google Sheets via `save_field` function call -> **WF-02 Sub-flow A**
-3. After collecting key info, AI checks disqualification rules -> **WF-02 Sub-flow B**
-4. If not disqualified, AI checks hot lead thresholds -> **WF-02 Sub-flow C**
-5. If hot lead detected, triggers immediate transfer -> **WF-03**
+2. Phone number confirmation via DTMF keypad or voice: "I got [number] -- press 1 if that's correct, or 2 if I need to fix it. You can also just say yes or no."
+3. Each field is saved to Google Sheets via `save_field` function call -> **WF-02 Sub-flow A**
+4. After collecting name, phone, email, and insurance type, AI triggers `send_form_link` -> **WF-08** sends Google Form link via email
+5. After collecting key info, AI checks disqualification rules -> **WF-02 Sub-flow B**
+6. If not disqualified, AI checks hot lead thresholds -> **WF-02 Sub-flow C**
+7. If hot lead detected, triggers immediate transfer -> **WF-03**
 
 ### Step 3B: Existing Customer Flow (WF-04)
 1. AI collects the customer's request summary
@@ -459,6 +468,30 @@ Cron (every 30 min) -> Read Pending Tickets -> Filter Overdue (2+ hours) -> Send
 
 ---
 
+### WF-08: Email Form Sender
+
+| Property | Value |
+|----------|-------|
+| **n8n ID** | TBD |
+| **Webhook** | `POST /vapi-send-form` |
+| **Nodes** | 3 |
+| **Trigger** | VAPI `send_form_link` tool call |
+
+**What it does:** Sends a Google Form link to the caller via email after the AI has collected their name, phone number, email, and insurance type. Business hours only.
+
+**Flow:**
+```
+Webhook -> Build Email (caller_email + Google Form URL) -> Gmail Send Email -> Respond to VAPI
+```
+
+**Google Form URL:** `https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform`
+
+**Gmail Configuration:**
+- Uses Gmail OAuth2 credential (n8n ID: `Q1QMixyCKrZpc2Vl`)
+- Email body includes the Google Form link and a personalized message
+
+---
+
 ## 5. Google Sheets Data Model
 
 ### Leads Sheet
@@ -564,10 +597,11 @@ The AI must **NEVER**:
 - Claim affiliation with Equity Insurance in Tulsa, Oklahoma
 
 The AI must **ALWAYS**:
+- Disclose it is an AI assistant in the first greeting message
 - State non-affiliation with Equity Insurance in Tulsa, OK
 - Flag all AI-collected data with `VAPI_AI_COLLECTED`
 - Allow caller to press `#` at any time to reach a human
-- Double-check phone numbers (repeat back and confirm)
+- Double-check phone numbers (DTMF keypad or voice confirmation)
 - Ask callers to spell their names
 
 ### Business Hours
@@ -604,6 +638,45 @@ The AI must **ALWAYS**:
 | Voice ID | `sarah` (Female, Warm) |
 | Transcriber | Deepgram `scribe_v2_realtime` |
 | LLM | GPT-4o |
+| maxTokens | 500 |
+
+### Timing & Latency Parameters
+
+**stopSpeakingPlan** (when caller interrupts):
+
+| Parameter | Value |
+|-----------|-------|
+| numWords | 2 |
+| voiceSeconds | 0.2 |
+| backoffSeconds | 1.2 |
+
+**startSpeakingPlan** (when AI should start talking):
+
+| Parameter | Value |
+|-----------|-------|
+| waitSeconds | 0.6 |
+| onPunctuationSeconds | 0.4 |
+| onNoPunctuationSeconds | 1.5 |
+| onNumberSeconds | 0.8 |
+
+**Anti-looping prompt rules:**
+- Never repeat a question the caller has already answered
+- Never re-save duplicate info that was already saved via `save_field`
+- Continue immediately to the next question after a successful `save_field` call
+
+### Keypad Input (DTMF)
+
+```json
+{
+  "keypadInputPlan": {
+    "enabled": true,
+    "timeoutSeconds": 5,
+    "delimiters": ["#"]
+  }
+}
+```
+
+Phone number confirmation supports keypad digit entry. After the caller provides their phone number, the AI says: "I got [number] -- press 1 if that's correct, or 2 if I need to fix it. You can also just say yes or no."
 
 ### VAPI Tools (Function Calls)
 
@@ -614,6 +687,7 @@ The AI must **ALWAYS**:
 | `check_hot_lead` | WF-02 `/vapi-check-hotlead` | Check hot lead thresholds |
 | `route_existing_customer` | WF-04 `/vapi-existing-customer` | Handle existing customer requests |
 | `route_claim` | WF-05 `/vapi-claim` | Handle insurance claims |
+| `send_form_link` | WF-08 `/vapi-send-form` | Send Google Form link via email (business hours only) |
 
 ---
 
@@ -630,6 +704,7 @@ The AI must **ALWAYS**:
 | Hot lead transfer fails | Val's phone unavailable | System tries secondary number, then sends URGENT email |
 | Escalation emails not firing | WF-07 might be inactive | Activate WF-07 via n8n dashboard |
 | After hours voice wrong | WF-01 After Hours config | Check voice = `sarah`, transcriber = `scribe_v2_realtime` |
+| Form link email not sending | Gmail OAuth credential issue | Re-authenticate Gmail credential `Q1QMixyCKrZpc2Vl` in n8n |
 
 ### Checking Workflow Status
 
@@ -654,6 +729,7 @@ curl -s -X GET "https://solarexpresss.app.n8n.cloud/api/v1/executions?status=err
 | Google Sheets OAuth2 | `6jzp7PcmqFZb8sKc` | All Google Sheets operations |
 | Gmail OAuth2 | `P7kfjEjjwQs7JnSI` | All email notifications |
 | VAPI API Key | `BxJCvZZfiIkt90Ua` | Call transfers (WF-03, WF-05) |
+| Gmail OAuth2 (Form Sender) | `Q1QMixyCKrZpc2Vl` | Email form link (WF-08) |
 
 ---
 
@@ -719,6 +795,8 @@ WF-01 (routes call)
           +---> WF-02 (new customer data collection)
           |       |
           |       +---> WF-03 (hot lead transfer - sub-workflow)
+          |       |
+          |       +---> WF-08 (email form link via Gmail)
           |
           +---> WF-04 (existing customer ticket)
           |       |
@@ -741,3 +819,4 @@ After EVERY call:
 | `https://solarexpresss.app.n8n.cloud/webhook/vapi-existing-customer` | WF-04 |
 | `https://solarexpresss.app.n8n.cloud/webhook/vapi-claim` | WF-05 |
 | `https://solarexpresss.app.n8n.cloud/webhook/vapi-call-ended` | WF-06 |
+| `https://solarexpresss.app.n8n.cloud/webhook/vapi-send-form` | WF-08 |

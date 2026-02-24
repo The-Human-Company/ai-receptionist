@@ -85,6 +85,16 @@
       "nodeCount": 5,
       "active": false,
       "note": "Cron: */30 9-17 * * 1-5 Pacific/Honolulu (covers through 5:30pm)"
+    },
+    "wf08-sms-form-sender": {
+      "workflowId": "x63DDMX2na48SViA",
+      "sourceFile": "n8n-wf08-sms-form-sender.json",
+      "lastDeployed": null,
+      "name": "WF-08 Email Form Sender",
+      "nodeCount": 6,
+      "active": false,
+      "webhookPath": "/vapi-send-form",
+      "note": "Sends Google Form link via Gmail after collecting caller basic info. Uses existing Gmail OAuth credential."
     }
   }
 }

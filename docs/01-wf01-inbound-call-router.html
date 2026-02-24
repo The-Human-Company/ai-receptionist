@@ -111,7 +111,7 @@
         </li>
         <li>
             <strong>Business Hours Config</strong>
-            Returns full VAPI assistant configuration with: system prompt (12 rules, call flow, 12 data fields, policy questions, qualification checks, cross-sell, closing), 5 VAPI function tools (save_field, check_disqualifier, check_hot_lead, route_existing_customer, route_claim), ElevenLabs voice (Female, Warm), greeting message with Tulsa disclaimer.
+            Returns full VAPI assistant configuration with: system prompt (12 rules, call flow, 12 data fields, policy questions, qualification checks, cross-sell, closing, anti-looping rules), 6 VAPI function tools (save_field, check_disqualifier, check_hot_lead, route_existing_customer, route_claim, send_form_link), ElevenLabs voice (Female, Warm), greeting message with AI self-disclosure and Tulsa disclaimer, keypadInputPlan (enabled, timeoutSeconds: 5, delimiters: ["#"]), tuned timing parameters (stopSpeakingPlan: numWords 2, voiceSeconds 0.2, backoffSeconds 1.2; startSpeakingPlan: waitSeconds 0.6, onPunctuationSeconds 0.4, onNoPunctuationSeconds 1.5, onNumberSeconds 0.8), maxTokens: 500.
         </li>
         <li>
             <strong>After-Hours Config</strong>
@@ -153,6 +153,11 @@
                 <td>route_claim</td>
                 <td>/vapi-claim</td>
                 <td>Route claim calls</td>
+            </tr>
+            <tr>
+                <td>send_form_link</td>
+                <td>/vapi-send-form</td>
+                <td>Send Google Form link via email (business hours only)</td>
             </tr>
         </tbody>
     </table>
@@ -215,7 +220,7 @@
             <tr>
                 <td>Return Business Hours Config</td>
                 <td>n8n-nodes-base.respondToWebhook (v1.1)</td>
-                <td>JSON response: full VAPI assistant with GPT-4o (temp 0.3), ElevenLabs voice, system prompt, 5 function tools</td>
+                <td>JSON response: full VAPI assistant with GPT-4o (temp 0.3, maxTokens 500), ElevenLabs voice, AI self-disclosure in greeting, system prompt with anti-looping rules, 6 function tools, keypadInputPlan (enabled), tuned stopSpeakingPlan and startSpeakingPlan</td>
             </tr>
             <tr>
                 <td>Return After-Hours Config</td>
@@ -226,7 +231,7 @@
     </table>
 
     <footer>
-        Equity Insurance AI Receptionist &mdash; WF-01 Documentation &mdash; Generated 2026-02-14
+        Equity Insurance AI Receptionist &mdash; WF-01 Documentation &mdash; Updated 2026-02-25
     </footer>
 
 </body>

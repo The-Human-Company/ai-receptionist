@@ -382,6 +382,7 @@
   .wf-icon.wf5 { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
   .wf-icon.wf6 { background: var(--purple-bg); color: var(--purple); border-color: var(--purple); }
   .wf-icon.wf7 { background: var(--info-bg); color: var(--info); border-color: var(--info); }
+  .wf-icon.wf8 { background: var(--success-bg); color: var(--success); border-color: var(--success); }
 
   .wf-title { font-size: 22px; font-weight: 800; text-transform: uppercase; }
   .wf-subtitle { font-size: 14px; color: var(--text-dim); margin-top: 6px; font-weight: 700; }
@@ -672,15 +673,15 @@
   <p>Complete system documentation for Equity Insurance Inc.'s automated voice receptionist &mdash; powered by VAPI, n8n, and Google Workspace.</p>
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="num">7</div>
+      <div class="num">8</div>
       <div class="label">Workflows</div>
     </div>
     <div class="hero-stat">
-      <div class="num">75</div>
+      <div class="num">78</div>
       <div class="label">Nodes</div>
     </div>
     <div class="hero-stat">
-      <div class="num">7</div>
+      <div class="num">8</div>
       <div class="label">Webhooks</div>
     </div>
     <div class="hero-stat">
@@ -721,7 +722,7 @@
       </div>
       <div class="card">
         <h3>&#9881; Orchestration</h3>
-        <p><strong>n8n Cloud</strong> runs 7 automated workflows that handle all business logic: routing calls, saving data, checking rules, transferring calls, sending emails, and monitoring for escalations.</p>
+        <p><strong>n8n Cloud</strong> runs 8 automated workflows that handle all business logic: routing calls, saving data, checking rules, transferring calls, sending emails, emailing form links, and monitoring for escalations.</p>
       </div>
       <div class="card">
         <h3>&#128202; Data Storage</h3>
@@ -746,11 +747,12 @@
           <tr><td><strong>Phone System</strong></td><td>Talkroute</td><td>Main line +1 808-593-7746, forwards to VAPI</td></tr>
           <tr><td><strong>Voice AI</strong></td><td>VAPI.ai + ElevenLabs</td><td>Conversational AI with natural voice</td></tr>
           <tr><td><strong>Brain</strong></td><td>GPT-4o</td><td>Intent detection, data extraction, conversation flow</td></tr>
-          <tr><td><strong>Orchestration</strong></td><td>n8n Cloud</td><td>7 workflows, 75 nodes total</td></tr>
+          <tr><td><strong>Orchestration</strong></td><td>n8n Cloud</td><td>8 workflows, 78 nodes total</td></tr>
           <tr><td><strong>CRM</strong></td><td>QQ Catalyst</td><td>Primary CRM (integration pending)</td></tr>
           <tr><td><strong>Data Storage</strong></td><td>Google Sheets</td><td>Leads, Tickets, Analytics, Transcripts, Errors</td></tr>
           <tr><td><strong>Notifications</strong></td><td>Gmail</td><td>Team alerts for all call outcomes</td></tr>
           <tr><td><strong>Transcription</strong></td><td>ElevenLabs Scribe (scribe_v2_realtime)</td><td>Real-time speech-to-text</td></tr>
+          <tr><td><strong>Form Delivery</strong></td><td>Gmail</td><td>Sends Google Form link to callers via email (WF-08)</td></tr>
         </tbody>
       </table>
     </div>
@@ -900,7 +902,7 @@
 
       <!-- Row 2: AI Conversation -->
       <div class="flow-row">
-        <div class="flow-node vapi" style="min-width: 300px;">&#127908; AI Conversation Begins<br><small>"Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii..."</small></div>
+        <div class="flow-node vapi" style="min-width: 300px;">&#127908; AI Conversation Begins<br><small>"Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii... Just so you know, I'm an AI assistant here to help get things started..."</small></div>
       </div>
 
       <div class="flow-arrow-down">&darr;</div>
@@ -998,7 +1000,7 @@
         <!-- Greeting -->
         <div class="msg ai">
           <div class="sender">AI RECEPTIONIST</div>
-          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. Just so you know, I'm an AI assistant here to help get things started. How can I help you today?
         </div>
 
         <!-- Intent -->
@@ -1030,8 +1032,9 @@
         </div>
         <div class="msg ai">
           <div class="sender">AI RECEPTIONIST</div>
-          808-555-2001 &mdash; did I get that right?
+          I got 808-555-2001 &mdash; press 1 if that's correct, or 2 if I need to fix it. You can also just say yes or no.
         </div>
+        <div class="convo-action">&#128290; DTMF keypad input enabled &mdash; <code>keypadInputPlan: { enabled: true, timeoutSeconds: 5, delimiters: ["#"] }</code></div>
         <div class="msg user">
           <div class="sender">CALLER</div>
           Yep, that's it.
@@ -1111,6 +1114,13 @@
           Oh that's so kind, we appreciate that!
         </div>
         <div class="convo-action success">&#128190; <code>save_field</code> &rarr; WF-02 &rarr; Google Sheets: <strong>referral_source = Coworker referral</strong></div>
+
+        <!-- Email Form Link -->
+        <div class="convo-action success">&#128231; <code>send_form_link</code> &rarr; WF-08 &rarr; Gmail: Google Form link emailed to <strong>sarah.tanaka@gmail.com</strong></div>
+        <div class="msg ai">
+          <div class="sender">AI RECEPTIONIST</div>
+          By the way, I just sent you an email with a link to a short form. If you get a chance to fill it out, it'll help Val get your quote ready even faster.
+        </div>
 
         <!-- 9. Shopping Reason -->
         <div class="msg ai">
@@ -1232,7 +1242,7 @@
       <div class="convo-body">
         <div class="msg ai">
           <div class="sender">AI RECEPTIONIST</div>
-          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. Just so you know, I'm an AI assistant here to help get things started. How can I help you today?
         </div>
         <div class="msg user">
           <div class="sender">CALLER</div>
@@ -1299,7 +1309,7 @@
       <div class="convo-body">
         <div class="msg ai">
           <div class="sender">AI RECEPTIONIST</div>
-          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii &mdash; not affiliated with Equity Insurance in Tulsa, Oklahoma. Just so you know, I'm an AI assistant here to help get things started. How can I help you today?
         </div>
         <div class="msg user">
           <div class="sender">CALLER</div>
@@ -1362,7 +1372,7 @@
       <div class="convo-body">
         <div class="msg ai">
           <div class="sender">AI RECEPTIONIST</div>
-          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We're currently closed &mdash; our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I can take a message and have someone call you back. May I have your name?
+          Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We're currently closed &mdash; our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I'm an AI assistant, but I can take a message and have someone call you back. May I have your name?
         </div>
         <div class="msg user">
           <div class="sender">CALLER</div>
@@ -1448,6 +1458,13 @@
             <td>WF-05</td>
             <td>Business + After Hours</td>
           </tr>
+          <tr>
+            <td><code>send_form_link</code></td>
+            <td><code>/vapi-send-form</code></td>
+            <td>Sends Google Form link via email after name, phone, email, &amp; type collected</td>
+            <td>WF-08</td>
+            <td>Business Hours only</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1458,7 +1475,7 @@
 <section id="workflows">
   <div class="container">
     <div class="section-label">Automation Engine</div>
-    <div class="section-title">All 7 Workflows</div>
+    <div class="section-title">All 8 Workflows</div>
     <div class="section-desc">Each workflow handles a specific part of the call lifecycle. All run on n8n Cloud.</div>
 
     <div class="wf-grid">
@@ -1606,6 +1623,25 @@ C) /vapi-check-hotlead
         <div class="wf-tags">
           <span class="wf-tag cron">cron schedule</span>
           <span class="wf-tag sheets">Tickets Sheet</span>
+          <span class="wf-tag gmail">Gmail</span>
+        </div>
+      </div>
+
+      <!-- WF-08 -->
+      <div class="wf-card">
+        <div class="wf-header">
+          <div class="wf-icon wf8">08</div>
+          <div>
+            <div class="wf-title">Email Form Sender</div>
+            <div class="wf-subtitle">3 nodes &bull; Gmail</div>
+          </div>
+        </div>
+        <div class="wf-body">Sends a Google Form link to callers via email after the AI collects their name, phone, email, and insurance type. Business hours only. The form allows callers to provide additional details at their convenience.</div>
+        <div class="wf-flow">Webhook (/vapi-send-form) &#10132; Build Email
+  &#10132; Gmail Send Email (Google Form link)
+  &#10132; Respond to VAPI</div>
+        <div class="wf-tags">
+          <span class="wf-tag webhook">webhook</span>
           <span class="wf-tag gmail">Gmail</span>
         </div>
       </div>
@@ -2017,10 +2053,11 @@ C) /vapi-check-hotlead
         <div>
           <h4 style="color: var(--success); font-size: 14px; margin-bottom: 8px;">AI Must ALWAYS:</h4>
           <ul style="list-style: none; font-size: 13px; color: var(--text-dim);">
+            <li style="padding: 3px 0;">&#9989; Disclose it is an AI assistant in the first greeting</li>
             <li style="padding: 3px 0;">&#9989; State non-affiliation with Tulsa entity</li>
             <li style="padding: 3px 0;">&#9989; Flag data with VAPI_AI_COLLECTED</li>
             <li style="padding: 3px 0;">&#9989; Allow # key press for human transfer</li>
-            <li style="padding: 3px 0;">&#9989; Double-check phone numbers and spelling</li>
+            <li style="padding: 3px 0;">&#9989; Double-check phone numbers (DTMF or voice confirmation)</li>
           </ul>
         </div>
       </div>
@@ -2086,7 +2123,7 @@ C) /vapi-check-hotlead
   <div class="container">
     <p><strong>Equity Insurance Inc.</strong> &bull; AI Receptionist System Documentation</p>
     <p style="margin-top: 4px;">Powered by VAPI.ai &bull; n8n Cloud &bull; Google Workspace &bull; Built February 2026</p>
-    <p style="margin-top: 4px; opacity: 0.5;">All 7 workflows active &bull; 26/26 tests passing &bull; System operational</p>
+    <p style="margin-top: 4px; opacity: 0.5;">All 8 workflows active &bull; 26/26 tests passing &bull; System operational</p>
   </div>
 </footer>
 

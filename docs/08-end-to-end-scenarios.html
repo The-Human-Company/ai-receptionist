@@ -339,15 +339,17 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <h4>Conversation</h4>
 <ul class="dialog">
   <li class="system"><span class="label">System</span>Phone rings at Equity Insurance main line (+1 808-593-7746). Talkroute forwards to VAPI. WF-01 returns assistant config via webhook.</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! My name is the virtual assistant for Equity Insurance Inc. here in Honolulu. We are always of service. How can I help you today?</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance here in Honolulu! Just so you know, I'm an AI assistant here to help get things started. We are not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?</li>
   <li class="caller"><span class="label">Caller</span>Hi, I'm looking to get a quote on home insurance. My current rate just went way up.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>I'd be happy to help you get a competitive home insurance quote! Let me collect some information so our agent Val can put together the best options for you. First, may I have your full name? And could you spell it for me?</li>
   <li class="caller"><span class="label">Caller</span>Sarah Tanaka. S-A-R-A-H, T-A-N-A-K-A.</li>
   <li class="system"><span class="label">System</span>VAPI calls <strong>save_field</strong> tool &#8594; WF-02 webhook /vapi-save-field &#8594; Writes "full_name: Sarah Tanaka" to Google Sheets Leads row with VAPI_AI_COLLECTED flag</li>
   <li class="ai"><span class="label">AI (VAPI)</span>Thank you, Sarah! And what's the best phone number to reach you?</li>
   <li class="caller"><span class="label">Caller</span>808-555-0142.</li>
-  <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves phone, repeats back for confirmation</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>That's 808-555-0142, is that correct? Great. And what's your email address? We'll need that to send you the quote.</li>
+  <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves phone. DTMF keypadInputPlan enabled (timeoutSeconds: 5, delimiters: ["#"])</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>I got 808-555-0142 &mdash; press 1 if that's correct, or 2 if I need to fix it. You can also just say yes or no.</li>
+  <li class="caller"><span class="label">Caller</span>Yes, that's right.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Great. And what's your email address? We'll need that to send you the quote.</li>
   <li class="caller"><span class="label">Caller</span>sarah.tanaka@gmail.com</li>
   <li class="system"><span class="label">System</span>save_field &#8594; WF-02: Saves email (REQUIRED field)</li>
   <li class="ai"><span class="label">AI (VAPI)</span>Perfect. What's your mailing address?</li>
@@ -362,7 +364,8 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
   <li class="caller"><span class="label">Caller</span>Mainly home, but I'd be open to bundling auto if the price is right.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>Absolutely, bundling can often save you money. How did you hear about Equity Insurance?</li>
   <li class="caller"><span class="label">Caller</span>My neighbor recommended you.</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>That's wonderful! And why are you shopping for insurance right now — was it just the rate increase on renewal?</li>
+  <li class="system"><span class="label">System</span>VAPI calls <strong>send_form_link</strong> &#8594; WF-08: Name, phone, email, and insurance type collected. Google Form link emailed to sarah.tanaka@gmail.com.</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>That's wonderful! By the way, I just sent you an email with a link to a short form. If you get a chance to fill it out, it'll help Val get your quote ready even faster. Now, why are you shopping for insurance right now — was it just the rate increase on renewal?</li>
   <li class="caller"><span class="label">Caller</span>Yeah, my renewal went up about 30% and I want to see what else is out there.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>That's understandable. Who is your current carrier, and do you know roughly what you're paying now?</li>
   <li class="caller"><span class="label">Caller</span>I'm with First Insurance, paying about $3,200 a year now.</li>
@@ -420,7 +423,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <h4>Conversation</h4>
 <ul class="dialog">
   <li class="system"><span class="label">System</span>Call comes in at 10:30am HST (Tuesday). Standard flow through Talkroute &#8594; VAPI &#8594; WF-01.</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! How can I help you today?</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance in Honolulu! Just so you know, I'm an AI assistant here to help get things started. How can I help you today?</li>
   <li class="caller"><span class="label">Caller</span>I need to get home insurance for my property in Kahala. It's a beachfront home.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>I'd love to help with that! Let me gather some details. Could I get your full name?</li>
   <li class="caller"><span class="label">Caller</span>James Wong. J-A-M-E-S W-O-N-G.</li>
@@ -467,7 +470,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <h4>Conversation</h4>
 <ul class="dialog">
   <li class="system"><span class="label">System</span>Call arrives at 2:15pm HST. Talkroute &#8594; VAPI &#8594; WF-01.</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! How can I help you today?</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance in Honolulu! Just so you know, I'm an AI assistant here to help get things started. How can I help you today?</li>
   <li class="caller"><span class="label">Caller</span>Hi, I'm already a customer. I just bought a new car and need to add it to my policy.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>Congratulations on the new car! I'd be happy to help get that process started. Could I have your name?</li>
   <li class="caller"><span class="label">Caller</span>Mike Pham.</li>
@@ -518,7 +521,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <h4>Conversation</h4>
 <ul class="dialog">
   <li class="system"><span class="label">System</span>Call arrives at 11:45am HST. Standard routing through to VAPI.</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! How can I help you today?</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance in Honolulu! Just so you know, I'm an AI assistant here to help get things started. How can I help you today?</li>
   <li class="caller"><span class="label">Caller</span>I need to file a claim. I was in a car accident this morning.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>I'm sorry to hear about the accident, Lisa. I hope you're okay. Let me get the details so we can get this handled right away. First, may I have your name?</li>
   <li class="caller"><span class="label">Caller</span>Lisa Nakamura.</li>
@@ -569,7 +572,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <h4>Conversation</h4>
 <ul class="dialog">
   <li class="system"><span class="label">System</span>Call arrives at 7:30pm HST. After business hours (past 5pm). VAPI answers — WF-01 returns after-hours assistant config.</li>
-  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance! Our office is currently closed — our hours are Monday through Friday, 9am to 5pm Hawaii time. However, I can still help you. How can I assist?</li>
+  <li class="ai"><span class="label">AI (VAPI)</span>Aloha and thank you for calling Equity Insurance in Honolulu! Our office is currently closed &mdash; our hours are Monday through Friday, 9am to 5pm Hawaii time. I'm an AI assistant, but I can take a message and have someone call you back. How can I assist?</li>
   <li class="caller"><span class="label">Caller</span>I have an emergency — there's a burst pipe at my rental property and there's water everywhere.</li>
   <li class="ai"><span class="label">AI (VAPI)</span>I'm sorry to hear that. Let me get the details documented right away so our team can follow up first thing in the morning. What's your name?</li>
   <li class="caller"><span class="label">Caller</span>Tom Reyes.</li>
@@ -743,12 +746,17 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
       <td><strong>WF-07</strong> Escalation Monitor</td>
       <td>Checks for pending tickets &gt;2hrs old, escalates to Davin</td>
     </tr>
+    <tr>
+      <td>Name, phone, email, and insurance type collected</td>
+      <td><strong>WF-08</strong> Email Form Sender</td>
+      <td>Sends Google Form link via email (business hours only)</td>
+    </tr>
   </tbody>
 </table>
 
 <footer>
   Equity Insurance AI Receptionist &mdash; End-to-End Scenario Documentation<br/>
-  Generated February 2026 &bull; 7 Workflows &bull; All scenarios based on deployed n8n automation
+  Updated February 25, 2026 &bull; 8 Workflows &bull; All scenarios based on deployed n8n automation
 </footer>
 
 </body>

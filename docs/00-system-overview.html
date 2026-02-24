@@ -32,10 +32,10 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <body>
 
 <h1>Equity Insurance AI Receptionist</h1>
-<p class="subtitle">System Architecture Overview &mdash; 7-Workflow n8n Automation</p>
+<p class="subtitle">System Architecture Overview &mdash; 8-Workflow n8n Automation</p>
 
 <h2>System Architecture</h2>
-<p>The AI Receptionist is a voice-powered call handling system for Equity Insurance Inc., a 3rd-generation family-owned insurance agency in Honolulu, Hawaii. Inbound calls on the main line (+1 808-593-7746) are routed through Talkroute to VAPI.ai, which handles voice interaction and LLM processing. n8n orchestrates all backend automation across 7 specialized workflows.</p>
+<p>The AI Receptionist is a voice-powered call handling system for Equity Insurance Inc., a 3rd-generation family-owned insurance agency in Honolulu, Hawaii. Inbound calls on the main line (+1 808-593-7746) are routed through Talkroute to VAPI.ai, which handles voice interaction and LLM processing. Both assistants announce they are AI in their first greeting. n8n orchestrates all backend automation across 8 specialized workflows.</p>
 
 <div class="diagram">
 <svg width="960" height="520" viewBox="0 0 960 520">
@@ -153,6 +153,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <tr><td><strong>WF-05</strong> Claims Router</td><td><span class="badge badge-webhook">Webhook</span></td><td>7</td><td>/vapi-claim</td><td>Routes claims with transfer during hours</td></tr>
 <tr><td><strong>WF-06</strong> Post-Call Processor</td><td><span class="badge badge-webhook">Webhook</span></td><td>15</td><td>/vapi-call-ended</td><td>Merges data, CRM write, email summary, analytics</td></tr>
 <tr><td><strong>WF-07</strong> Escalation Monitor</td><td><span class="badge badge-cron">Cron</span></td><td>5</td><td>&mdash;</td><td>Every 30min: checks overdue tickets, escalates to Davin</td></tr>
+<tr><td><strong>WF-08</strong> Email Form Sender</td><td><span class="badge badge-webhook">Webhook</span></td><td>3</td><td>/vapi-send-form</td><td>Sends Google Form link via email after collecting name, phone, email, type</td></tr>
 </table>
 
 <h2>Call Flow — Three Branches</h2>
@@ -232,6 +233,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 <tr><td>Data Store</td><td>Google Sheets (4 sheets)</td><td>Leads, Tickets, Analytics, Errors</td></tr>
 <tr><td>CRM</td><td>QQ Catalyst (pending)</td><td>Primary CRM with migration flag VAPI_AI_COLLECTED</td></tr>
 <tr><td>Notifications</td><td>SMTP Email</td><td>Val and Davin alerts with priority levels</td></tr>
+<tr><td>Form Delivery</td><td>Gmail</td><td>Sends Google Form link to callers via email (WF-08)</td></tr>
 <tr><td>Timezone</td><td>Pacific/Honolulu (HST)</td><td>UTC-10, no daylight saving, business hours 9am-5pm Mon-Fri</td></tr>
 </table>
 
@@ -265,7 +267,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; fon
 </table>
 
 <footer>
-Equity Insurance AI Receptionist &mdash; System Documentation &mdash; Generated 2026-02-14
+Equity Insurance AI Receptionist &mdash; System Documentation &mdash; Updated 2026-02-25
 </footer>
 
 </body>

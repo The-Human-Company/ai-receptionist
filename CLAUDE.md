@@ -8,6 +8,7 @@ Building a VAPI-powered AI receptionist for **Equity Insurance Inc.** (Davin Cha
 - **Orchestration:** n8n (workflow automation)
 - **Phone System:** Talkroute (mainline with extensions/directory)
 - **CRM:** QQ Catalyst (primary), Levitate AI (marketing/retention)
+- **SMS:** Twilio (outbound SMS for Google Form links)
 - **Language:** JavaScript/Node.js (n8n Code nodes)
 
 ## Key Architecture
@@ -15,11 +16,22 @@ Building a VAPI-powered AI receptionist for **Equity Insurance Inc.** (Davin Cha
 Talkroute -> VAPI.ai (voice + LLM) -> n8n (orchestrator) -> QQ Catalyst + Email + Levitate
 ```
 
-### n8n Workflows
-1. **VAPI Call Handler** (`n8n-workflow-vapi-call-handler.json`) - Main webhook handler for all VAPI events
-2. **Notifications** (`n8n-workflow-notifications.json`) - Email alerts + 2hr escalation to Davin
-3. **CRM Sync** (TBD) - Push lead data to QQ Catalyst with migration flags
-4. **After-Hours** (TBD) - Handle calls outside 9am-5pm HST
+### n8n Workflows (8 Active)
+
+| WF | Name | File | Webhook |
+| ---- | ------ | ------ | --------- |
+| WF-01 | Inbound Call Router | `n8n-wf01-inbound-call-router.json` | `/vapi-call-started` |
+| WF-02 | New Customer P&C Intake | `n8n-wf02-new-customer-intake.json` | `/vapi-save-field`, `/vapi-check-disqualifier`, `/vapi-check-hotlead` |
+| WF-03 | Hot Lead Transfer | `n8n-wf03-hot-lead-transfer.json` | Sub-workflow |
+| WF-04 | Existing Customer | `n8n-wf04-existing-customer.json` | `/vapi-existing-customer` |
+| WF-05 | Claims Router | `n8n-wf05-claims-router.json` | `/vapi-claim` |
+| WF-06 | Post-Call Processor | `n8n-wf06-post-call-processor.json` | `/vapi-call-ended` |
+| WF-07 | Escalation Monitor | `n8n-wf07-escalation-monitor.json` | Cron schedule |
+| WF-08 | SMS Form Sender | `n8n-wf08-sms-form-sender.json` | `/vapi-send-form` |
+
+Legacy (kept as backup):
+- **VAPI Call Handler** (`n8n-workflow-vapi-call-handler.json`) - Original monolithic workflow
+- **Notifications** (`n8n-workflow-notifications.json`) - Original notification workflow
 
 ### Call Flow (3 Branches)
 - **New Customer:** Classify -> Collect Data -> Check Disqualifiers -> Check Hot Lead -> Save -> Notify

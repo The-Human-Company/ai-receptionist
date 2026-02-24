@@ -1,0 +1,185 @@
+{
+  "name": "WF-08 Email Form Sender",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-send-form",
+        "authentication": "none",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf08-webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "vapi-send-form"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "call_id",
+              "name": "call_id",
+              "value": "={{ $json.message.toolCallList[0].function.arguments.call_id || $json.message.call.id || 'unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "caller_name",
+              "name": "caller_name",
+              "value": "={{ $json.message.toolCallList[0].function.arguments.caller_name || 'Valued Caller' }}",
+              "type": "string"
+            },
+            {
+              "id": "caller_email",
+              "name": "caller_email",
+              "value": "={{ $json.message.toolCallList[0].function.arguments.caller_email || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf08-extract-params",
+      "name": "Extract Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build email body with Google Form link\nconst callerName = items[0].json.caller_name || 'there';\nconst callerEmail = items[0].json.caller_email || '';\nconst callId = items[0].json.call_id || '';\n\n// Google Form public URL\nconst FORM_URL = 'https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform';\n\nconst emailSubject = 'Equity Insurance - Your Quote Form';\n\nconst emailBody = `<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n  <h2 style=\"color: #2c5282;\">Aloha ${callerName}!</h2>\n  <p>Thank you for calling Equity Insurance. As discussed, here's the link to our quick quote form to help our agent get your quote together even faster:</p>\n  <p style=\"text-align: center; margin: 30px 0;\">\n    <a href=\"${FORM_URL}\" style=\"background-color: #2c5282; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-size: 16px;\">Fill Out Quote Form</a>\n  </p>\n  <p>Or copy and paste this link: <a href=\"${FORM_URL}\">${FORM_URL}</a></p>\n  <p>If you have any questions, don't hesitate to call us back at <strong>(808) 593-7746</strong>.</p>\n  <p>Mahalo!<br>The Equity Insurance Team<br>Honolulu, Hawaii</p>\n</div>`;\n\nreturn [{\n  json: {\n    to: callerEmail,\n    subject: emailSubject,\n    body: emailBody,\n    call_id: callId,\n    caller_name: callerName,\n    form_url: FORM_URL\n  }\n}];"
+      },
+      "id": "wf08-build-email",
+      "name": "Build Email Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        710,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "wf08-send-email",
+      "name": "Send Email via Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        940,
+        300
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q1QMixyCKrZpc2Vl",
+          "name": "Gmail - Equity Insurance"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"results\": [\n    {\n      \"toolCallId\": \"{{ $('Webhook Trigger').item.json.message.toolCallList[0].id }}\",\n      \"result\": \"Email sent successfully to {{ $('Extract Params').item.json.caller_email }}. The Google Form link has been emailed to the caller.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "wf08-respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1170,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"results\": [\n    {\n      \"toolCallId\": \"{{ $('Webhook Trigger').item.json.message.toolCallList[0].id }}\",\n      \"result\": \"Email could not be sent at this time, but the caller's information has been saved. An agent will follow up with the form link.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "wf08-respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1170,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Params": {
+      "main": [
+        [
+          {
+            "node": "Build Email Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email Body": {
+      "main": [
+        [
+          {
+            "node": "Send Email via Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email via Gmail": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null
+}

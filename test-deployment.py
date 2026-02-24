@@ -155,7 +155,7 @@ if 'WF-01' in workflows:
         test('WF-01 biz-hours: has check_hot_lead tool', 'check_hot_lead' in body)
         test('WF-01 biz-hours: voice provider=11labs', '11labs' in body)
         test('WF-01 biz-hours: model=gpt-4o', 'gpt-4o' in body)
-        test('WF-01 biz-hours: temperature=0.3', '0.3' in body)
+        test('WF-01 biz-hours: temperature=0.5', '0.5' in body)
         test('WF-01 biz-hours: data collection order specified', 'DATA COLLECTION FOR NEW P&C CUSTOMERS' in body)
         test('WF-01 biz-hours: has route_existing_customer tool', 'route_existing_customer' in body)
         test('WF-01 biz-hours: has route_claim tool', 'route_claim' in body)

@@ -152,6 +152,24 @@ tool_route_claim = {
     'server': {'url': f'{N8N_BASE}/vapi-claim'}
 }
 
+tool_send_form_link = {
+    'type': 'function',
+    'function': {
+        'name': 'send_form_link',
+        'description': 'Email the caller a link to the insurance quote form after collecting their basic info (name, phone, email, insurance type).',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'call_id': {'type': 'string', 'description': 'The unique call identifier'},
+                'caller_name': {'type': 'string', 'description': "The caller's name"},
+                'caller_email': {'type': 'string', 'description': "The caller's email address to send the form link to"}
+            },
+            'required': ['call_id', 'caller_name', 'caller_email']
+        }
+    },
+    'server': {'url': f'{N8N_BASE}/vapi-send-form'}
+}
+
 tool_route_claim_ah = {
     'type': 'function',
     'function': {
@@ -178,16 +196,19 @@ shared_behavior = {
     'dialKeypadFunctionEnabled': True,
     'serverUrl': f'{N8N_BASE}/vapi-call-ended',
     'stopSpeakingPlan': {
-        'numWords': 3, 'voiceSeconds': 0.3, 'backoffSeconds': 1.0,
+        'numWords': 2, 'voiceSeconds': 0.2, 'backoffSeconds': 1.2,
         'acknowledgementPhrases': ['okay','got it','mm-hmm','uh-huh','right','sure','yep'],
         'interruptionPhrases': ['wait','hold on','stop','actually','excuse me']
     },
     'startSpeakingPlan': {
-        'waitSeconds': 1.2,
+        'waitSeconds': 0.6,
         'smartEndpointingPlan': {'provider': 'livekit'},
         'transcriptionEndpointingPlan': {
-            'onPunctuationSeconds': 0.6, 'onNoPunctuationSeconds': 2.2, 'onNumberSeconds': 1.5
+            'onPunctuationSeconds': 0.4, 'onNoPunctuationSeconds': 1.5, 'onNumberSeconds': 0.8
         }
+    },
+    'keypadInputPlan': {
+        'enabled': True, 'timeoutSeconds': 5, 'delimiters': ['#']
     },
     'backchannelingEnabled': False,
     'silenceTimeoutSeconds': 30,
@@ -219,11 +240,11 @@ def create_assistant(config):
 # === Create Business Hours Assistant ===
 biz_config = {
     'name': 'Equity Insurance - Business Hours',
-    'firstMessage': 'Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii -- not affiliated with Equity Insurance in Tulsa, Oklahoma. How can I help you today?',
+    'firstMessage': 'Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii -- not affiliated with Equity Insurance in Tulsa, Oklahoma. Just so you know, I\'m an AI assistant here to help get things started. How can I help you today?',
     'model': {
-        'provider': 'openai', 'model': 'gpt-4o', 'temperature': 0.5, 'maxTokens': 300,
+        'provider': 'openai', 'model': 'gpt-4o', 'temperature': 0.5, 'maxTokens': 500,
         'messages': [{'role': 'system', 'content': biz_prompt}],
-        'tools': [tool_save_field_biz, tool_check_disqualifier, tool_check_hot_lead, tool_route_existing, tool_route_claim]
+        'tools': [tool_save_field_biz, tool_check_disqualifier, tool_check_hot_lead, tool_route_existing, tool_route_claim, tool_send_form_link]
     },
     'voice': shared_voice_biz,
     'transcriber': shared_transcriber,
@@ -243,9 +264,9 @@ print()
 # === Create After Hours Assistant ===
 ah_config = {
     'name': 'Equity Insurance - After Hours',
-    'firstMessage': 'Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We are currently closed -- our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I can take a message and have someone call you back. May I have your name?',
+    'firstMessage': 'Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We\'re currently closed -- our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I\'m an AI assistant, but I can take a message and have someone call you back. May I have your name?',
     'model': {
-        'provider': 'openai', 'model': 'gpt-4o', 'temperature': 0.5, 'maxTokens': 300,
+        'provider': 'openai', 'model': 'gpt-4o', 'temperature': 0.5, 'maxTokens': 500,
         'messages': [{'role': 'system', 'content': ah_prompt}],
         'tools': [tool_save_field_ah, tool_route_claim_ah]
     },
