@@ -18,17 +18,20 @@ shared_voice_biz = {
     'provider': '11labs', 'voiceId': 'EXAVITQu4vr4xnSDxMaL',
     'stability': 0.55, 'similarityBoost': 0.8, 'style': 0.45, 'speed': 0.92,
     'useSpeakerBoost': True, 'model': 'eleven_turbo_v2_5',
-    'chunkPlan': {'enabled': True, 'minCharacters': 80}
+    'chunkPlan': {'enabled': True, 'minCharacters': 30}
 }
 shared_voice_ah = {
     'provider': '11labs', 'voiceId': 'sarah',
     'stability': 0.55, 'similarityBoost': 0.8, 'style': 0.45, 'speed': 0.92,
     'useSpeakerBoost': True, 'model': 'eleven_turbo_v2_5',
-    'chunkPlan': {'enabled': True, 'minCharacters': 80}
+    'chunkPlan': {'enabled': True, 'minCharacters': 30}
 }
 shared_transcriber = {
-    'provider': '11labs', 'model': 'scribe_v2_realtime',
-    'language': 'en', 'silenceThresholdSeconds': 0.3
+    'provider': 'deepgram', 'model': 'nova-3',
+    'language': 'en', 'smartFormat': True,
+    'keywords': ['Equity:2', 'Honolulu:2', 'Hawaii:2', 'Tulsa:1', 'Oklahoma:1',
+                 'renters:1', 'homeowners:1', 'auto:1', 'liability:1', 'deductible:1',
+                 'premium:1', 'VIN:2', 'lienholder:2', 'Davin:2', 'Val:1']
 }
 
 # Tool definitions
@@ -42,12 +45,11 @@ tool_save_field_biz = {
             'properties': {
                 'call_id': {'type': 'string', 'description': 'The unique call identifier'},
                 'field_name': {'type': 'string', 'enum': [
-                    'caller_name','caller_phone','caller_email','caller_address','caller_dob','caller_occupation',
-                    'policy_type','referral_source','claims_count','claims_details','urgency_timeline','current_coverage','shopping_reason',
-                    'auto_vehicle_info','auto_vin','auto_lien_type','auto_lienholder','auto_violations','auto_household_drivers','auto_title_names',
-                    'renter_address','renter_possessions_value','renter_mgmt_company','renter_addl_insured',
-                    'property_address','property_first_buyer','property_value','property_coverage_needs','property_policy_age',
-                    'biz_name','biz_ein','biz_start_date','biz_revenue','biz_industry','biz_contact','cross_sell_interest','cross_sell_types'
+                    'caller_name','caller_phone','caller_address','caller_dob','caller_occupation',
+                    'policy_type','auto_vehicle_info','auto_vin','auto_violations',
+                    'home_owner_or_renter','home_property_address','home_claims_losses','home_property_type',
+                    'biz_name','biz_ein','biz_start_date','biz_revenue','biz_industry','biz_contact',
+                    'claims_count','claims_details'
                 ]},
                 'field_value': {'type': 'string', 'description': 'The value collected from the caller'}
             },
@@ -152,24 +154,6 @@ tool_route_claim = {
     'server': {'url': f'{N8N_BASE}/vapi-claim'}
 }
 
-tool_send_form_link = {
-    'type': 'function',
-    'function': {
-        'name': 'send_form_link',
-        'description': 'Email the caller a link to the insurance quote form after collecting their basic info (name, phone, email, insurance type).',
-        'parameters': {
-            'type': 'object',
-            'properties': {
-                'call_id': {'type': 'string', 'description': 'The unique call identifier'},
-                'caller_name': {'type': 'string', 'description': "The caller's name"},
-                'caller_email': {'type': 'string', 'description': "The caller's email address to send the form link to"}
-            },
-            'required': ['call_id', 'caller_name', 'caller_email']
-        }
-    },
-    'server': {'url': f'{N8N_BASE}/vapi-send-form'}
-}
-
 tool_route_claim_ah = {
     'type': 'function',
     'function': {
@@ -201,10 +185,10 @@ shared_behavior = {
         'interruptionPhrases': ['wait','hold on','stop','actually','excuse me']
     },
     'startSpeakingPlan': {
-        'waitSeconds': 0.6,
+        'waitSeconds': 0.4,
         'smartEndpointingPlan': {'provider': 'livekit'},
         'transcriptionEndpointingPlan': {
-            'onPunctuationSeconds': 0.4, 'onNoPunctuationSeconds': 1.5, 'onNumberSeconds': 0.8
+            'onPunctuationSeconds': 0.3, 'onNoPunctuationSeconds': 1.2, 'onNumberSeconds': 0.6
         }
     },
     'keypadInputPlan': {
@@ -242,9 +226,9 @@ biz_config = {
     'name': 'Equity Insurance - Business Hours',
     'firstMessage': 'Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii -- not affiliated with Equity Insurance in Tulsa, Oklahoma. Just so you know, I\'m an AI assistant here to help get things started. How can I help you today?',
     'model': {
-        'provider': 'openai', 'model': 'gpt-4o', 'temperature': 0.5, 'maxTokens': 500,
+        'provider': 'openai', 'model': 'gpt-4o-mini', 'temperature': 0.5, 'maxTokens': 300,
         'messages': [{'role': 'system', 'content': biz_prompt}],
-        'tools': [tool_save_field_biz, tool_check_disqualifier, tool_check_hot_lead, tool_route_existing, tool_route_claim, tool_send_form_link]
+        'tools': [tool_save_field_biz, tool_check_disqualifier, tool_check_hot_lead, tool_route_existing, tool_route_claim]
     },
     'voice': shared_voice_biz,
     'transcriber': shared_transcriber,
@@ -266,7 +250,7 @@ ah_config = {
     'name': 'Equity Insurance - After Hours',
     'firstMessage': 'Aloha, thank you for calling Equity Insurance in Honolulu, Hawaii. We\'re currently closed -- our business hours are 9 AM to 5 PM Hawaii time, Monday through Friday. I\'m an AI assistant, but I can take a message and have someone call you back. May I have your name?',
     'model': {
-        'provider': 'openai', 'model': 'gpt-4o', 'temperature': 0.5, 'maxTokens': 500,
+        'provider': 'openai', 'model': 'gpt-4o-mini', 'temperature': 0.5, 'maxTokens': 300,
         'messages': [{'role': 'system', 'content': ah_prompt}],
         'tools': [tool_save_field_ah, tool_route_claim_ah]
     },

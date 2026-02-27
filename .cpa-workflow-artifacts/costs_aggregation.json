@@ -1,7 +1,7 @@
 {
   "created_date": "2026-02-21T00:11:46.376180+00:00",
-  "last_update": "2026-02-24T18:52:46.477806+00:00",
-  "session_count": 6,
+  "last_update": "2026-02-26T17:07:10.334044+00:00",
+  "session_count": 8,
   "total_tokens": {
     "input": 23342,
     "output": 2397,
@@ -47,6 +47,18 @@
     {
       "session_id": "c73f9dda-a0dd-4e9b-af3d-4854e54b34f6",
       "date": "2026-02-24T18:52:46.470163+00:00",
+      "duration": null,
+      "cost_usd": 0
+    },
+    {
+      "session_id": "87bc6810-4294-4a43-96cb-26383b0b85c4",
+      "date": "2026-02-24T19:46:19.724103+00:00",
+      "duration": null,
+      "cost_usd": 0
+    },
+    {
+      "session_id": "d3b448e6-45b0-4085-9042-ff994219fabe",
+      "date": "2026-02-26T17:07:10.323520+00:00",
       "duration": null,
       "cost_usd": 0
     }
