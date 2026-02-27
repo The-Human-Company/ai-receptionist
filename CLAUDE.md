@@ -52,15 +52,32 @@ Legacy (kept as backup):
 - **Val Char** - P&C Agent, Davin's mother (+1 808 780 0473, val@equityinsurance.services)
 - **Domain:** equityinsurance.services
 
-## Data Fields (Quote Collection Order)
-1. Full Name (ask to spell)
-2. Phone Number (repeat back, confirm)
-3. Email Address (for sending quote)
-4. Mailing Address (double-check spelling)
-5. Date of Birth
-6. Occupation (qualifies for P&C credits)
-7. Insurance Type
-8. Referral Source
+## Data Fields — Auto Insurance (Collection Order)
+1. Phone Number — via caller ID confirmation ("Is the best number to reach you the one you're calling from?"), press 1/yes to confirm. If not, collect and repeat back for confirmation.
+2. Full Name — with last name spelling, read back for confirmation
+3. Date of Birth — with confirmation
+4. VIN — they won't always have it (numbers captured better than letters); fall back to make/model/year if unavailable
+5. Profession — 4-year degree affects quotes
+6. Accidents or violations in last 5 years — good to have
+7. **SMS form sent** (must) — via Email-to-SMS gateway
+
+## Data Fields — Home Insurance (Collection Order)
+1. Phone Number — same caller ID confirmation flow
+2. Full Name — with spelling confirmation
+3. Date of Birth — with confirmation
+4. Profession
+5. Owner or Renter
+6. Property Address — key info, needs confirmation
+7. Claims or losses in last 5 years
+8. Property Type — Condo, Single Family Home, other
+9. **SMS form sent** (must) — via Email-to-SMS gateway
+
+## SMS Delivery Method
+- **Email-to-SMS Gateway** — sends email to carrier-specific addresses (e.g., `8085551234@txt.att.net`)
+- Broadcasts to all major US carriers: AT&T, T-Mobile, Verizon, Sprint, US Cellular, Cricket, MetroPCS, Boost, Google Fi
+- Only the correct carrier delivers; others silently fail
+- Form URL: `https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform`
+- Twilio/Zapier NOT used (cost/registration barriers)
 
 ## Project Files
 - `deliverables/` - Client briefing documents, transcripts, analysis PDFs

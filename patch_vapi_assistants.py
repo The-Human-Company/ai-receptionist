@@ -11,10 +11,10 @@ import urllib.request
 import os
 
 # --- Config ---
-API_KEY = "35c9ce5b-63f5-46a2-91e3-0d5275567738"
+API_KEY = os.environ.get("VAPI_API_KEY", "407f3078-02d3-4951-9ba1-2d414787e4c0")
 BASE_URL = "https://api.vapi.ai"
-BUSINESS_ID = "af31b79d-92e1-4888-905d-c15d01fd7751"
-AFTERHOURS_ID = "45bddc18-ab13-40b5-85ca-d5713a54a891"
+BUSINESS_ID = "bbf67fe2-99dc-427a-a546-37892f58a796"
+AFTERHOURS_ID = "8ae61948-d6c5-4586-9f55-b7c1416db25b"
 
 HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vapi-web-test.html")
 
