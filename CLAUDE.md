@@ -86,21 +86,27 @@ Legacy (kept as backup):
 - `n8n-workflow-notifications.json` - Notification/escalation workflow (importable)
 
 ## n8n Deployment
-- **Instance:** https://n8n.nomanuai.com
-- API key stored in `.env` (never committed to git)
+- **Primary Instance:** https://n8n.nomanuai.com (self-hosted, N8N_API_KEY_2 / N8N_INSTANCE_URL_2)
+- **Legacy Instance:** https://solarexpresss.app.n8n.cloud/ (execution limit reached, N8N_API_KEY / N8N_INSTANCE_URL)
+- API keys stored in `.env` (never committed to git)
 - All workflows use `Pacific/Honolulu` timezone
 - Execution data saved for debugging during pilot phase
+- Gmail credential ID: `YsqH9VLQvq5yEhqJ` (name: "Gmail account") — used by WF-02 through WF-08
 
-### Live Workflow IDs
-| n8n ID | Name | Active | Local File | Nodes |
-|--------|------|--------|------------|-------|
-| `1IX82-PqM5HiZq7sUSfpf` | Equity Insurance - VAPI AI Receptionist (Main) | Yes | `n8n-workflow-vapi-call-handler.json` | 13 nodes |
-| `5LCW3l7WBBOClWIV` | Equity Insurance - Post-Call Notifications & Escalation | No* | `n8n-workflow-notifications.json` | 9 nodes |
-| `kVAZboMRFcblG1qX` | WCRAv3 Error Handler | Yes | — | — |
-| `O4Edwi1Wa1cSqbUz` | Weekly Campaign Report v3 | No | — | — |
-| `bFjs13pY08N5Lnct` | Ravi-test | No | — | — |
+### Live Workflow IDs (n8n.nomanuai.com)
+| n8n ID | Name | Active | Local File |
+|--------|------|--------|------------|
+| `uDw59X1Z2JR7qd5Q` | Equity Insurance - VAPI AI Receptionist (Main) | Yes | `n8n-workflow-vapi-call-handler.json` |
+| `K24yQ9qLJzSJy8n1` | WF-01 Inbound Call Router | Yes | `n8n-wf01-inbound-call-router.json` |
+| `iR0Y35KkqyJkEVVG` | WF-02 New Customer P&C Intake | Yes | `n8n-wf02-new-customer-intake.json` |
+| `ZAUyRX2R5zBpE4YA` | WF-03 Hot Lead Transfer Handler | Yes | `n8n-wf03-hot-lead-transfer.json` |
+| `EXIC9N6XRr3NMX1h` | WF-04 Existing Customer Handler | Yes | `n8n-wf04-existing-customer.json` |
+| `gSAwJdQndD8qq8TW` | WF-05 Claims Router | Yes | `n8n-wf05-claims-router.json` |
+| `zBApWWRhk7QbEgyT` | WF-06 Post-Call Processor | Yes | `n8n-wf06-post-call-processor.json` |
+| `OY8BUOfSoFZ5BJfb` | WF-07 Escalation Monitor | Yes | `n8n-wf07-escalation-monitor.json` |
+| `llZY8q1babZHLMXZ` | WF-08 SMS Form Sender (Email-to-SMS Gateway) | Yes | `n8n-wf08-sms-form-sender.json` |
 
-*Notifications workflow needs SMTP credentials configured on n8n before activation.
+**Note:** Self-hosted n8n wraps webhook POST body under `$json.body`, so expressions use `($json.body?.message || $json.message)` for cross-instance compatibility.
 
 ## Slash Commands
 

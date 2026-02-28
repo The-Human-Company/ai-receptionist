@@ -25,31 +25,31 @@
             {
               "id": "call_id",
               "name": "call_id",
-              "value": "={{ $json.message.toolCallList[0].function.arguments.call_id || $json.message.call.id || 'unknown' }}",
+              "value": "={{ ($json.body?.message || $json.message).toolCallList[0].function.arguments.call_id || ($json.body?.message || $json.message).call.id || 'unknown' }}",
               "type": "string"
             },
             {
               "id": "caller_name",
               "name": "caller_name",
-              "value": "={{ $json.message.toolCallList[0].function.arguments.caller_name || 'Valued Caller' }}",
+              "value": "={{ ($json.body?.message || $json.message).toolCallList[0].function.arguments.caller_name || 'Valued Caller' }}",
               "type": "string"
             },
             {
               "id": "caller_phone",
               "name": "caller_phone",
-              "value": "={{ $json.message.toolCallList[0].function.arguments.caller_phone || '' }}",
+              "value": "={{ ($json.body?.message || $json.message).toolCallList[0].function.arguments.caller_phone || '' }}",
               "type": "string"
             },
             {
               "id": "insurance_type",
               "name": "insurance_type",
-              "value": "={{ $json.message.toolCallList[0].function.arguments.insurance_type || 'auto' }}",
+              "value": "={{ ($json.body?.message || $json.message).toolCallList[0].function.arguments.insurance_type || 'auto' }}",
               "type": "string"
             },
             {
               "id": "toolCallId",
               "name": "toolCallId",
-              "value": "={{ $json.message.toolCallList[0].id }}",
+              "value": "={{ ($json.body?.message || $json.message).toolCallList[0].id }}",
               "type": "string"
             }
           ]
@@ -105,7 +105,7 @@
     {
       "parameters": {
         "sendTo": "={{ $json.to }}",
-        "subject": "",
+        "subject": "Equity Insurance Quote Form",
         "message": "={{ $json.body }}",
         "options": {
           "appendAttribution": false
@@ -118,8 +118,8 @@
       "position": [1170, 250],
       "credentials": {
         "gmailOAuth2": {
-          "id": "Q1QMixyCKrZpc2Vl",
-          "name": "Gmail - Equity Insurance"
+          "id": "YsqH9VLQvq5yEhqJ",
+          "name": "Gmail account"
         }
       }
     },
