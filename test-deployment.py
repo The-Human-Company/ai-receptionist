@@ -127,7 +127,7 @@ print('=' * 60)
 wf2 = fetch_workflow('5LCW3l7WBBOClWIV')
 
 test('Workflow exists and is accessible', wf2.get('id') == '5LCW3l7WBBOClWIV')
-test('Has 9 nodes', len(wf2.get('nodes', [])) == 9, f"got {len(wf2.get('nodes', []))}")
+test('Has 13 nodes', len(wf2.get('nodes', [])) == 13, f"got {len(wf2.get('nodes', []))}")
 test('Timezone is Pacific/Honolulu', wf2.get('settings', {}).get('timezone') == 'Pacific/Honolulu')
 
 node_names2 = [n['name'] for n in wf2.get('nodes', [])]
@@ -135,6 +135,8 @@ required_nodes2 = [
     'Post-Call Webhook', 'Parse & Classify Notification', 'Route Notification Type',
     'Email: Hot Lead Alert', 'Email: New P&C Lead to Val',
     'Email: Commercial Lead to Val', 'Email: Existing Customer to Val',
+    'SMS: Hot Lead Alert', 'SMS: New P&C Lead',
+    'SMS: Commercial Lead', 'SMS: Existing Customer',
     'Wait 2 Hours', 'Email: Escalate to Davin'
 ]
 for rn in required_nodes2:
@@ -145,6 +147,34 @@ conns2 = wf2.get('connections', {})
 test('Route Notification Type has 4 outputs',
      len(conns2.get('Route Notification Type', {}).get('main', [])) == 4,
      f"got {len(conns2.get('Route Notification Type', {}).get('main', []))}")
+
+# SMS node tests
+sms_node_names = ['SMS: Hot Lead Alert', 'SMS: New P&C Lead', 'SMS: Commercial Lead', 'SMS: Existing Customer']
+for sms_name in sms_node_names:
+    sms_node = [n for n in wf2['nodes'] if n['name'] == sms_name]
+    test(f'{sms_name} is httpRequest type', len(sms_node) > 0 and sms_node[0]['type'] == 'n8n-nodes-base.httpRequest',
+         f"type={sms_node[0]['type'] if sms_node else 'missing'}")
+    if sms_node:
+        params = sms_node[0].get('parameters', {})
+        test(f'{sms_name} uses AWS SNS endpoint', params.get('url') == 'https://sns.us-east-1.amazonaws.com',
+             f"url={params.get('url')}")
+        test(f'{sms_name} uses AWS auth', params.get('genericAuthType') == 'aws',
+             f"auth={params.get('genericAuthType')}")
+        body_params = {p['name']: p['value'] for p in params.get('bodyParameters', {}).get('parameters', [])}
+        test(f'{sms_name} Action=Publish', body_params.get('Action') == 'Publish')
+        test(f'{sms_name} sends to +639759483289', body_params.get('PhoneNumber') == '+639759483289')
+        test(f'{sms_name} has AWS credential', sms_node[0].get('credentials', {}).get('aws', {}).get('id') == 'k7djkf7WKIHVtcRl')
+
+# SMS nodes connected in parallel with email nodes
+route_outputs = conns2.get('Route Notification Type', {}).get('main', [])
+test('Output 0 connects to both Email + SMS for hot lead',
+     any(c['node'] == 'SMS: Hot Lead Alert' for c in route_outputs[0]) if len(route_outputs) > 0 else False)
+test('Output 1 connects to both Email + SMS for new P&C',
+     any(c['node'] == 'SMS: New P&C Lead' for c in route_outputs[1]) if len(route_outputs) > 1 else False)
+test('Output 2 connects to both Email + SMS for commercial',
+     any(c['node'] == 'SMS: Commercial Lead' for c in route_outputs[2]) if len(route_outputs) > 2 else False)
+test('Output 3 connects to both Email + SMS for existing customer',
+     any(c['node'] == 'SMS: Existing Customer' for c in route_outputs[3]) if len(route_outputs) > 3 else False)
 
 # Email destination checks
 hot_email = [n for n in wf2['nodes'] if n['name'] == 'Email: Hot Lead Alert'][0]

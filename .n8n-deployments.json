@@ -11,11 +11,11 @@
     "notifications-escalation": {
       "workflowId": "5LCW3l7WBBOClWIV",
       "sourceFile": "n8n-workflow-notifications.json",
-      "lastDeployed": "2026-02-10T02:06:00.000Z",
+      "lastDeployed": "2026-03-03T00:32:00.000Z",
       "name": "Equity Insurance - Post-Call Notifications & Escalation",
-      "nodeCount": 9,
+      "nodeCount": 13,
       "active": false,
-      "note": "Needs SMTP credentials configured on n8n instance before activation"
+      "note": "Added 4 SMS nodes (AWS SNS). Needs SMTP credentials for email activation. AWS credential ID: k7djkf7WKIHVtcRl"
     }
   }
 }

@@ -56,7 +56,39 @@
       "name": "Email: Hot Lead Alert",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1050, 100]
+      "position": [1100, 50]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sns.us-east-1.amazonaws.com",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "aws",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "Action", "value": "Publish" },
+            { "name": "PhoneNumber", "value": "+639759483289" },
+            { "name": "Message", "value": "=HOT LEAD: {{ $json.leadData?.personal_info?.full_name || 'Unknown' }} - {{ $json.leadData?.insurance_request?.type || 'Insurance' }}. Call: {{ $json.leadData?.personal_info?.phone || 'N/A' }}. Reason: {{ $json.leadData?.qualification?.hot_lead_reason || 'High-value' }}. -Equity AI" },
+            { "name": "MessageAttributes.entry.1.Name", "value": "AWS.SNS.SMS.SMSType" },
+            { "name": "MessageAttributes.entry.1.Value.DataType", "value": "String" },
+            { "name": "MessageAttributes.entry.1.Value.StringValue", "value": "Transactional" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-sms-hot-lead",
+      "name": "SMS: Hot Lead Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 150],
+      "credentials": {
+        "aws": {
+          "id": "k7djkf7WKIHVtcRl",
+          "name": "AWS SNS SMS"
+        }
+      }
     },
     {
       "parameters": {
@@ -71,7 +103,39 @@
       "name": "Email: New P&C Lead to Val",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1050, 250]
+      "position": [1100, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sns.us-east-1.amazonaws.com",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "aws",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "Action", "value": "Publish" },
+            { "name": "PhoneNumber", "value": "+639759483289" },
+            { "name": "Message", "value": "=New P&C lead: {{ $json.leadData?.personal_info?.full_name || 'Unknown' }} - {{ $json.leadData?.insurance_request?.type || 'Insurance' }}. Call: {{ $json.leadData?.personal_info?.phone || 'N/A' }}. -Equity AI" },
+            { "name": "MessageAttributes.entry.1.Name", "value": "AWS.SNS.SMS.SMSType" },
+            { "name": "MessageAttributes.entry.1.Value.DataType", "value": "String" },
+            { "name": "MessageAttributes.entry.1.Value.StringValue", "value": "Transactional" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-sms-new-lead",
+      "name": "SMS: New P&C Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 380],
+      "credentials": {
+        "aws": {
+          "id": "k7djkf7WKIHVtcRl",
+          "name": "AWS SNS SMS"
+        }
+      }
     },
     {
       "parameters": {
@@ -86,7 +150,39 @@
       "name": "Email: Commercial Lead to Val",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1050, 400]
+      "position": [1100, 480]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sns.us-east-1.amazonaws.com",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "aws",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "Action", "value": "Publish" },
+            { "name": "PhoneNumber", "value": "+639759483289" },
+            { "name": "Message", "value": "=Commercial lead: {{ $json.leadData?.personal_info?.full_name || 'Unknown' }} - Business Insurance. Call: {{ $json.leadData?.personal_info?.phone || 'N/A' }}. -Equity AI" },
+            { "name": "MessageAttributes.entry.1.Name", "value": "AWS.SNS.SMS.SMSType" },
+            { "name": "MessageAttributes.entry.1.Value.DataType", "value": "String" },
+            { "name": "MessageAttributes.entry.1.Value.StringValue", "value": "Transactional" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-sms-commercial",
+      "name": "SMS: Commercial Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 580],
+      "credentials": {
+        "aws": {
+          "id": "k7djkf7WKIHVtcRl",
+          "name": "AWS SNS SMS"
+        }
+      }
     },
     {
       "parameters": {
@@ -101,7 +197,39 @@
       "name": "Email: Existing Customer to Val",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1050, 550]
+      "position": [1100, 680]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sns.us-east-1.amazonaws.com",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "aws",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "Action", "value": "Publish" },
+            { "name": "PhoneNumber", "value": "+639759483289" },
+            { "name": "Message", "value": "=Customer request: {{ $json.leadData?.personal_info?.full_name || 'Unknown' }}. {{ $json.leadData?.insurance_request?.specific_needs || 'General inquiry' }}. Call: {{ $json.leadData?.personal_info?.phone || 'N/A' }}. -Equity AI" },
+            { "name": "MessageAttributes.entry.1.Name", "value": "AWS.SNS.SMS.SMSType" },
+            { "name": "MessageAttributes.entry.1.Value.DataType", "value": "String" },
+            { "name": "MessageAttributes.entry.1.Value.StringValue", "value": "Transactional" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-sms-existing",
+      "name": "SMS: Existing Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 780],
+      "credentials": {
+        "aws": {
+          "id": "k7djkf7WKIHVtcRl",
+          "name": "AWS SNS SMS"
+        }
+      }
     },
     {
       "parameters": {
@@ -112,7 +240,7 @@
       "name": "Wait 2 Hours",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1300, 400]
+      "position": [1350, 480]
     },
     {
       "parameters": {
@@ -127,7 +255,7 @@
       "name": "Email: Escalate to Davin",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1550, 400]
+      "position": [1600, 480]
     }
   ],
   "connections": {
@@ -148,16 +276,20 @@
     "Route Notification Type": {
       "main": [
         [
-          { "node": "Email: Hot Lead Alert", "type": "main", "index": 0 }
+          { "node": "Email: Hot Lead Alert", "type": "main", "index": 0 },
+          { "node": "SMS: Hot Lead Alert", "type": "main", "index": 0 }
         ],
         [
-          { "node": "Email: New P&C Lead to Val", "type": "main", "index": 0 }
+          { "node": "Email: New P&C Lead to Val", "type": "main", "index": 0 },
+          { "node": "SMS: New P&C Lead", "type": "main", "index": 0 }
         ],
         [
-          { "node": "Email: Commercial Lead to Val", "type": "main", "index": 0 }
+          { "node": "Email: Commercial Lead to Val", "type": "main", "index": 0 },
+          { "node": "SMS: Commercial Lead", "type": "main", "index": 0 }
         ],
         [
-          { "node": "Email: Existing Customer to Val", "type": "main", "index": 0 }
+          { "node": "Email: Existing Customer to Val", "type": "main", "index": 0 },
+          { "node": "SMS: Existing Customer", "type": "main", "index": 0 }
         ]
       ]
     },
@@ -203,6 +335,7 @@
   "tags": [
     { "name": "equity-insurance" },
     { "name": "notifications" },
-    { "name": "escalation" }
+    { "name": "escalation" },
+    { "name": "sms" }
   ]
 }
