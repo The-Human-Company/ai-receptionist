@@ -1,0 +1,10 @@
+{
+  "session_id": "9347ffe8-d5c1-450b-98c5-ebe54ebec137",
+  "timestamp": "2026-02-21T00:12:12.017244+00:00",
+  "exit_reason": "other",
+  "working_directory": "c:/Users/JephMari/Desktop/Portfolio/TheHumanCompany/ai-receptionist",
+  "transcript_path": "C:/Users/JephMari/.claude/projects/c--Users-JephMari-Desktop-Portfolio-TheHumanCompany-ai-receptionist/9347ffe8-d5c1-450b-98c5-ebe54ebec137.jsonl",
+  "cost_data": {
+    "transcript_parse_error": "'charmap' codec can't decode byte 0x9d in position 315: character maps to <undefined>"
+  }
+}

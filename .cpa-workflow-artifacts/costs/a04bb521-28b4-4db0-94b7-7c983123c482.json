@@ -1,0 +1,10 @@
+{
+  "session_id": "a04bb521-28b4-4db0-94b7-7c983123c482",
+  "timestamp": "2026-02-21T00:11:46.374178+00:00",
+  "exit_reason": "other",
+  "working_directory": "c:/Users/JephMari/Desktop/Portfolio/TheHumanCompany/ai-receptionist",
+  "transcript_path": "C:/Users/JephMari/.claude/projects/c--Users-JephMari-Desktop-Portfolio-TheHumanCompany-ai-receptionist/a04bb521-28b4-4db0-94b7-7c983123c482.jsonl",
+  "cost_data": {
+    "transcript_parse_error": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\JephMari\\\\.claude\\\\projects\\\\c--Users-JephMari-Desktop-Portfolio-TheHumanCompany-ai-receptionist\\\\a04bb521-28b4-4db0-94b7-7c983123c482.jsonl'"
+  }
+}

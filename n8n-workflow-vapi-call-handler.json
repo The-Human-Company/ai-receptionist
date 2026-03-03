@@ -44,10 +44,11 @@
             { "value2": "saveLeadData", "output": 2 },
             { "value2": "checkDisqualifiers", "output": 3 },
             { "value2": "checkHotLead", "output": 4 },
-            { "value2": "transferCall", "output": 5 }
+            { "value2": "transferCall", "output": 5 },
+            { "value2": "sendFormSMS", "output": 6 }
           ]
         },
-        "fallbackOutput": 6
+        "fallbackOutput": 7
       },
       "id": "node-function-router",
       "name": "Route Function Call",
@@ -166,6 +167,16 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [750, 650]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send SMS form link via Email-to-SMS gateway\nconst args = $input.first().json.message.functionCall.parameters;\nconst callerPhone = (args.phone || '').replace(/[\\s\\-()\\+]/g, '');\nconst callerName = args.name || 'there';\nconst insuranceType = args.insurance_type || 'auto';\n\n// Strip leading '1' if 11 digits\nlet phone10 = callerPhone;\nif (phone10.length === 11 && phone10.startsWith('1')) {\n  phone10 = phone10.substring(1);\n}\n\nconst FORM_URL = 'https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform';\n\nconst smsBody = `Aloha ${callerName}! Mahalo for calling Equity Insurance. Please complete your ${insuranceType} quote form here: ${FORM_URL} - Call us at (808) 593-7746 with any questions!`;\n\n// US Carrier Email-to-SMS gateways — send to all, only correct carrier delivers\nconst gateways = [\n  phone10 + '@txt.att.net',\n  phone10 + '@tmomail.net',\n  phone10 + '@vtext.com',\n  phone10 + '@messaging.sprintpcs.com',\n  phone10 + '@email.uscc.net',\n  phone10 + '@sms.cricketwireless.net',\n  phone10 + '@mymetropcs.com',\n  phone10 + '@sms.myboostmobile.com',\n  phone10 + '@msg.fi.google.com'\n];\n\nreturn [{\n  json: {\n    results: [{\n      toolCallId: $input.first().json.message.functionCall.id,\n      result: JSON.stringify({\n        sent: phone10.length === 10,\n        phone: phone10,\n        gateway_recipients: gateways.join(', '),\n        sms_body: smsBody,\n        message: phone10.length === 10\n          ? 'SMS form link sent to ' + phone10 + ' via email-to-SMS gateway. The caller will receive a text with the quote form link.'\n          : 'Could not send SMS — invalid phone number. An agent will follow up manually.'\n      })\n    }]\n  }\n}];"
+      },
+      "id": "node-send-form-sms",
+      "name": "Send Form SMS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 900]
     }
   ],
   "connections": {
@@ -208,6 +219,9 @@
         ],
         [
           { "node": "Transfer Call", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Send Form SMS", "type": "main", "index": 0 }
         ]
       ]
     },
@@ -247,6 +261,13 @@
       ]
     },
     "Transfer Call": {
+      "main": [
+        [
+          { "node": "Respond to VAPI", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Send Form SMS": {
       "main": [
         [
           { "node": "Respond to VAPI", "type": "main", "index": 0 }

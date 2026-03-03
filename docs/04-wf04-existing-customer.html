@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-04 Existing Customer Handler — Equity Insurance AI Receptionist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+        h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+        p { margin-bottom: 12px; font-size: 14px; }
+        .subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+        .diagram { margin: 24px 0; text-align: center; }
+        svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+        th { font-weight: 600; background: #f8f8f8; }
+        .step-list { list-style: none; padding: 0; margin: 16px 0; }
+        .step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+        .step-list li strong { display: inline-block; min-width: 120px; }
+        footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+
+    <h1>WF-04 Existing Customer Handler</h1>
+    <p class="subtitle">Webhook: POST /vapi-existing-customer &mdash; 5 Nodes &mdash; n8n ID: BNsx9bdXMBKfJjCe</p>
+
+    <h2>Flow Diagram</h2>
+    <div class="diagram">
+        <svg width="1020" height="120" viewBox="0 0 1020 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- Node 1: Webhook Trigger -->
+            <rect x="10" y="30" width="170" height="55" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="95" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Webhook Trigger</text>
+            <text x="95" y="68" text-anchor="middle" font-size="10" fill="#666">POST /vapi-existing-</text>
+            <text x="95" y="80" text-anchor="middle" font-size="10" fill="#666">customer</text>
+
+            <!-- Arrow 1-2 -->
+            <line x1="180" y1="57" x2="210" y2="57" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 2: Extract Customer Data -->
+            <rect x="210" y="30" width="170" height="55" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="295" y="49" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Extract Customer</text>
+            <text x="295" y="63" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Data</text>
+            <text x="295" y="78" text-anchor="middle" font-size="10" fill="#666">call_id, name, phone,</text>
+            <text x="295" y="88" text-anchor="middle" font-size="9" fill="#666">policy_type, request_desc</text>
+
+            <!-- Arrow 2-3 -->
+            <line x1="380" y1="57" x2="410" y2="57" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 3: Create Ticket Row -->
+            <rect x="410" y="30" width="170" height="55" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="495" y="49" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Create Ticket Row</text>
+            <text x="495" y="65" text-anchor="middle" font-size="10" fill="#666">Google Sheets Tickets</text>
+            <text x="495" y="78" text-anchor="middle" font-size="10" fill="#666">status=pending,</text>
+            <text x="495" y="88" text-anchor="middle" font-size="9" fill="#666">assigned_to=Val</text>
+
+            <!-- Arrow 3-4 -->
+            <line x1="580" y1="57" x2="610" y2="57" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 4: Send Notification to Val -->
+            <rect x="610" y="30" width="170" height="55" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="695" y="49" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Send Notification</text>
+            <text x="695" y="63" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">to Val</text>
+            <text x="695" y="78" text-anchor="middle" font-size="10" fill="#666">Email with caller</text>
+            <text x="695" y="88" text-anchor="middle" font-size="9" fill="#666">details + follow-up</text>
+
+            <!-- Arrow 4-5 -->
+            <line x1="780" y1="57" x2="810" y2="57" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 5: Respond to VAPI -->
+            <rect x="810" y="30" width="170" height="55" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="895" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Respond to VAPI</text>
+            <text x="895" y="68" text-anchor="middle" font-size="10" fill="#666">Success confirmation</text>
+        </svg>
+    </div>
+
+    <h2>Step-by-Step Process</h2>
+    <ol class="step-list">
+        <li>
+            <strong>Webhook Trigger</strong>
+            VAPI calls the route_existing_customer function, sending a POST request to /vapi-existing-customer.
+        </li>
+        <li>
+            <strong>Extract Customer Data</strong>
+            Extracts call_id, caller_name, caller_phone, policy_type, and request_description from the VAPI function call parameters.
+        </li>
+        <li>
+            <strong>Create Ticket Row</strong>
+            Appends a new row to the Google Sheets Tickets sheet with: ticket_id={call_id}_existing, status=pending, escalated=false, assigned_to=Val, created_at=now.
+        </li>
+        <li>
+            <strong>Send Notification to Val</strong>
+            Emails val@equityinsurance.services with subject "[Existing Customer] {name} &mdash; {policy_type} &mdash; Callback Requested" and full caller details.
+        </li>
+        <li>
+            <strong>Respond to VAPI</strong>
+            Returns success JSON so the AI can confirm to the caller that their request has been logged and a team member will follow up.
+        </li>
+    </ol>
+
+    <h2>Ticket Fields</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ticket_id</td>
+                <td>{call_id}_existing</td>
+            </tr>
+            <tr>
+                <td>status</td>
+                <td>pending</td>
+            </tr>
+            <tr>
+                <td>assigned_to</td>
+                <td>Val</td>
+            </tr>
+            <tr>
+                <td>escalated</td>
+                <td>false</td>
+            </tr>
+            <tr>
+                <td>acknowledged_at</td>
+                <td><em>(empty &mdash; updated by Val)</em></td>
+            </tr>
+            <tr>
+                <td>completed_at</td>
+                <td><em>(empty &mdash; updated by Val)</em></td>
+            </tr>
+        </tbody>
+    </table>
+    <p>Note: If a ticket remains in pending status for 2+ hours, WF-07 Escalation Monitor will automatically escalate the ticket to Davin.</p>
+
+    <h2>Node Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Node Name</th>
+                <th>Type</th>
+                <th>Key Parameters</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Webhook Trigger</td>
+                <td>n8n-nodes-base.webhook (v2)</td>
+                <td>POST /vapi-existing-customer, headerAuth, responseMode: responseNode</td>
+            </tr>
+            <tr>
+                <td>Extract Customer Data</td>
+                <td>n8n-nodes-base.set (v3.4)</td>
+                <td>Manual mode, extracts call_id, caller_name, caller_phone, policy_type, request_description from VAPI function call parameters</td>
+            </tr>
+            <tr>
+                <td>Create Ticket Row</td>
+                <td>n8n-nodes-base.googleSheets (v4.5)</td>
+                <td>Append row to Tickets sheet: ticket_id={call_id}_existing, status=pending, escalated=false, assigned_to=Val, created_at=now (HST)</td>
+            </tr>
+            <tr>
+                <td>Send Notification to Val</td>
+                <td>n8n-nodes-base.emailSend (v2.1)</td>
+                <td>To: val@equityinsurance.services, Subject: "[Existing Customer] {name} &mdash; {policy_type} &mdash; Callback Requested", Body: caller details + request description</td>
+            </tr>
+            <tr>
+                <td>Respond to VAPI</td>
+                <td>n8n-nodes-base.respondToWebhook (v1.1)</td>
+                <td>JSON response: { success: true, ticket_id: "{call_id}_existing", message: "Request logged and notification sent to Val" }</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        Equity Insurance AI Receptionist &mdash; WF-04 Documentation &mdash; Generated 2026-02-14
+    </footer>
+
+</body>
+</html>

@@ -1,12 +1,13 @@
 {
   "deployments": {
     "vapi-call-handler": {
-      "workflowId": "1IX82-PqM5HiZq7sUSfpf",
+      "workflowId": "5pkshlEoMFCbZsDB",
       "sourceFile": "n8n-workflow-vapi-call-handler.json",
-      "lastDeployed": "2026-02-10T02:05:06.277Z",
+      "lastDeployed": "2026-02-28T00:00:00.000Z",
       "name": "Equity Insurance - VAPI AI Receptionist (Main)",
-      "nodeCount": 13,
-      "active": true
+      "nodeCount": 14,
+      "active": false,
+      "note": "Added sendFormSMS function route (output 6) with Email-to-SMS gateway logic for sending Google Form links via text."
     },
     "notifications-escalation": {
       "workflowId": "5LCW3l7WBBOClWIV",
@@ -15,7 +16,85 @@
       "name": "Equity Insurance - Post-Call Notifications & Escalation",
       "nodeCount": 13,
       "active": false,
-      "note": "Added 4 SMS nodes (AWS SNS). Needs SMTP credentials for email activation. AWS credential ID: k7djkf7WKIHVtcRl"
+      "note": "Legacy notification workflow with 4 AWS SNS SMS nodes added. AWS credential ID: k7djkf7WKIHVtcRl. Kept as backup."
+    },
+    "wf01-inbound-call-router": {
+      "workflowId": "mghU5hDPImnGTMKe",
+      "sourceFile": "n8n-wf01-inbound-call-router.json",
+      "lastDeployed": "2026-02-14T00:01:00.000Z",
+      "name": "WF-01 Inbound Call Router",
+      "nodeCount": 6,
+      "active": false,
+      "webhookPath": "/vapi-call-started",
+      "vapiTools": ["save_field", "check_disqualifier", "check_hot_lead", "route_existing_customer", "route_claim"],
+      "note": "Updated with Briefing Session #1 corrections: email REQUIRED, shopping reason, current coverage, transfer triggers, service culture, claims detail, property grandfathering, business EIN/revenue, auto lienholder, renters address"
+    },
+    "wf02-new-customer-intake": {
+      "workflowId": "BEOQVaIituRIqug9",
+      "sourceFile": "n8n-wf02-new-customer-intake.json",
+      "lastDeployed": "2026-02-28T00:00:00.000Z",
+      "name": "WF-02 New Customer P&C Intake",
+      "nodeCount": 22,
+      "active": true,
+      "webhookPaths": ["/vapi-save-field", "/vapi-check-disqualifier", "/vapi-check-hotlead"],
+      "note": "Updated valid fields whitelist for Auto Insurance intake (auto_make_model_year, auto_accidents_violations_5yr, caller_profession, phone_confirmed, insurance_type) and Home Insurance fields (property_type, property_owner_or_renter, property_claims_losses_5yr)."
+    },
+    "wf03-hot-lead-transfer": {
+      "workflowId": "AxGXJxHIDQJILOtQ",
+      "sourceFile": "n8n-wf03-hot-lead-transfer.json",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
+      "name": "WF-03 Hot Lead Transfer Handler",
+      "nodeCount": 14,
+      "active": false,
+      "note": "Sub-workflow triggered by WF-02 hot lead detection. Added secondary transfer fallback chain with guard for placeholder phone. SMTP replaced with Gmail."
+    },
+    "wf04-existing-customer": {
+      "workflowId": "BNsx9bdXMBKfJjCe",
+      "sourceFile": "n8n-wf04-existing-customer.json",
+      "lastDeployed": "2026-02-13T00:00:00.000Z",
+      "name": "WF-04 Existing Customer Handler",
+      "nodeCount": 5,
+      "active": false,
+      "webhookPath": "/vapi-existing-customer"
+    },
+    "wf05-claims-router": {
+      "workflowId": "ZAoSyxR2U2lH2a7b",
+      "sourceFile": "n8n-wf05-claims-router.json",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
+      "name": "WF-05 Claims Router",
+      "nodeCount": 7,
+      "active": false,
+      "webhookPath": "/vapi-claim",
+      "note": "Added VAPI Transfer Command node for business-hours warm transfer to Val (+18087800473)"
+    },
+    "wf06-post-call-processor": {
+      "workflowId": "nKwYydxwd8n58ExN",
+      "sourceFile": "n8n-wf06-post-call-processor.json",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
+      "name": "WF-06 Post-Call Processor",
+      "nodeCount": 17,
+      "active": false,
+      "webhookPath": "/vapi-call-ended",
+      "note": "Migration flag VAPI_AI_COLLECTED. Fixed business_hours analytics default (was always true)."
+    },
+    "wf07-escalation-monitor": {
+      "workflowId": "aTOUUPC13xwUH6PI",
+      "sourceFile": "n8n-wf07-escalation-monitor.json",
+      "lastDeployed": "2026-02-16T10:00:00.000Z",
+      "name": "WF-07 Escalation Monitor",
+      "nodeCount": 5,
+      "active": false,
+      "note": "Cron: */30 9-17 * * 1-5 Pacific/Honolulu (covers through 5:30pm)"
+    },
+    "wf08-sms-form-sender": {
+      "workflowId": "x63DDMX2na48SViA",
+      "sourceFile": "n8n-wf08-sms-form-sender.json",
+      "lastDeployed": "2026-02-28T00:00:00.000Z",
+      "name": "WF-08 SMS Form Sender (Email-to-SMS Gateway)",
+      "nodeCount": 8,
+      "active": true,
+      "webhookPath": "/vapi-send-form",
+      "note": "Full rewrite: Email-to-SMS gateway replaces direct email. Sends Google Form link as SMS to all major US carrier gateways (ATT, TMobile, Verizon, Sprint, USCellular, Cricket, MetroPCS, Boost, GoogleFi). Includes reminder tracking via static data."
     }
   }
 }

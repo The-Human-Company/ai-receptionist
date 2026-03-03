@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF-02 New Customer P&C Intake</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+p { margin-bottom: 12px; font-size: 14px; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+.diagram { margin: 24px 0; text-align: center; }
+svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+th { font-weight: 600; background: #f8f8f8; }
+.step-list { list-style: none; padding: 0; margin: 16px 0; }
+.step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+.step-list li strong { display: inline-block; min-width: 120px; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<h1>WF-02 New Customer P&amp;C Intake</h1>
+<p class="subtitle">3 Webhooks &mdash; 17 Nodes &mdash; n8n ID: BEOQVaIituRIqug9</p>
+
+<h2>Flow Diagram</h2>
+<p>WF-02 handles all new customer data collection via three parallel webhook branches. VAPI calls each endpoint as the AI collects information from the caller.</p>
+
+<div class="diagram">
+<svg width="980" height="720" viewBox="0 0 980 720">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- ===== BRANCH A: Save Field ===== -->
+  <text x="30" y="30" font-size="13" font-weight="700" fill="#333">Branch A &mdash; Save Field</text>
+
+  <!-- Webhook -->
+  <rect x="30" y="45" width="175" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="117" y="66" text-anchor="middle" font-size="11" font-weight="600">Webhook</text>
+  <text x="117" y="82" text-anchor="middle" font-size="9" fill="#666">/vapi-save-field</text>
+
+  <line x1="205" y1="70" x2="240" y2="70" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Extract Field Parameters -->
+  <rect x="240" y="45" width="175" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="327" y="66" text-anchor="middle" font-size="11" font-weight="600">Extract Field Params</text>
+  <text x="327" y="82" text-anchor="middle" font-size="9" fill="#666">call_id, field_name, field_value</text>
+
+  <line x1="415" y1="70" x2="450" y2="70" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Validate Field -->
+  <rect x="450" y="45" width="155" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="527" y="66" text-anchor="middle" font-size="11" font-weight="600">Validate Field</text>
+  <text x="527" y="82" text-anchor="middle" font-size="9" fill="#666">phone, email, DOB check</text>
+
+  <line x1="605" y1="70" x2="640" y2="70" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- IF Valid -->
+  <rect x="640" y="50" width="70" height="40" rx="4" fill="#fff" stroke="#333" stroke-width="1.5" transform="rotate(45,675,70)" style="transform-origin:675px 70px"/>
+  <!-- Diamond label -->
+  <text x="675" y="74" text-anchor="middle" font-size="10" font-weight="600">Valid?</text>
+
+  <!-- TRUE path -->
+  <line x1="710" y1="50" x2="750" y2="50" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="730" y="44" text-anchor="middle" font-size="9" fill="#666">TRUE</text>
+
+  <!-- Save to Google Sheet -->
+  <rect x="750" y="25" width="200" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="850" y="46" text-anchor="middle" font-size="11" font-weight="600">Save to Google Sheet</text>
+  <text x="850" y="62" text-anchor="middle" font-size="9" fill="#666">flag = VAPI_AI_COLLECTED</text>
+
+  <!-- Return Success -->
+  <line x1="850" y1="75" x2="850" y2="100" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="780" y="100" width="140" height="35" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="850" y="122" text-anchor="middle" font-size="11" font-weight="600">Return Success</text>
+
+  <!-- FALSE path -->
+  <line x1="675" y1="105" x2="675" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="690" y="125" font-size="9" fill="#666">FALSE</text>
+
+  <!-- Return Validation Error -->
+  <rect x="600" y="140" width="155" height="35" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="677" y="162" text-anchor="middle" font-size="11" font-weight="600">Return Validation Error</text>
+
+  <!-- Separator -->
+  <line x1="30" y1="205" x2="950" y2="205" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="6,3"/>
+
+  <!-- ===== BRANCH B: Check Disqualifier ===== -->
+  <text x="30" y="235" font-size="13" font-weight="700" fill="#333">Branch B &mdash; Check Disqualifier</text>
+
+  <!-- Webhook -->
+  <rect x="30" y="255" width="195" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="127" y="276" text-anchor="middle" font-size="11" font-weight="600">Webhook</text>
+  <text x="127" y="292" text-anchor="middle" font-size="9" fill="#666">/vapi-check-disqualifier</text>
+
+  <line x1="225" y1="280" x2="270" y2="280" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Evaluate Disqualifier Rules -->
+  <rect x="270" y="255" width="250" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="395" y="276" text-anchor="middle" font-size="11" font-weight="600">Evaluate Disqualifier Rules</text>
+  <text x="395" y="292" text-anchor="middle" font-size="9" fill="#666">claims &ge; 3 OR urgency &le; 72hrs</text>
+
+  <line x1="520" y1="280" x2="565" y2="280" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Update Lead in Sheet -->
+  <rect x="565" y="255" width="185" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="657" y="276" text-anchor="middle" font-size="11" font-weight="600">Update Lead in Sheet</text>
+  <text x="657" y="292" text-anchor="middle" font-size="9" fill="#666">status + reason</text>
+
+  <line x1="750" y1="280" x2="795" y2="280" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Return Disqualifier Result -->
+  <rect x="795" y="255" width="160" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="875" y="276" text-anchor="middle" font-size="11" font-weight="600">Return Disqualifier</text>
+  <text x="875" y="292" text-anchor="middle" font-size="9" fill="#666">Result</text>
+
+  <!-- Separator -->
+  <line x1="30" y1="340" x2="950" y2="340" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="6,3"/>
+
+  <!-- ===== BRANCH C: Check Hot Lead ===== -->
+  <text x="30" y="370" font-size="13" font-weight="700" fill="#333">Branch C &mdash; Check Hot Lead</text>
+
+  <!-- Webhook -->
+  <rect x="30" y="390" width="185" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="122" y="411" text-anchor="middle" font-size="11" font-weight="600">Webhook</text>
+  <text x="122" y="427" text-anchor="middle" font-size="9" fill="#666">/vapi-check-hotlead</text>
+
+  <line x1="215" y1="415" x2="255" y2="415" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Evaluate Hot Lead -->
+  <rect x="255" y="390" width="220" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="365" y="411" text-anchor="middle" font-size="11" font-weight="600">Evaluate Hot Lead</text>
+  <text x="365" y="427" text-anchor="middle" font-size="9" fill="#666">property &ge; $2M OR auto &ge; $180K</text>
+
+  <line x1="475" y1="415" x2="515" y2="415" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- IF Hot Lead diamond -->
+  <rect x="515" y="400" width="60" height="30" rx="4" fill="#fff" stroke="#333" stroke-width="1.5" transform="rotate(45,545,415)" style="transform-origin:545px 415px"/>
+  <text x="545" y="419" text-anchor="middle" font-size="10" font-weight="600">Hot?</text>
+
+  <!-- TRUE path (up) -->
+  <line x1="575" y1="400" x2="625" y2="400" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="600" y="393" text-anchor="middle" font-size="9" fill="#666">TRUE</text>
+
+  <!-- Trigger WF-03 + Email -->
+  <rect x="625" y="375" width="230" height="50" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="740" y="396" text-anchor="middle" font-size="11" font-weight="600">Trigger WF-03 + Email</text>
+  <text x="740" y="412" text-anchor="middle" font-size="9" fill="#666">Pre-transfer alert to Val + Davin</text>
+
+  <!-- Return Result from TRUE -->
+  <line x1="855" y1="400" x2="895" y2="400" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="895" y="385" width="60" height="30" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="925" y="405" text-anchor="middle" font-size="10" font-weight="600">Result</text>
+
+  <!-- FALSE path (down) -->
+  <line x1="545" y1="448" x2="545" y2="480" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="560" y="468" font-size="9" fill="#666">FALSE</text>
+
+  <!-- Return Result from FALSE -->
+  <rect x="480" y="480" width="130" height="35" rx="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="545" y="502" text-anchor="middle" font-size="11" font-weight="600">Return Result</text>
+
+  <!-- Legend -->
+  <rect x="30" y="560" width="920" height="90" rx="6" fill="#fafafa" stroke="#e0e0e0" stroke-width="1"/>
+  <text x="50" y="585" font-size="12" font-weight="600" fill="#333">Legend</text>
+
+  <rect x="50" y="600" width="40" height="20" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+  <text x="100" y="615" font-size="11" fill="#666">Process Node</text>
+
+  <rect x="220" y="600" width="30" height="15" rx="3" fill="#fff" stroke="#333" stroke-width="1.5" transform="rotate(45,235,607.5)" style="transform-origin:235px 607.5px"/>
+  <text x="270" y="615" font-size="11" fill="#666">Decision (IF)</text>
+
+  <line x1="380" y1="610" x2="420" y2="610" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="430" y="615" font-size="11" fill="#666">Data Flow</text>
+
+  <line x1="540" y1="610" x2="580" y2="610" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="590" y="615" font-size="11" fill="#666">Branch Separator</text>
+</svg>
+</div>
+
+<h2>Step-by-Step Process</h2>
+
+<h3>Branch A &mdash; Save Field</h3>
+<ul class="step-list">
+  <li><strong>Step 1:</strong> Webhook receives POST <code>/vapi-save-field</code> from VAPI when the AI collects a data point from the caller</li>
+  <li><strong>Step 2:</strong> Extract field parameters: <code>call_id</code>, <code>field_name</code> (enum of 37 field types), <code>field_value</code></li>
+  <li><strong>Step 3:</strong> Validate the field: phone (regex), email (regex), DOB (date validation), other (non-empty)</li>
+  <li><strong>Step 4:</strong> If valid: Append or update row in Google Sheets Leads table with <code>migration_flag=VAPI_AI_COLLECTED</code></li>
+  <li><strong>Step 5:</strong> Return success or validation error to VAPI</li>
+</ul>
+
+<h3>Branch B &mdash; Check Disqualifier</h3>
+<ul class="step-list">
+  <li><strong>Step 1:</strong> Webhook receives POST <code>/vapi-check-disqualifier</code> with <code>claims_count_worst_year</code> and <code>urgency_hours</code></li>
+  <li><strong>Step 2:</strong> Evaluate rules: disqualified if claims &ge; 3 in worst year OR urgency &le; 72 hours</li>
+  <li><strong>Step 3:</strong> Update lead record in Google Sheets with disqualified status and reason</li>
+  <li><strong>Step 4:</strong> Return result to VAPI so the AI can deliver a polite redirect</li>
+</ul>
+
+<h3>Branch C &mdash; Check Hot Lead</h3>
+<ul class="step-list">
+  <li><strong>Step 1:</strong> Webhook receives POST <code>/vapi-check-hotlead</code> with <code>policy_type</code> and <code>estimated_value</code></li>
+  <li><strong>Step 2:</strong> Evaluate: <code>hot_lead</code> if property &ge; $2,000,000 OR auto &ge; $180,000</li>
+  <li><strong>Step 3:</strong> If hot lead: trigger WF-03 sub-workflow for immediate transfer AND send pre-transfer email to Val + Davin</li>
+  <li><strong>Step 4:</strong> Return result to VAPI</li>
+</ul>
+
+<h2>Validation Rules</h2>
+<table>
+<tr><th>Field</th><th>Validation</th><th>Error Message</th></tr>
+<tr><td><code>caller_phone</code></td><td>Regex <code>/^\+?1?\d{10}$/</code></td><td>Invalid phone number format</td></tr>
+<tr><td><code>caller_email</code></td><td>Regex <code>/^[^@]+@[^@]+\.[^@]+$/</code></td><td>Invalid email format</td></tr>
+<tr><td><code>caller_dob</code></td><td>Valid date in the past</td><td>Invalid date of birth</td></tr>
+<tr><td>All others</td><td>Non-empty string</td><td>Field cannot be empty</td></tr>
+</table>
+
+<h2>Business Rules</h2>
+<table>
+<tr><th>Rule</th><th>Threshold</th><th>Action</th></tr>
+<tr><td>Claims Disqualifier</td><td>&ge; 3 claims in worst year</td><td>Polite redirect to state insurance department</td></tr>
+<tr><td>Urgency Disqualifier</td><td>&le; 72 hours (property coverage)</td><td>Polite redirect &mdash; cannot bind coverage in time</td></tr>
+<tr><td>Hot Lead &mdash; Property</td><td>&ge; $2,000,000 estimated value</td><td>Immediate transfer to agent via WF-03</td></tr>
+<tr><td>Hot Lead &mdash; Auto</td><td>&ge; $180,000 estimated value</td><td>Immediate transfer to agent via WF-03</td></tr>
+<tr><td>Pre-Transfer Email</td><td>Hot lead detected</td><td>Send alert to Val + Davin before transfer</td></tr>
+<tr><td>Migration Flag</td><td>All saved fields</td><td>Tag with <code>VAPI_AI_COLLECTED</code> for future CRM migration</td></tr>
+<tr><td>No Coverage Advice</td><td>Always</td><td>AI must NEVER give coverage advice, bind policies, or guarantee anything</td></tr>
+</table>
+
+<h2>Node Details</h2>
+<table>
+<tr><th>Node #</th><th>Node Name</th><th>Type</th><th>Branch</th><th>Purpose</th></tr>
+<tr><td>1</td><td>Webhook: /vapi-save-field</td><td>Webhook</td><td>A</td><td>Receives POST with call_id, field_name, field_value</td></tr>
+<tr><td>2</td><td>Extract Field Parameters</td><td>Set</td><td>A</td><td>Parses call_id, field_name, and field_value from request body</td></tr>
+<tr><td>3</td><td>Validate Field</td><td>Code</td><td>A</td><td>Runs phone regex, email regex, DOB validation, or non-empty check</td></tr>
+<tr><td>4</td><td>IF Valid</td><td>IF</td><td>A</td><td>Routes to save path (true) or error path (false)</td></tr>
+<tr><td>5</td><td>Save to Google Sheet</td><td>Google Sheets</td><td>A</td><td>Appends/updates lead row with field value, sets migration_flag</td></tr>
+<tr><td>6</td><td>Return Success</td><td>Respond to Webhook</td><td>A</td><td>Returns { success: true, field_name, field_value } to VAPI</td></tr>
+<tr><td>7</td><td>Return Validation Error</td><td>Respond to Webhook</td><td>A</td><td>Returns { success: false, error } to VAPI</td></tr>
+<tr><td>8</td><td>Webhook: /vapi-check-disqualifier</td><td>Webhook</td><td>B</td><td>Receives POST with claims_count_worst_year, urgency_hours</td></tr>
+<tr><td>9</td><td>Evaluate Disqualifier Rules</td><td>Code</td><td>B</td><td>Checks claims &ge; 3 OR urgency &le; 72 hours</td></tr>
+<tr><td>10</td><td>Update Lead in Sheet</td><td>Google Sheets</td><td>B</td><td>Updates lead record with disqualified status and reason</td></tr>
+<tr><td>11</td><td>Return Disqualifier Result</td><td>Respond to Webhook</td><td>B</td><td>Returns { disqualified: bool, reason } to VAPI</td></tr>
+<tr><td>12</td><td>Webhook: /vapi-check-hotlead</td><td>Webhook</td><td>C</td><td>Receives POST with policy_type, estimated_value</td></tr>
+<tr><td>13</td><td>Evaluate Hot Lead</td><td>Code</td><td>C</td><td>Checks property &ge; $2M or auto &ge; $180K</td></tr>
+<tr><td>14</td><td>IF Hot Lead</td><td>IF</td><td>C</td><td>Routes to transfer path (true) or result path (false)</td></tr>
+<tr><td>15</td><td>Trigger WF-03</td><td>Execute Sub-Workflow</td><td>C</td><td>Triggers Hot Lead Transfer workflow with lead data</td></tr>
+<tr><td>16</td><td>Send Pre-Transfer Email</td><td>Email (SMTP)</td><td>C</td><td>Alerts Val + Davin with lead details before transfer</td></tr>
+<tr><td>17</td><td>Return Hot Lead Result</td><td>Respond to Webhook</td><td>C</td><td>Returns { hot_lead: bool, transfer_initiated: bool } to VAPI</td></tr>
+</table>
+
+<footer>
+Equity Insurance AI Receptionist &mdash; WF-02 Documentation &mdash; Generated 2026-02-14
+</footer>
+
+</body>
+</html>

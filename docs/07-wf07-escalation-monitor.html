@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WF-07 Escalation Monitor — Equity Insurance AI Receptionist</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.6; padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
+        h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; }
+        p { margin-bottom: 12px; font-size: 14px; }
+        .subtitle { font-size: 14px; color: #666; margin-bottom: 32px; }
+        .diagram { margin: 24px 0; text-align: center; }
+        svg text { font-family: 'Segoe UI', system-ui, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+        th { font-weight: 600; background: #f8f8f8; }
+        .step-list { list-style: none; padding: 0; margin: 16px 0; }
+        .step-list li { padding: 10px 16px; margin-bottom: 8px; border-left: 3px solid #333; background: #fafafa; font-size: 14px; }
+        .step-list li strong { display: inline-block; min-width: 120px; }
+        footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+
+    <h1>WF-07 Escalation Monitor</h1>
+    <p class="subtitle">Cron Schedule: */30 9-16 * * 1-5 (Pacific/Honolulu) &mdash; 5 Nodes &mdash; n8n ID: aTOUUPC13xwUH6PI</p>
+
+    <p>This workflow runs automatically every 30 minutes during business hours (9am&ndash;4:30pm HST, Monday through Friday). It checks for support tickets that have been waiting in &ldquo;pending&rdquo; status for more than 2 hours and escalates them to Davin Char (CEO/Owner) via email.</p>
+
+    <h2>Flow Diagram</h2>
+    <div class="diagram">
+        <svg width="1020" height="120" viewBox="0 0 1020 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- Node 1: Cron Trigger -->
+            <rect x="5" y="30" width="170" height="56" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="90" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Cron Trigger</text>
+            <text x="90" y="68" text-anchor="middle" font-size="10" fill="#666">*/30 9-16 * * 1-5</text>
+            <text x="90" y="80" text-anchor="middle" font-size="10" fill="#666">Pacific/Honolulu</text>
+
+            <!-- Arrow 1-2 -->
+            <line x1="175" y1="58" x2="205" y2="58" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 2: Read Pending Tickets -->
+            <rect x="205" y="30" width="170" height="56" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="290" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Read Pending Tickets</text>
+            <text x="290" y="68" text-anchor="middle" font-size="10" fill="#666">Google Sheets Tickets</text>
+            <text x="290" y="80" text-anchor="middle" font-size="10" fill="#666">filter: status=pending</text>
+
+            <!-- Arrow 2-3 -->
+            <line x1="375" y1="58" x2="405" y2="58" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 3: Filter Overdue -->
+            <rect x="405" y="30" width="170" height="56" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="490" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Filter Overdue</text>
+            <text x="490" y="68" text-anchor="middle" font-size="10" fill="#666">JS: created_at > 2hrs</text>
+            <text x="490" y="80" text-anchor="middle" font-size="10" fill="#666">status still pending</text>
+
+            <!-- Arrow 3-4 -->
+            <line x1="575" y1="58" x2="605" y2="58" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 4: Send Escalation to Davin -->
+            <rect x="605" y="30" width="185" height="56" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="697" y="48" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Send Escalation</text>
+            <text x="697" y="62" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">to Davin</text>
+            <text x="697" y="78" text-anchor="middle" font-size="10" fill="#666">ESCALATION: {name}</text>
+
+            <!-- Arrow 4-5 -->
+            <line x1="790" y1="58" x2="820" y2="58" stroke="#333" stroke-width="1.5" marker-end="url(#arrowhead)" />
+
+            <!-- Node 5: Update Ticket Status -->
+            <rect x="820" y="30" width="185" height="56" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="912" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Update Ticket Status</text>
+            <text x="912" y="68" text-anchor="middle" font-size="10" fill="#666">Google Sheets: status=</text>
+            <text x="912" y="80" text-anchor="middle" font-size="10" fill="#666">escalated, escalated_at=now</text>
+        </svg>
+    </div>
+
+    <h2>Step-by-Step Process</h2>
+    <ul class="step-list">
+        <li>
+            <strong>1. Cron Trigger</strong>
+            Schedule trigger fires every 30 minutes during business hours. Cron expression: <code>*/30 9-16 * * 1-5</code> in Pacific/Honolulu timezone. This means it runs at :00 and :30 of each hour from 9am to 4:30pm HST, Monday through Friday.
+        </li>
+        <li>
+            <strong>2. Read Pending Tickets</strong>
+            Reads all rows from Google Sheets Tickets sheet where <code>status="pending"</code>. Uses <code>GOOGLE_SHEET_TICKETS_ID</code> environment variable.
+        </li>
+        <li>
+            <strong>3. Filter Overdue</strong>
+            JavaScript code node that filters tickets: calculates time elapsed since <code>created_at</code>, keeps only tickets where elapsed &ge; 2 hours (7,200,000 milliseconds) AND status is still &ldquo;pending&rdquo;. If no overdue tickets found, returns empty array and workflow stops.
+        </li>
+        <li>
+            <strong>4. Send Escalation to Davin</strong>
+            For each overdue ticket, sends email to <code>davin@equityinsurance.services</code>. Subject: &ldquo;ESCALATION: {caller_name} waiting {N} hours for callback&rdquo;. Body includes: ticket_id, caller name, phone, policy type, request description, created_at timestamp, total hours waiting. Instructs Davin to follow up immediately or update ticket status.
+        </li>
+        <li>
+            <strong>5. Update Ticket Status</strong>
+            Updates each escalated ticket in Google Sheets: sets <code>status="escalated"</code>, <code>escalated="true"</code>, <code>escalated_at=now</code>.
+        </li>
+    </ul>
+
+    <h2>Schedule Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cron Expression</td>
+                <td><code>*/30 9-16 * * 1-5</code></td>
+            </tr>
+            <tr>
+                <td>Timezone</td>
+                <td>Pacific/Honolulu (HST, UTC-10, no DST)</td>
+            </tr>
+            <tr>
+                <td>Frequency</td>
+                <td>Every 30 minutes</td>
+            </tr>
+            <tr>
+                <td>Active Hours</td>
+                <td>9:00 AM to 4:30 PM HST</td>
+            </tr>
+            <tr>
+                <td>Active Days</td>
+                <td>Monday through Friday</td>
+            </tr>
+            <tr>
+                <td>Escalation Threshold</td>
+                <td>2 hours (120 minutes)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Ticket Lifecycle</h2>
+    <div class="diagram">
+        <svg width="820" height="100" viewBox="0 0 820 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrow2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- State 1: Created -->
+            <rect x="5" y="25" width="150" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="80" y="47" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">Created</text>
+            <text x="80" y="63" text-anchor="middle" font-size="10" fill="#666">via WF-04</text>
+
+            <!-- Arrow 1-2 -->
+            <line x1="155" y1="50" x2="195" y2="50" stroke="#333" stroke-width="1.5" marker-end="url(#arrow2)" />
+
+            <!-- State 2: Pending -->
+            <rect x="195" y="25" width="150" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="270" y="47" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">status: pending</text>
+            <text x="270" y="63" text-anchor="middle" font-size="10" fill="#666">awaiting callback</text>
+
+            <!-- Arrow 2-3 -->
+            <line x1="345" y1="50" x2="395" y2="50" stroke="#333" stroke-width="1.5" marker-end="url(#arrow2)" />
+            <text x="370" y="20" text-anchor="middle" font-size="10" fill="#666">2+ hours</text>
+
+            <!-- State 3: Escalated -->
+            <rect x="395" y="25" width="175" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="482" y="47" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">status: escalated</text>
+            <text x="482" y="63" text-anchor="middle" font-size="10" fill="#666">via WF-07</text>
+
+            <!-- Arrow 3-4 -->
+            <line x1="570" y1="50" x2="620" y2="50" stroke="#333" stroke-width="1.5" marker-end="url(#arrow2)" />
+
+            <!-- State 4: Completed -->
+            <rect x="620" y="25" width="175" height="50" rx="8" ry="8" fill="#f8f8f8" stroke="#333" stroke-width="1.5" />
+            <text x="707" y="47" text-anchor="middle" font-size="12" font-weight="600" fill="#1a1a1a">status: completed</text>
+            <text x="707" y="63" text-anchor="middle" font-size="10" fill="#666">manual by team</text>
+        </svg>
+    </div>
+
+    <h2>Node Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Node Name</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Configuration</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Cron Trigger</td>
+                <td>n8n-nodes-base.scheduleTrigger</td>
+                <td>Fires every 30 minutes during business hours, Mon&ndash;Fri</td>
+                <td>Cron: <code>*/30 9-16 * * 1-5</code>, TZ: Pacific/Honolulu</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Read Pending Tickets</td>
+                <td>n8n-nodes-base.googleSheets</td>
+                <td>Reads all ticket rows from Google Sheets where status is &ldquo;pending&rdquo;</td>
+                <td>Sheet ID: <code>GOOGLE_SHEET_TICKETS_ID</code>, Filter: status=pending</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Filter Overdue</td>
+                <td>n8n-nodes-base.code</td>
+                <td>JavaScript node that calculates elapsed time and filters tickets older than 2 hours</td>
+                <td>Threshold: 7,200,000 ms (2 hours), returns empty array if none overdue</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Send Escalation to Davin</td>
+                <td>n8n-nodes-base.emailSend</td>
+                <td>Sends escalation email for each overdue ticket to Davin Char</td>
+                <td>To: davin@equityinsurance.services, Subject: ESCALATION: {caller_name} waiting {N} hours</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Update Ticket Status</td>
+                <td>n8n-nodes-base.googleSheets</td>
+                <td>Updates escalated ticket rows in Google Sheets</td>
+                <td>Set: status=escalated, escalated=true, escalated_at=now</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        Equity Insurance AI Receptionist &mdash; WF-07 Documentation &mdash; Generated 2026-02-14
+    </footer>
+
+</body>
+</html>
