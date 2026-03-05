@@ -7,17 +7,18 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "*/30 9-17 * * 1-5"
+              "expression": "*/10 * * * *"
             }
           ]
         }
       },
       "id": "wf07-cron",
-      "name": "Cron Trigger",
+      "name": "Cron Trigger (Every 10 Min)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [250, 300]
+      "position": [250, 400]
     },
+
     {
       "parameters": {
         "operation": "read",
@@ -34,7 +35,7 @@
       "name": "Read Pending Tickets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [480, 300],
+      "position": [530, 200],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "Mx6UAeNueCHJeT8c",
@@ -44,13 +45,13 @@
     },
     {
       "parameters": {
-        "jsCode": "const tickets = items;\nconst now = new Date();\nconst thresholdMs = 2 * 60 * 60 * 1000; // 2 hours in milliseconds\n\nconst overdue = tickets.filter(t => {\n  const created = new Date(t.json.created_at);\n  return (now - created) >= thresholdMs && t.json.status === 'pending';\n});\n\nreturn overdue.length > 0 ? overdue : [];"
+        "jsCode": "const tickets = items;\nconst now = new Date();\nconst thresholdMs = 2 * 60 * 60 * 1000; // 2 hours\n\nconst overdue = tickets.filter(t => {\n  const created = new Date(t.json.created_at);\n  return (now - created) >= thresholdMs && t.json.status === 'pending';\n});\n\nreturn overdue.length > 0 ? overdue : [];"
       },
       "id": "wf07-filter-overdue",
-      "name": "Filter Overdue",
+      "name": "Filter Overdue Tickets",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [710, 300]
+      "position": [760, 200]
     },
     {
       "parameters": {
@@ -60,10 +61,10 @@
         "options": {}
       },
       "id": "wf07-escalation-email",
-      "name": "Send Escalation to Davin",
+      "name": "Send Ticket Escalation to Davin",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [940, 300],
+      "position": [990, 200],
       "credentials": {
         "gmailOAuth2": {
           "id": "Q1QMixyCKrZpc2Vl",
@@ -91,27 +92,320 @@
       "name": "Update Ticket Status",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [1170, 300],
+      "position": [1220, 200],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "Mx6UAeNueCHJeT8c",
           "name": "Google Sheets account"
         }
       }
+    },
+
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EscalationTracking", "mode": "name" },
+        "options": {}
+      },
+      "id": "wf07-read-escalations",
+      "name": "Read Escalation Tracking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [530, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Hot lead escalation acknowledgment loop:\n// - If Val hasn't ACK'd within 30 min → escalate to Davin\n// - If Davin hasn't ACK'd within 30 min after that → email both URGENT\nconst now = new Date();\nconst THIRTY_MIN = 30 * 60 * 1000;\n\nconst needsEscalation = [];\n\nfor (const item of items) {\n  const d = item.json;\n  \n  // Skip already acknowledged\n  if (d.acknowledged === 'true' || d.acknowledged === true) continue;\n  \n  const flaggedAt = new Date(d.flagged_at);\n  const elapsed = now - flaggedAt;\n  const escalatedToDavin = (d.escalated_to_davin === 'true' || d.escalated_to_davin === true);\n  \n  if (!escalatedToDavin && elapsed >= THIRTY_MIN) {\n    // Val hasn't ACK'd in 30 min → escalate to Davin\n    needsEscalation.push({\n      json: { ...d, action: 'escalate_to_davin', minutes_waiting: Math.round(elapsed / 60000) }\n    });\n  } else if (escalatedToDavin) {\n    const escalatedAt = new Date(d.escalated_to_davin_at || d.flagged_at);\n    const elapsedSinceEscalation = now - escalatedAt;\n    if (elapsedSinceEscalation >= THIRTY_MIN) {\n      // Davin hasn't ACK'd in 30 min → URGENT email to both\n      needsEscalation.push({\n        json: { ...d, action: 'urgent_both', minutes_waiting: Math.round(elapsed / 60000) }\n      });\n    }\n  }\n}\n\nif (needsEscalation.length === 0) {\n  return [{ json: { no_escalations_needed: true } }];\n}\n\nreturn needsEscalation;"
+      },
+      "id": "wf07-filter-unacked",
+      "name": "Filter Unacknowledged Hot Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-escalations",
+              "leftValue": "={{ $json.no_escalations_needed }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "notEquals", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf07-if-has-escalations",
+      "name": "IF Has Escalations",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [990, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "action-type",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "escalate_to_davin",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf07-if-davin-or-urgent",
+      "name": "IF Escalate to Davin",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1220, 600]
+    },
+    {
+      "parameters": {
+        "from": "+18087451420",
+        "to": "={{ $json.caller_phone_davin || '+18087800473' }}",
+        "message": "=🔥 ESCALATED HOT LEAD: {{ $json.caller_name }} — {{ $json.policy_type }} — ${{ $json.estimated_value }}. Val hasn't responded in {{ $json.minutes_waiting }} min. Reply ACK to confirm you'll handle it.",
+        "options": {}
+      },
+      "id": "wf07-sms-davin",
+      "name": "SMS Escalation to Davin",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1480, 500],
+      "credentials": {
+        "twilioApi": {
+          "id": "gpRSeZXXUQwZ3HH1",
+          "name": "Twilio SMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EscalationTracking", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "escalated_to_davin": "true",
+            "escalated_to_davin_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": ["call_id"]
+        },
+        "options": {}
+      },
+      "id": "wf07-mark-escalated-davin",
+      "name": "Mark Escalated to Davin",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1740, 500],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "val@equityinsurance.services, davin@equityinsurance.services",
+        "subject": "=🚨 URGENT: HOT LEAD UNACKNOWLEDGED — {{ $json.caller_name }} waiting {{ $json.minutes_waiting }} min",
+        "message": "=NEITHER Val NOR Davin has acknowledged this hot lead:\n\nCaller: {{ $json.caller_name }}\nPhone: {{ $json.caller_phone }}\nPolicy: {{ $json.policy_type }}\nValue: ${{ $json.estimated_value }}\nFlagged: {{ $json.minutes_waiting }} minutes ago\n\nSomeone MUST reply ACK via SMS to +18087451420 or call the prospect immediately.\n\n— AI Receptionist Escalation System",
+        "options": {}
+      },
+      "id": "wf07-urgent-email-both",
+      "name": "URGENT Email to Both",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1480, 750],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q1QMixyCKrZpc2Vl",
+          "name": "Gmail account"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-ack-escalation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wf07-ack-webhook",
+      "name": "ACK Webhook (Twilio Inbound)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle incoming SMS replies (ACK acknowledgments)\n// Twilio sends inbound SMS to this webhook\nconst body = $input.first().json.body || $input.first().json;\nconst from = (body.From || '').replace(/[\\s\\-\\(\\)]/g, '');\nconst messageBody = (body.Body || '').trim().toUpperCase();\n\nif (messageBody.includes('ACK')) {\n  // Determine who acknowledged\n  let acknowledgedBy = 'unknown';\n  if (from.includes('8087800473')) {\n    acknowledgedBy = 'val';\n  } else {\n    acknowledgedBy = 'davin';\n  }\n  \n  return [{ json: { acknowledged: true, acknowledged_by: acknowledgedBy, from: from } }];\n}\n\nreturn [{ json: { acknowledged: false, from: from, message: messageBody } }];"
+      },
+      "id": "wf07-parse-ack",
+      "name": "Parse ACK Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [530, 900]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "is-ack",
+              "leftValue": "={{ $json.acknowledged }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf07-if-ack",
+      "name": "IF Valid ACK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [760, 900]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EscalationTracking", "mode": "name" },
+        "filtersUI": {
+          "values": [
+            { "lookupColumn": "acknowledged", "lookupValue": "false" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wf07-find-open-escalation",
+      "name": "Find Open Escalation",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [990, 850],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EscalationTracking", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "acknowledged": "true",
+            "acknowledged_by": "={{ $('Parse ACK Reply').first().json.acknowledged_by }}",
+            "acknowledged_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": ["call_id"]
+        },
+        "options": {}
+      },
+      "id": "wf07-mark-acked",
+      "name": "Mark Acknowledged",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1220, 850],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=ACK received. {{ $('Parse ACK Reply').first().json.acknowledged_by }} is now responsible for this lead.",
+        "options": {}
+      },
+      "id": "wf07-ack-response",
+      "name": "Send ACK Confirmation",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1480, 850]
     }
   ],
   "connections": {
-    "Cron Trigger": {
-      "main": [[{ "node": "Read Pending Tickets", "type": "main", "index": 0 }]]
+    "Cron Trigger (Every 10 Min)": {
+      "main": [[
+        { "node": "Read Pending Tickets", "type": "main", "index": 0 },
+        { "node": "Read Escalation Tracking", "type": "main", "index": 0 }
+      ]]
     },
     "Read Pending Tickets": {
-      "main": [[{ "node": "Filter Overdue", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Filter Overdue Tickets", "type": "main", "index": 0 }]]
     },
-    "Filter Overdue": {
-      "main": [[{ "node": "Send Escalation to Davin", "type": "main", "index": 0 }]]
+    "Filter Overdue Tickets": {
+      "main": [[{ "node": "Send Ticket Escalation to Davin", "type": "main", "index": 0 }]]
     },
-    "Send Escalation to Davin": {
+    "Send Ticket Escalation to Davin": {
       "main": [[{ "node": "Update Ticket Status", "type": "main", "index": 0 }]]
+    },
+    "Read Escalation Tracking": {
+      "main": [[{ "node": "Filter Unacknowledged Hot Leads", "type": "main", "index": 0 }]]
+    },
+    "Filter Unacknowledged Hot Leads": {
+      "main": [[{ "node": "IF Has Escalations", "type": "main", "index": 0 }]]
+    },
+    "IF Has Escalations": {
+      "main": [
+        [{ "node": "IF Escalate to Davin", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "IF Escalate to Davin": {
+      "main": [
+        [{ "node": "SMS Escalation to Davin", "type": "main", "index": 0 }],
+        [{ "node": "URGENT Email to Both", "type": "main", "index": 0 }]
+      ]
+    },
+    "SMS Escalation to Davin": {
+      "main": [[{ "node": "Mark Escalated to Davin", "type": "main", "index": 0 }]]
+    },
+    "ACK Webhook (Twilio Inbound)": {
+      "main": [[{ "node": "Parse ACK Reply", "type": "main", "index": 0 }]]
+    },
+    "Parse ACK Reply": {
+      "main": [[{ "node": "IF Valid ACK", "type": "main", "index": 0 }]]
+    },
+    "IF Valid ACK": {
+      "main": [
+        [{ "node": "Find Open Escalation", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Find Open Escalation": {
+      "main": [[{ "node": "Mark Acknowledged", "type": "main", "index": 0 }]]
+    },
+    "Mark Acknowledged": {
+      "main": [[{ "node": "Send ACK Confirmation", "type": "main", "index": 0 }]]
     }
   },
   "settings": {

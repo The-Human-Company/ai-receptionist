@@ -1,5 +1,5 @@
 {
-  "name": "WF-08 SMS Form Sender (Email-to-SMS Gateway)",
+  "name": "WF-08 SMS Form Sender (Twilio)",
   "nodes": [
     {
       "parameters": {
@@ -64,10 +64,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// Build SMS messages for all major US carrier gateways\nconst callerName = items[0].json.caller_name || 'there';\nconst callerPhone = (items[0].json.caller_phone || '').replace(/[\\s\\-()\\+]/g, '');\nconst callId = items[0].json.call_id || '';\nconst insuranceType = items[0].json.insurance_type || 'auto';\nconst toolCallId = items[0].json.toolCallId || '';\n\n// Strip leading '1' if 11 digits (US country code)\nlet phone10 = callerPhone;\nif (phone10.length === 11 && phone10.startsWith('1')) {\n  phone10 = phone10.substring(1);\n}\n\nif (phone10.length !== 10) {\n  return [{\n    json: {\n      error: true,\n      message: 'Invalid phone number: ' + callerPhone + ' (need 10 digits)',\n      toolCallId\n    }\n  }];\n}\n\n// Google Form URL for Auto Insurance\nconst FORM_URL = 'https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform';\n\n// SMS body — must be short and clean (SMS = 160 char limit per segment)\nconst smsBody = `Aloha ${callerName}! Mahalo for calling Equity Insurance. Please complete your ${insuranceType} quote form here: ${FORM_URL} - Call us at (808) 593-7746 with any questions!`;\n\n// US Carrier Email-to-SMS gateways\n// We send to ALL major carriers — only the correct one will deliver\nconst carrierGateways = [\n  { carrier: 'ATT',       address: phone10 + '@txt.att.net' },\n  { carrier: 'TMobile',   address: phone10 + '@tmomail.net' },\n  { carrier: 'Verizon',   address: phone10 + '@vtext.com' },\n  { carrier: 'Sprint',    address: phone10 + '@messaging.sprintpcs.com' },\n  { carrier: 'USCellular', address: phone10 + '@email.uscc.net' },\n  { carrier: 'Cricket',   address: phone10 + '@sms.cricketwireless.net' },\n  { carrier: 'MetroPCS',  address: phone10 + '@mymetropcs.com' },\n  { carrier: 'Boost',     address: phone10 + '@sms.myboostmobile.com' },\n  { carrier: 'GoogleFi',  address: phone10 + '@msg.fi.google.com' }\n];\n\n// Combine all gateway addresses into comma-separated TO field\nconst allRecipients = carrierGateways.map(g => g.address).join(', ');\n\nreturn [{\n  json: {\n    to: allRecipients,\n    subject: '',\n    body: smsBody,\n    call_id: callId,\n    caller_name: callerName,\n    caller_phone: phone10,\n    insurance_type: insuranceType,\n    form_url: FORM_URL,\n    toolCallId,\n    error: false,\n    gateway_count: carrierGateways.length,\n    sent_at: new Date().toISOString()\n  }\n}];"
+        "jsCode": "// Build SMS message for Twilio delivery\nconst callerName = items[0].json.caller_name || 'there';\nconst callerPhone = (items[0].json.caller_phone || '').replace(/[\\s\\-()\\+]/g, '');\nconst callId = items[0].json.call_id || '';\nconst insuranceType = (items[0].json.insurance_type || 'auto').toLowerCase().trim();\nconst toolCallId = items[0].json.toolCallId || '';\n\n// Strip leading '1' if 11 digits (US country code)\nlet phone10 = callerPhone;\nif (phone10.length === 11 && phone10.startsWith('1')) {\n  phone10 = phone10.substring(1);\n}\n\nif (phone10.length !== 10) {\n  return [{\n    json: {\n      error: true,\n      message: 'Invalid phone number: ' + callerPhone + ' (need 10 digits)',\n      toolCallId\n    }\n  }];\n}\n\n// Format as E.164 for Twilio\nconst e164Phone = '+1' + phone10;\n\n// Google Form URLs by insurance type\nconst FORM_URLS = {\n  auto:             'https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform',\n  vehicle:          'https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform',\n  commercial_auto:  'https://docs.google.com/forms/d/1ye5IHu-M60EVFPcmfYjQ53zoHLFVSuOp9yoVJ-dYmFY/viewform',\n  business:         'https://docs.google.com/forms/d/1ye5IHu-M60EVFPcmfYjQ53zoHLFVSuOp9yoVJ-dYmFY/viewform',\n  homeowners:       'https://docs.google.com/forms/d/1ZkpKXF_ikkMHCrbYMa7Nw5M8x7STbU6nOXe18kSa0RI/viewform',\n  home:             'https://docs.google.com/forms/d/1ZkpKXF_ikkMHCrbYMa7Nw5M8x7STbU6nOXe18kSa0RI/viewform',\n  property:         'https://docs.google.com/forms/d/1ZkpKXF_ikkMHCrbYMa7Nw5M8x7STbU6nOXe18kSa0RI/viewform',\n  condo:            'https://docs.google.com/forms/d/1a4SelYXb12Ihofm2G4Z8Kmj1vilLvhcFI5QvzufBg_4/viewform',\n  renters:          'https://docs.google.com/forms/d/1UJZb20UgfubgeLkqe3BhmSwQVcDJke_5X8X17p2m_kc/viewform',\n  dwelling_fire:    'https://docs.google.com/forms/d/1xPRCet_wFHhITOHsa8aEcSc__n5gtXhf18SKuHUBoIM/viewform'\n};\n\n// Select the right form URL based on insurance type (default to auto)\nconst formUrl = FORM_URLS[insuranceType] || FORM_URLS['auto'];\n\n// Friendly label for the SMS\nconst typeLabels = {\n  auto: 'auto insurance', vehicle: 'auto insurance',\n  commercial_auto: 'commercial auto insurance', business: 'commercial auto insurance',\n  homeowners: 'home insurance', home: 'home insurance', property: 'home insurance',\n  condo: 'condo insurance', renters: 'renters insurance',\n  dwelling_fire: 'dwelling fire insurance'\n};\nconst typeLabel = typeLabels[insuranceType] || 'insurance';\n\n// SMS body\nconst smsBody = `Aloha ${callerName}! Mahalo for calling Equity Insurance. Please complete your ${typeLabel} quote form here: ${formUrl} - Call us at (808) 593-7746 with any questions!`;\n\nreturn [{\n  json: {\n    to: e164Phone,\n    body: smsBody,\n    call_id: callId,\n    caller_name: callerName,\n    caller_phone: phone10,\n    insurance_type: insuranceType,\n    form_url: formUrl,\n    toolCallId,\n    error: false,\n    sent_at: new Date().toISOString()\n  }\n}];"
       },
       "id": "wf08-build-sms",
-      "name": "Build SMS via Gateway",
+      "name": "Build SMS Message",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [710, 300]
@@ -104,22 +104,20 @@
     },
     {
       "parameters": {
-        "sendTo": "={{ $json.to }}",
-        "subject": "Equity Insurance Quote Form",
+        "from": "+18087451420",
+        "to": "={{ $json.to }}",
         "message": "={{ $json.body }}",
-        "options": {
-          "appendAttribution": false
-        }
+        "options": {}
       },
-      "id": "wf08-send-sms-gateway",
-      "name": "Send SMS via Email Gateway",
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.1,
+      "id": "wf08-send-sms-twilio",
+      "name": "Send SMS via Twilio",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
       "position": [1170, 250],
       "credentials": {
-        "gmailOAuth2": {
-          "id": "YsqH9VLQvq5yEhqJ",
-          "name": "Gmail account"
+        "twilioApi": {
+          "id": "gpRSeZXXUQwZ3HH1",
+          "name": "Twilio SMS"
         }
       }
     },
@@ -149,13 +147,38 @@
     },
     {
       "parameters": {
-        "jsCode": "// Log the SMS send for follow-up reminder tracking\n// Store in workflow static data so WF-08 reminder cron can check\nconst staticData = $getWorkflowStaticData('global');\nconst callId = $('Extract Params').item.json.call_id;\nconst phone = $('Extract Params').item.json.caller_phone;\nconst sentAt = new Date().toISOString();\n\nif (!staticData.pendingReminders) {\n  staticData.pendingReminders = {};\n}\n\n// Track this SMS for follow-up reminder (check after 24 hours)\nstaticData.pendingReminders[callId] = {\n  phone,\n  caller_name: $('Extract Params').item.json.caller_name,\n  insurance_type: $('Extract Params').item.json.insurance_type,\n  sent_at: sentAt,\n  reminder_sent: false\n};\n\nreturn items;"
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "FormTracking", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $('Extract Params').item.json.call_id }}",
+            "caller_name": "={{ $('Extract Params').item.json.caller_name }}",
+            "caller_phone": "={{ $json.to }}",
+            "insurance_type": "={{ $('Extract Params').item.json.insurance_type }}",
+            "form_url": "={{ $json.form_url }}",
+            "form_sent_at": "={{ $now.toISO() }}",
+            "reminder_sent": "false",
+            "form_completed": "false",
+            "reminder_sent_at": "",
+            "form_completed_at": ""
+          }
+        },
+        "options": { "cellFormat": "USER_ENTERED" }
       },
       "id": "wf08-log-for-reminder",
-      "name": "Log for Reminder",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1400, 100]
+      "name": "Log Form Tracking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1400, 100],
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
     }
   ],
   "connections": {
@@ -174,14 +197,14 @@
       "main": [
         [
           {
-            "node": "Build SMS via Gateway",
+            "node": "Build SMS Message",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Build SMS via Gateway": {
+    "Build SMS Message": {
       "main": [
         [
           {
@@ -196,7 +219,7 @@
       "main": [
         [
           {
-            "node": "Send SMS via Email Gateway",
+            "node": "Send SMS via Twilio",
             "type": "main",
             "index": 0
           }
@@ -210,7 +233,7 @@
         ]
       ]
     },
-    "Send SMS via Email Gateway": {
+    "Send SMS via Twilio": {
       "main": [
         [
           {

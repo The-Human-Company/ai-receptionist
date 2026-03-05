@@ -1,0 +1,236 @@
+{
+  "name": "WF-09 Form Reminder Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "wf09-cron-trigger",
+      "name": "Run Every Hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "FormTracking", "mode": "name" },
+        "options": {}
+      },
+      "id": "wf09-read-tracking",
+      "name": "Read Form Tracking Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [480, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Multi-tier reminder system:\n// Tier 1: 1 hour after form sent (gentle nudge)\n// Tier 2: 12 hours after form sent (half-day reminder)\n// Tier 3: 24 hours after form sent (full-day final reminder)\nconst now = new Date();\nconst ONE_HOUR = 1 * 60 * 60 * 1000;\nconst TWELVE_HOURS = 12 * 60 * 60 * 1000;\nconst TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;\n\nconst TIERS = [\n  { tier: 1, threshold: ONE_HOUR, label: '1-hour' },\n  { tier: 2, threshold: TWELVE_HOURS, label: '12-hour' },\n  { tier: 3, threshold: TWENTY_FOUR_HOURS, label: '24-hour' }\n];\n\nconst needsReminder = [];\n\nfor (const item of items) {\n  const d = item.json;\n  \n  // Skip if form completed\n  if (d.form_completed === 'true' || d.form_completed === true) continue;\n  \n  // Skip if no sent timestamp\n  if (!d.form_sent_at) continue;\n  \n  const sentAt = new Date(d.form_sent_at);\n  const elapsed = now - sentAt;\n  const currentReminderCount = parseInt(d.reminder_count || '0', 10);\n  \n  // Find the next tier this lead qualifies for\n  for (const tier of TIERS) {\n    if (elapsed >= tier.threshold && currentReminderCount < tier.tier) {\n      needsReminder.push({\n        json: {\n          ...d,\n          hours_since_sent: Math.round(elapsed / (60 * 60 * 1000)),\n          reminder_tier: tier.tier,\n          reminder_label: tier.label,\n          new_reminder_count: tier.tier\n        }\n      });\n      break; // Only send one reminder per check\n    }\n  }\n}\n\nif (needsReminder.length === 0) {\n  return [{ json: { no_reminders_needed: true } }];\n}\n\nreturn needsReminder;"
+      },
+      "id": "wf09-filter-needs-reminder",
+      "name": "Filter Needs Reminder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [710, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-reminders",
+              "leftValue": "={{ $json.no_reminders_needed }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf09-if-has-reminders",
+      "name": "IF Has Reminders",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build tier-specific reminder SMS\nconst d = items[0].json;\nconst callerName = d.caller_name || 'there';\nconst formUrl = d.form_url || '';\nconst insuranceType = d.insurance_type || 'insurance';\nconst tier = d.reminder_tier || 1;\n\nconst typeLabels = {\n  auto: 'auto insurance', vehicle: 'auto insurance',\n  commercial_auto: 'commercial auto insurance', business: 'commercial auto insurance',\n  homeowners: 'home insurance', home: 'home insurance', property: 'home insurance',\n  condo: 'condo insurance', renters: 'renters insurance',\n  dwelling_fire: 'dwelling fire insurance'\n};\nconst typeLabel = typeLabels[insuranceType] || 'insurance';\n\nlet smsBody;\nif (tier === 1) {\n  smsBody = `Hi ${callerName}! Just a friendly reminder to fill out your ${typeLabel} intake form so we can get your quote started: ${formUrl} - Questions? Call us at (808) 593-7746. Mahalo!`;\n} else if (tier === 2) {\n  smsBody = `Hi ${callerName}, we noticed your ${typeLabel} intake form hasn't been submitted yet. Complete it here to get your quote: ${formUrl} - We're here to help! Call (808) 593-7746.`;\n} else {\n  smsBody = `Hi ${callerName}, this is our final reminder about your ${typeLabel} intake form: ${formUrl} - We'd love to get your quote going! Feel free to call us at (808) 593-7746 if you need any help.`;\n}\n\nreturn [{\n  json: {\n    ...d,\n    to: d.caller_phone,\n    reminder_body: smsBody\n  }\n}];"
+      },
+      "id": "wf09-build-reminder-sms",
+      "name": "Build Reminder SMS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1170, 200]
+    },
+    {
+      "parameters": {
+        "from": "+18087451420",
+        "to": "={{ $json.to }}",
+        "message": "={{ $json.reminder_body }}",
+        "options": {}
+      },
+      "id": "wf09-send-reminder-twilio",
+      "name": "Send Reminder SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1400, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "gpRSeZXXUQwZ3HH1",
+          "name": "Twilio SMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "FormTracking", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "reminder_sent": "true",
+            "reminder_count": "={{ $json.new_reminder_count }}",
+            "reminder_tier": "={{ $json.reminder_label }}",
+            "reminder_sent_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": ["call_id"]
+        },
+        "options": {}
+      },
+      "id": "wf09-mark-reminded",
+      "name": "Mark Reminder Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1630, 200],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "val@equityinsurance.services",
+        "subject": "=Form Reminder Sent — {{ $json.caller_name }} ({{ $json.insurance_type }})",
+        "message": "=A gentle reminder SMS was sent to {{ $json.caller_name }} ({{ $json.caller_phone }}) to complete their {{ $json.insurance_type }} intake form.\n\nForm was originally sent {{ $json.hours_since_sent }} hours ago.\n\nIf they still haven't completed it, a personal follow-up call may be needed.",
+        "options": {}
+      },
+      "id": "wf09-notify-team",
+      "name": "Notify Team",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1860, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q1QMixyCKrZpc2Vl",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "wf09-error-handler",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "=1qF-nC9GRGntn4i-REurbqtzfVii2K4vHc6GCVZ2PgvE", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Errors", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $now }}",
+            "workflow_id": "WF-09",
+            "workflow_name": "Form Reminder Monitor",
+            "node_name": "={{ $json.execution?.lastNodeExecuted || 'unknown' }}",
+            "error_message": "={{ $json.execution?.error?.message || 'Unknown error' }}",
+            "call_id": "unknown",
+            "resolution_status": "open",
+            "resolved_at": "",
+            "notes": ""
+          }
+        },
+        "options": {}
+      },
+      "id": "wf09-log-error",
+      "name": "Log Error to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [530, 600],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Run Every Hour": {
+      "main": [[{ "node": "Read Form Tracking Sheet", "type": "main", "index": 0 }]]
+    },
+    "Read Form Tracking Sheet": {
+      "main": [[{ "node": "Filter Needs Reminder", "type": "main", "index": 0 }]]
+    },
+    "Filter Needs Reminder": {
+      "main": [[{ "node": "IF Has Reminders", "type": "main", "index": 0 }]]
+    },
+    "IF Has Reminders": {
+      "main": [
+        [{ "node": "Build Reminder SMS", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Build Reminder SMS": {
+      "main": [[{ "node": "Send Reminder SMS", "type": "main", "index": 0 }]]
+    },
+    "Send Reminder SMS": {
+      "main": [[{ "node": "Mark Reminder Sent", "type": "main", "index": 0 }]]
+    },
+    "Mark Reminder Sent": {
+      "main": [[{ "node": "Notify Team", "type": "main", "index": 0 }]]
+    },
+    "Error Trigger": {
+      "main": [[{ "node": "Log Error to Sheet", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "Pacific/Honolulu",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null
+}

@@ -16,25 +16,26 @@ Building a VAPI-powered AI receptionist for **Equity Insurance Inc.** (Davin Cha
 Talkroute -> VAPI.ai (voice + LLM) -> n8n (orchestrator) -> QQ Catalyst + Email + Levitate
 ```
 
-### n8n Workflows (8 Active)
+### n8n Workflows (9 Active)
 
 | WF | Name | File | Webhook |
 | ---- | ------ | ------ | --------- |
 | WF-01 | Inbound Call Router | `n8n-wf01-inbound-call-router.json` | `/vapi-call-started` |
 | WF-02 | New Customer P&C Intake | `n8n-wf02-new-customer-intake.json` | `/vapi-save-field`, `/vapi-check-disqualifier`, `/vapi-check-hotlead` |
-| WF-03 | Hot Lead Transfer | `n8n-wf03-hot-lead-transfer.json` | Sub-workflow |
+| WF-03 | Hot Lead Transfer + Flag | `n8n-wf03-hot-lead-transfer.json` | Sub-workflow (SMS flag to Val + transfer) |
 | WF-04 | Existing Customer | `n8n-wf04-existing-customer.json` | `/vapi-existing-customer` |
 | WF-05 | Claims Router | `n8n-wf05-claims-router.json` | `/vapi-claim` |
 | WF-06 | Post-Call Processor | `n8n-wf06-post-call-processor.json` | `/vapi-call-ended` |
-| WF-07 | Escalation Monitor | `n8n-wf07-escalation-monitor.json` | Cron schedule |
+| WF-07 | Escalation + ACK Monitor | `n8n-wf07-escalation-monitor.json` | Cron (every 10 min) + `/vapi-ack-escalation` |
 | WF-08 | SMS Form Sender | `n8n-wf08-sms-form-sender.json` | `/vapi-send-form` |
+| WF-09 | Form Reminder Monitor | `n8n-wf09-form-reminder-monitor.json` | Cron (every 1 hour, multi-tier) |
 
 Legacy (kept as backup):
 - **VAPI Call Handler** (`n8n-workflow-vapi-call-handler.json`) - Original monolithic workflow
 - **Notifications** (`n8n-workflow-notifications.json`) - Original notification workflow
 
 ### Call Flow (3 Branches)
-- **New Customer:** Classify -> Collect Data -> Check Disqualifiers -> Check Hot Lead -> Save -> Notify
+- **New Customer:** Classify -> Collect Data -> Check Disqualifiers -> Check Hot Lead -> Save -> Send Intake Form -> Confirm Receipt -> End Call
 - **Existing Customer:** Collect request + contact -> Notify Val -> 2hr escalation
 - **Claim:** Route to claims agent directly
 
@@ -53,31 +54,69 @@ Legacy (kept as backup):
 - **Domain:** equityinsurance.services
 
 ## Data Fields — Auto Insurance (Collection Order)
-1. Phone Number — via caller ID confirmation ("Is the best number to reach you the one you're calling from?"), press 1/yes to confirm. If not, collect and repeat back for confirmation.
-2. Full Name — with last name spelling, read back for confirmation
-3. Date of Birth — with confirmation
-4. VIN — they won't always have it (numbers captured better than letters); fall back to make/model/year if unavailable
+
+1. Phone Number — caller ID confirmation ("Is the best number to reach you the one you're calling from?"), press 1/yes. If not, collect and READ BACK full number for confirmation.
+2. Full Name — with last name spelling. READ back full name AND SPELL back last name letter by letter for confirmation.
+3. Date of Birth — READ back to confirm. Then say: "We'll text you an intake form right away to get everything confirmed."
+4. VIN — fall back to a) Make b) Model c) Year if unavailable. READ back to confirm.
 5. Profession — 4-year degree affects quotes
-6. Accidents or violations in last 5 years — good to have
-7. **SMS form sent** (must) — via Email-to-SMS gateway
+6. Traffic violations or accidents in last 5 years — for each, ask what happened and outcome
+7. Closing — brief recap, confirm → call `send_form_link` → AI says "I just sent you your intake form via text" → confirms prospect received SMS → invites them to fill out and submit → thanks and ends call
 
 ## Data Fields — Home Insurance (Collection Order)
-1. Phone Number — same caller ID confirmation flow
-2. Full Name — with spelling confirmation
-3. Date of Birth — with confirmation
-4. Profession
-5. Owner or Renter
-6. Property Address — key info, needs confirmation
-7. Claims or losses in last 5 years
+
+1. Phone Number — same caller ID confirmation flow as auto
+2. Full Name — same READ back + SPELL back as auto
+3. Date of Birth — READ back to confirm. Then say: "We'll text you an intake form right away to get everything confirmed."
+4. Profession — discount mention
+5. Owner or Renter — determines policy type and form routing (homeowners/condo/renters)
+6. Property Address — key info, MUST READ back full address and confirm (DTMF 1/2)
+7. Claims or losses in last 5 years — for each, ask what happened and outcome
 8. Property Type — Condo, Single Family Home, other
-9. **SMS form sent** (must) — via Email-to-SMS gateway
+9. Closing — same as auto: recap → send form → confirm receipt → invite to fill out → end call
+
+## Post-Call Form Monitoring (WF-09)
+
+- WF-08 logs every SMS sent to `FormTracking` Google Sheet tab (call_id, phone, name, type, form_url, timestamp)
+- WF-09 runs **every 1 hour** with multi-tier reminders:
+  - **Tier 1 (1 hour):** Gentle nudge — "Just a friendly reminder to fill out your intake form..."
+  - **Tier 2 (12 hours):** Half-day — "We noticed your intake form hasn't been submitted yet..."
+  - **Tier 3 (24 hours):** Final reminder — "This is our final reminder about your intake form..."
+- Tracks `reminder_count` (1/2/3) instead of boolean, so each tier fires once
+- Emails Val about each reminder sent
+- **Form Completion Detection:** Google Apps Script (`google-apps-script-form-completion.js`) installed on each Google Form:
+  - Detects form submission → marks `form_completed=true` in FormTracking sheet
+  - Sends confirmation SMS to prospect: "We received your intake form — mahalo!"
+  - Notifies Val via email that form was completed
+  - Sends webhook to n8n (`/vapi-form-completed`) to stop reminder loop
+
+## Hot Lead Escalation Acknowledgment Loop
+
+- When AI detects a hot lead during a call (Property >$2M, Auto >$180K):
+  1. **Immediate SMS to Val** with prospect details + "Reply ACK to confirm"
+  2. Logged to `EscalationTracking` Google Sheet tab
+  3. Call transferred to Val via VAPI
+- **WF-07 monitors every 10 minutes:**
+  - If Val doesn't ACK within 30 min → SMS escalation to Davin
+  - If Davin doesn't ACK within 30 min → URGENT email to both Val + Davin
+  - When someone replies "ACK" → marked as acknowledged, loop ends
+- **Twilio inbound webhook** (`/vapi-ack-escalation`) handles ACK SMS replies
 
 ## SMS Delivery Method
-- **Email-to-SMS Gateway** — sends email to carrier-specific addresses (e.g., `8085551234@txt.att.net`)
-- Broadcasts to all major US carriers: AT&T, T-Mobile, Verizon, Sprint, US Cellular, Cricket, MetroPCS, Boost, Google Fi
-- Only the correct carrier delivers; others silently fail
-- Form URL: `https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform`
-- Twilio/Zapier NOT used (cost/registration barriers)
+- **Twilio SMS** — sends SMS directly via Twilio API (n8n Twilio node)
+- Phone numbers formatted as E.164 (e.g., `+18085551234`)
+- Twilio credential in n8n: `twilioApi` (Account SID + Auth Token)
+- Twilio phone number set via n8n environment variable `TWILIO_PHONE_NUMBER`
+- Form URLs (routed by `insurance_type` in WF-08):
+
+| Insurance Type | Form Name | Form ID |
+|----------------|-----------|---------|
+| `auto` / `vehicle` | Vehicle Insurance Intake Form | `1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk` |
+| `commercial_auto` / `business` | Commercial Auto Insurance Intake Form | `1ye5IHu-M60EVFPcmfYjQ53zoHLFVSuOp9yoVJ-dYmFY` |
+| `homeowners` / `home` / `property` | Home Insurance Policy Intake Form | `1ZkpKXF_ikkMHCrbYMa7Nw5M8x7STbU6nOXe18kSa0RI` |
+| `condo` | Homeowners Condo Policy Quote Intake Form | `1a4SelYXb12Ihofm2G4Z8Kmj1vilLvhcFI5QvzufBg_4` |
+| `renters` | Homeowners/Renters Policy Quote Intake Form | `1UJZb20UgfubgeLkqe3BhmSwQVcDJke_5X8X17p2m_kc` |
+| `dwelling_fire` | Dwelling Fire Policy Quote Intake Form | `1xPRCet_wFHhITOHsa8aEcSc__n5gtXhf18SKuHUBoIM` |
 
 ## Project Files
 - `deliverables/` - Client briefing documents, transcripts, analysis PDFs
@@ -91,7 +130,9 @@ Legacy (kept as backup):
 - API keys stored in `.env` (never committed to git)
 - All workflows use `Pacific/Honolulu` timezone
 - Execution data saved for debugging during pilot phase
-- Gmail credential ID: `YsqH9VLQvq5yEhqJ` (name: "Gmail account") — used by WF-02 through WF-08
+- Gmail credential ID: `YsqH9VLQvq5yEhqJ` (name: "Gmail account") — used by WF-02 through WF-07
+- Twilio credential: `twilioApi` (Account SID + Auth Token) — used by WF-08, WF-09
+- Twilio from-number: `+18087451420` (hardcoded in WF-08 and WF-09 Twilio nodes)
 
 ### Live Workflow IDs (n8n.nomanuai.com)
 | n8n ID | Name | Active | Local File |
@@ -104,7 +145,8 @@ Legacy (kept as backup):
 | `gSAwJdQndD8qq8TW` | WF-05 Claims Router | Yes | `n8n-wf05-claims-router.json` |
 | `zBApWWRhk7QbEgyT` | WF-06 Post-Call Processor | Yes | `n8n-wf06-post-call-processor.json` |
 | `OY8BUOfSoFZ5BJfb` | WF-07 Escalation Monitor | Yes | `n8n-wf07-escalation-monitor.json` |
-| `llZY8q1babZHLMXZ` | WF-08 SMS Form Sender (Email-to-SMS Gateway) | Yes | `n8n-wf08-sms-form-sender.json` |
+| `llZY8q1babZHLMXZ` | WF-08 SMS Form Sender (Twilio) | Yes | `n8n-wf08-sms-form-sender.json` |
+| `biRgLz1LTLgX10s3` | WF-09 Form Reminder Monitor | Yes | `n8n-wf09-form-reminder-monitor.json` |
 
 **Note:** Self-hosted n8n wraps webhook POST body under `$json.body`, so expressions use `($json.body?.message || $json.message)` for cross-instance compatibility.
 

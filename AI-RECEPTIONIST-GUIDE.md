@@ -38,7 +38,7 @@ The AI Receptionist is an automated voice-based call handling system for Equity 
 | **CRM** | QQ Catalyst | Primary CRM (integration pending) |
 | **Data Storage** | Google Sheets | Lead records, tickets, analytics, transcripts |
 | **Notifications** | Gmail | Email alerts to team members |
-| **Form Delivery** | Gmail | Sends Google Form link to callers via email (WF-08) |
+| **Form Delivery** | Twilio SMS | Sends insurance-specific Google Form link to callers via SMS (WF-08) |
 
 ### Team Contacts
 
@@ -132,7 +132,7 @@ The AI determines the caller's intent through conversation:
 1. AI collects data fields one at a time (name, phone, email, address, DOB, occupation, policy type)
 2. Phone number confirmation via DTMF keypad or voice: "I got [number] -- press 1 if that's correct, or 2 if I need to fix it. You can also just say yes or no."
 3. Each field is saved to Google Sheets via `save_field` function call -> **WF-02 Sub-flow A**
-4. After collecting name, phone, email, and insurance type, AI triggers `send_form_link` -> **WF-08** sends Google Form link via email
+4. After collecting name, phone, and insurance type, AI triggers `send_form_link` -> **WF-08** sends the correct Google Form link via Twilio SMS based on insurance type
 5. After collecting key info, AI checks disqualification rules -> **WF-02 Sub-flow B**
 6. If not disqualified, AI checks hot lead thresholds -> **WF-02 Sub-flow C**
 7. If hot lead detected, triggers immediate transfer -> **WF-03**
@@ -157,11 +157,12 @@ After every call ends, regardless of the call type:
 5. Logs analytics data (duration, call type, qualification status, etc.)
 6. Saves full transcript for review
 
-### Step 5: Escalation Monitoring (WF-07)
-- Runs every 30 minutes during business hours (Mon-Fri 9am-5pm HST)
-- Checks for tickets pending 2+ hours without acknowledgment
-- Sends escalation email to Davin for overdue tickets
-- Updates ticket status to "escalated"
+### Step 5: Escalation + Acknowledgment Monitoring (WF-07)
+
+- Runs every 10 minutes
+- **Ticket escalation:** Checks for tickets pending 2+ hours → emails Davin
+- **Hot lead ACK loop:** Checks if Val ACK'd within 30 min → if not, SMS Davin → if still no ACK after 30 min, URGENT email both
+- Handles inbound SMS "ACK" replies via `/vapi-ack-escalation` webhook
 
 ---
 
@@ -281,19 +282,21 @@ Webhook -> Evaluate Hot Lead Thresholds -> IF Hot Lead?
 | **Trigger** | Sub-workflow (called from WF-02) |
 | **Nodes** | 14 |
 
-**What it does:** Executes the actual call transfer to a human agent for hot leads. Has a primary and secondary transfer number with fallback logic.
+**What it does:** Executes the actual call transfer to a human agent for hot leads. Simultaneously sends an SMS flag to Val and logs the escalation for the acknowledgment loop.
 
 **Flow:**
 ```
 Receive from WF-02
-    -> Transfer to Primary (Val: +1 808-780-0473)
-    -> IF Transfer Success?
-        YES -> Update Lead Sheet (transferred)
-        NO  -> Try Secondary (+1 808-593-7746)
-            -> IF Secondary Success?
-                YES -> Update Lead Sheet (transferred via secondary)
-                NO  -> Update Lead Sheet (failed)
-                    -> Send URGENT Email (callback within 1 hour)
+    -> (parallel) SMS Flag to Val ("🔥 HOT LEAD: ... Reply ACK")
+    -> (parallel) Log to EscalationTracking sheet
+    -> (parallel) Transfer to Primary (Val: +1 808-780-0473)
+        -> IF Transfer Success?
+            YES -> Update Lead Sheet (transferred)
+            NO  -> Try Secondary (+1 808-593-7746)
+                -> IF Secondary Success?
+                    YES -> Update Lead Sheet (transferred via secondary)
+                    NO  -> Update Lead Sheet (failed)
+                        -> Send URGENT Email (callback within 1 hour)
 ```
 
 **Transfer Numbers:**
@@ -441,30 +444,43 @@ The summary email automatically categorizes based on call outcome:
 
 ---
 
-### WF-07: Escalation Monitor
+### WF-07: Escalation + Acknowledgment Monitor
 
 | Property | Value |
 |----------|-------|
 | **n8n ID** | `aTOUUPC13xwUH6PI` |
-| **Trigger** | Cron: every 30 min, Mon-Fri 9am-5pm HST |
-| **Nodes** | 5 |
+| **Trigger** | Cron: every 10 min + Webhook: `/vapi-ack-escalation` |
+| **Nodes** | 16 |
 
-**What it does:** Monitors pending tickets and escalates to Davin if no response after 2 hours.
+**What it does:** Two responsibilities:
+1. **Ticket escalation** — Monitors pending tickets, escalates to Davin after 2 hours
+2. **Hot lead acknowledgment loop** — Tracks whether Val/Davin ACK'd hot lead flags
 
-**Flow:**
+**Flow (Ticket Escalation):**
 ```
-Cron (every 30 min) -> Read Pending Tickets -> Filter Overdue (2+ hours) -> Send Escalation Email -> Update Ticket (status: escalated)
+Cron (every 10 min) -> Read Pending Tickets -> Filter Overdue (2+ hours) -> Send Escalation Email -> Update Ticket (status: escalated)
+```
+
+**Flow (Hot Lead ACK Loop):**
+```
+Cron (every 10 min) -> Read EscalationTracking -> Filter Unacknowledged
+    -> IF 30+ min without Val ACK -> SMS escalation to Davin
+    -> IF 30+ min without Davin ACK -> URGENT email to both Val + Davin
+```
+
+**Flow (ACK Webhook — Twilio Inbound):**
+```
+Webhook /vapi-ack-escalation -> Parse SMS Reply -> IF contains "ACK"
+    -> Find open escalation -> Mark acknowledged -> Respond confirmation
 ```
 
 **Escalation Rules:**
-- Checks tickets with `status: pending`
-- Escalates if `(current_time - created_at) >= 2 hours`
-- Sends email to Davin with ticket details
-- Updates ticket status to `escalated`
+- Tickets: `status: pending` and `(current_time - created_at) >= 2 hours` → email Davin
+- Hot leads: Val has 30 min to reply "ACK" → if no ACK, escalate to Davin → if still no ACK after 30 min, URGENT email both
 
-**Email:** Subject: `ESCALATION: {name} waiting {X} hours for callback`
-
-**Google Sheet:** Tickets Sheet (`1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8`) -> Tab: `Tickets`
+**Google Sheets:**
+- Tickets Sheet (`1Obobj0x_BmjrnAnSO3DwLkGUd1GXtQvyIIGr4o1PpT8`) → Tab: `Tickets`
+- Leads Sheet (`14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0`) → Tab: `EscalationTracking`
 
 ---
 
@@ -477,18 +493,28 @@ Cron (every 30 min) -> Read Pending Tickets -> Filter Overdue (2+ hours) -> Send
 | **Nodes** | 3 |
 | **Trigger** | VAPI `send_form_link` tool call |
 
-**What it does:** Sends a Google Form link to the caller via email after the AI has collected their name, phone number, email, and insurance type. Business hours only.
+**What it does:** Sends the correct Google Form link to the caller via Twilio SMS based on their insurance type. The workflow routes to one of 6 insurance-specific forms.
 
 **Flow:**
 ```
-Webhook -> Build Email (caller_email + Google Form URL) -> Gmail Send Email -> Respond to VAPI
+Webhook -> Build SMS (phone E.164 + form URL by insurance_type) -> Twilio Send SMS -> Respond to VAPI
 ```
 
-**Google Form URL:** `https://docs.google.com/forms/d/1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk/viewform`
+**Google Form URLs (routed by `insurance_type`):**
 
-**Gmail Configuration:**
-- Uses Gmail OAuth2 credential (n8n ID: `Q1QMixyCKrZpc2Vl`)
-- Email body includes the Google Form link and a personalized message
+| Type | Form | Form ID |
+|------|------|---------|
+| `auto` / `vehicle` | Vehicle Insurance Intake Form | `1nXAAS4HKmuoofX9dqK5vF_llri1zEEThAyOJBI-midk` |
+| `commercial_auto` / `business` | Commercial Auto Insurance Intake Form | `1ye5IHu-M60EVFPcmfYjQ53zoHLFVSuOp9yoVJ-dYmFY` |
+| `homeowners` / `home` / `property` | Home Insurance Policy Intake Form | `1ZkpKXF_ikkMHCrbYMa7Nw5M8x7STbU6nOXe18kSa0RI` |
+| `condo` | Homeowners Condo Policy Quote Intake Form | `1a4SelYXb12Ihofm2G4Z8Kmj1vilLvhcFI5QvzufBg_4` |
+| `renters` | Homeowners/Renters Policy Quote Intake Form | `1UJZb20UgfubgeLkqe3BhmSwQVcDJke_5X8X17p2m_kc` |
+| `dwelling_fire` | Dwelling Fire Policy Quote Intake Form | `1xPRCet_wFHhITOHsa8aEcSc__n5gtXhf18SKuHUBoIM` |
+
+**Twilio Configuration:**
+- Uses Twilio API credential (n8n credential: `twilioApi`)
+- From number set via n8n environment variable `TWILIO_PHONE_NUMBER`
+- Phone numbers formatted as E.164 (e.g., `+18085551234`)
 
 ---
 
@@ -601,8 +627,10 @@ The AI must **ALWAYS**:
 - State non-affiliation with Equity Insurance in Tulsa, OK
 - Flag all AI-collected data with `VAPI_AI_COLLECTED`
 - Allow caller to press `#` at any time to reach a human
-- Double-check phone numbers (DTMF keypad or voice confirmation)
-- Ask callers to spell their names
+- **READ back AND SPELL back** names (e.g., "That's John Smith — J-O-H-N, S-M-I-T-H — correct?")
+- **READ back** phone numbers, addresses, and DOB for confirmation
+- Mention the **INTAKE FORM** during the call and confirm SMS receipt before ending
+- Use "**traffic violations**" (not just "violations") when asking about driving history
 
 ### Business Hours
 - **Monday through Friday:** 9:00 AM - 5:00 PM HST (Hawaii Standard Time)
@@ -610,14 +638,13 @@ The AI must **ALWAYS**:
 - Outside business hours: After Hours assistant is used (limited tools, voicemail-style)
 
 ### Data Collection Order
-1. Full Name (ask to spell)
-2. Phone Number (repeat back, confirm)
-3. Email Address (for sending quote)
-4. Mailing Address (double-check spelling)
-5. Date of Birth
-6. Occupation (qualifies for P&C credits)
-7. Insurance Type
-8. Referral Source
+1. Phone Number — caller ID confirmation, READ BACK to confirm
+2. Full Name — READ back full name AND SPELL back last name letter by letter
+3. Date of Birth — READ back to confirm, then mention intake form is coming via text
+4. Policy-specific questions (VIN, address, etc.) — READ back each to confirm
+5. Occupation (qualifies for P&C credits)
+6. Traffic violations or accidents in last 5 years — ask what happened and outcome for each
+7. Closing — recap, send intake form via SMS, confirm receipt, invite to fill out, end call
 
 ---
 
@@ -687,7 +714,7 @@ Phone number confirmation supports keypad digit entry. After the caller provides
 | `check_hot_lead` | WF-02 `/vapi-check-hotlead` | Check hot lead thresholds |
 | `route_existing_customer` | WF-04 `/vapi-existing-customer` | Handle existing customer requests |
 | `route_claim` | WF-05 `/vapi-claim` | Handle insurance claims |
-| `send_form_link` | WF-08 `/vapi-send-form` | Send Google Form link via email (business hours only) |
+| `send_form_link` | WF-08 `/vapi-send-form` | Send Google Form link via Twilio SMS (business hours only) |
 
 ---
 
@@ -729,7 +756,7 @@ curl -s -X GET "https://solarexpresss.app.n8n.cloud/api/v1/executions?status=err
 | Google Sheets OAuth2 | `6jzp7PcmqFZb8sKc` | All Google Sheets operations |
 | Gmail OAuth2 | `P7kfjEjjwQs7JnSI` | All email notifications |
 | VAPI API Key | `BxJCvZZfiIkt90Ua` | Call transfers (WF-03, WF-05) |
-| Gmail OAuth2 (Form Sender) | `Q1QMixyCKrZpc2Vl` | Email form link (WF-08) |
+| Twilio API | `twilioApi` | SMS form link (WF-08) |
 
 ---
 
@@ -794,13 +821,17 @@ WF-01 (routes call)
           |
           +---> WF-02 (new customer data collection)
           |       |
-          |       +---> WF-03 (hot lead transfer - sub-workflow)
+          |       +---> WF-03 (hot lead: SMS flag Val + transfer + log escalation)
           |       |
-          |       +---> WF-08 (email form link via Gmail)
+          |       +---> WF-08 (SMS intake form link via Twilio)
+          |               |
+          |               +---> WF-09 (multi-tier reminders: 1hr, 12hr, 24hr)
+          |               |
+          |               +---> Google Apps Script (form completion detection)
           |
           +---> WF-04 (existing customer ticket)
           |       |
-          |       +---> WF-07 (monitors tickets every 30 min)
+          |       +---> WF-07 (ticket escalation + hot lead ACK loop)
           |
           +---> WF-05 (claims routing)
 
@@ -820,3 +851,5 @@ After EVERY call:
 | `https://solarexpresss.app.n8n.cloud/webhook/vapi-claim` | WF-05 |
 | `https://solarexpresss.app.n8n.cloud/webhook/vapi-call-ended` | WF-06 |
 | `https://solarexpresss.app.n8n.cloud/webhook/vapi-send-form` | WF-08 |
+| `https://n8n.nomanuai.com/webhook/vapi-ack-escalation` | WF-07 (ACK) |
+| `https://n8n.nomanuai.com/webhook/vapi-form-completed` | Google Apps Script |

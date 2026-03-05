@@ -36,6 +36,60 @@
     },
     {
       "parameters": {
+        "from": "+18087451420",
+        "to": "+18087800473",
+        "message": "=🔥 HOT LEAD: {{ $json.caller_name }} — {{ $json.policy_type }} — ${{ $json.estimated_value }}. Call in progress. Reply ACK to confirm you'll handle it.",
+        "options": {}
+      },
+      "id": "wf03-sms-flag-val",
+      "name": "SMS Flag to Val",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [500, 150],
+      "credentials": {
+        "twilioApi": {
+          "id": "gpRSeZXXUQwZ3HH1",
+          "name": "Twilio SMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "=14FqFY4ZyGDeOluYPhbQKNWmZhyPOwi7FFHpnn5c7CG0", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "EscalationTracking", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.call_id }}",
+            "caller_name": "={{ $json.caller_name }}",
+            "caller_phone": "={{ $json.caller_phone }}",
+            "policy_type": "={{ $json.policy_type }}",
+            "estimated_value": "={{ $json.estimated_value }}",
+            "flagged_to": "val",
+            "flagged_at": "={{ $now.toISO() }}",
+            "acknowledged": "false",
+            "acknowledged_by": "",
+            "acknowledged_at": "",
+            "escalated_to_davin": "false"
+          }
+        },
+        "options": {}
+      },
+      "id": "wf03-log-escalation",
+      "name": "Log Escalation to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [500, 450],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Mx6UAeNueCHJeT8c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "=https://api.vapi.ai/call/{{ $json.call_id }}/transfer",
         "authentication": "genericCredentialType",
@@ -51,7 +105,7 @@
       "name": "Send VAPI Transfer Command",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [500, 300],
+      "position": [780, 300],
       "credentials": {
         "httpHeaderAuth": {
           "id": "BxJCvZZfiIkt90Ua",
@@ -290,7 +344,11 @@
       "main": [[{ "node": "Receive Input Data", "type": "main", "index": 0 }]]
     },
     "Receive Input Data": {
-      "main": [[{ "node": "Send VAPI Transfer Command", "type": "main", "index": 0 }]]
+      "main": [[
+        { "node": "SMS Flag to Val", "type": "main", "index": 0 },
+        { "node": "Log Escalation to Sheet", "type": "main", "index": 0 },
+        { "node": "Send VAPI Transfer Command", "type": "main", "index": 0 }
+      ]]
     },
     "Send VAPI Transfer Command": {
       "main": [[{ "node": "Wait for Transfer Result", "type": "main", "index": 0 }]]
